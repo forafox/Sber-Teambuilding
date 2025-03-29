@@ -1,9 +1,9 @@
 package com.jellyone.controller;
 
 import com.jellyone.domain.enums.EventStatus;
+import com.jellyone.domain.enums.PollType;
 import com.jellyone.util.AuthUtil;
-import com.jellyone.web.request.EventRequest;
-import com.jellyone.web.request.MessageRequest;
+import com.jellyone.web.request.*;
 import com.jellyone.web.response.ChatResponse;
 import com.jellyone.web.response.EventResponse;
 import com.jellyone.web.response.MessageResponse;
@@ -39,6 +39,8 @@ class MessageControllerTest {
     private static Long eventId;
     private static Long chatId;
     private static Long messageId;
+    private static Long pollId;
+    private static Long optionId;
 
     @Container
     private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
@@ -63,7 +65,7 @@ class MessageControllerTest {
     @Test
     @Order(1)
     void createMessageShouldReturnOk() {
-        MessageRequest messageRequest = new MessageRequest("Test Message", null, false);
+        MessageRequest messageRequest = new MessageRequest("Test Message", null, false, null);
 
         MessageResponse messageResponse = RestAssured.given()
                 .auth().oauth2(jwtToken)
@@ -114,7 +116,7 @@ class MessageControllerTest {
     @Test
     @Order(4)
     void updateMessageShouldReturnOk() {
-        MessageRequest messageRequest = new MessageRequest("Updated Message", null, false);
+        MessageUpdateRequest messageRequest = new MessageUpdateRequest(messageId, "Updated Message", null, false, null);
 
         RestAssured.given()
                 .auth().oauth2(jwtToken)
@@ -143,7 +145,7 @@ class MessageControllerTest {
     @Test
     @Order(6)
     void createReplyMessageShouldReturnOk() {
-        MessageRequest messageRequest = new MessageRequest("Test Message", null, false);
+        MessageRequest messageRequest = new MessageRequest("Test Message", null, false, null);
 
         MessageResponse messageResponse = RestAssured.given()
                 .auth().oauth2(jwtToken)
@@ -158,7 +160,7 @@ class MessageControllerTest {
                 .as(MessageResponse.class);
 
         messageId = messageResponse.id();
-        MessageRequest messageRequestWithReply = new MessageRequest("Test Message", messageId, false);
+        MessageRequest messageRequestWithReply = new MessageRequest("Test Message", messageId, false, null);
 
         MessageResponse messageResponseWithReply = RestAssured.given()
                 .auth().oauth2(jwtToken)
@@ -173,6 +175,60 @@ class MessageControllerTest {
                 .as(MessageResponse.class);
 
         Assertions.assertEquals(messageId, messageResponseWithReply.replyToMessageId());
+    }
+
+    @Test
+    @Order(7)
+    void createMessageWithPollShouldReturnOk() {
+        MessageRequest messageRequest = new MessageRequest("Test Message",
+                null,
+                false,
+                new PollRequest("Test Poll", PollType.SINGLE, List.of(new OptionRequest("Option 1"))));
+
+        MessageResponse messageResponse = RestAssured.given()
+                .auth().oauth2(jwtToken)
+                .contentType(ContentType.JSON)
+                .body(messageRequest)
+                .when()
+                .post("/api/chats/" + chatId + "/messages")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .contentType(ContentType.JSON)
+                .extract()
+                .as(MessageResponse.class);
+
+        messageId = messageResponse.id();
+        pollId = messageResponse.poll().id();
+        optionId = messageResponse.poll().options().get(0).id();
+    }
+
+    @Test
+    @Order(8)
+    void updateMessageAndPollShouldReturnOk() {
+        MessageUpdateRequest messageRequest = new MessageUpdateRequest(
+                messageId,
+                "Updated Message",
+                null,
+                false,
+                new PollUpdateRequest(pollId, "Updated Poll", PollType.SINGLE, List.of(new OptionUpdateRequest(optionId, "Updated Option", List.of(1L)))));
+
+        MessageResponse response = RestAssured.given()
+                .auth().oauth2(jwtToken)
+                .contentType(ContentType.JSON)
+                .body(messageRequest)
+                .when()
+                .put("/api/chats/" + chatId + "/messages/" + messageId)
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .contentType(ContentType.JSON)
+                .extract()
+                .as(MessageResponse.class);
+
+        Assertions.assertEquals(messageId, response.id());
+        Assertions.assertEquals("Updated Message", response.content());
+        Assertions.assertEquals("Updated Poll", response.poll().title());
+        Assertions.assertEquals("Updated Option", response.poll().options().get(0).title());
+        Assertions.assertEquals(1L, response.poll().options().get(0).voters().get(0).id());
     }
 
     private void createEvent() {
