@@ -29,14 +29,20 @@ public class TelegramUserService {
             Long telegramChatId
     ) {
         log.info("Try to update telegram user with telegram username: {}", telegramUsername);
-        TelegramUser telegramUser = getByUsername(telegramUsername);
+        TelegramUser telegramUser = getByTelegramUsername(telegramUsername);
         telegramUser.setTelegramChatId(telegramChatId);
         return telegramUserRepository.save(telegramUser);
     }
 
-    public TelegramUser getByUsername(String telegramUsername) {
-        log.info("Try to get telegram user with username: {}", telegramUsername);
+    public TelegramUser getByTelegramUsername(String telegramUsername) {
+        log.info("Try to get telegram user with telegram username: {}", telegramUsername);
         return telegramUserRepository.findByTelegramUsername(telegramUsername)
+                .orElseThrow(() -> new ResourceNotFoundException("Telegram user not found"));
+    }
+
+    public TelegramUser getByUsername(String username) {
+        log.info("Try to get telegram user with username: {}", username);
+        return telegramUserRepository.findTelegramUserByUser_Username(username)
                 .orElseThrow(() -> new ResourceNotFoundException("Telegram user not found"));
     }
 
