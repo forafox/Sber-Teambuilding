@@ -1,6 +1,7 @@
 package com.jellyone.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.jellyone.domain.enums.EventStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,6 +26,9 @@ public class Event {
     private String description;
 
     private String location;
+
+    @Enumerated(EnumType.STRING)
+    private EventStatus status;
 
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)

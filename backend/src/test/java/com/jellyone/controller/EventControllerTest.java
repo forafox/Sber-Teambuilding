@@ -1,5 +1,6 @@
 package com.jellyone.controller;
 
+import com.jellyone.domain.enums.EventStatus;
 import com.jellyone.util.AuthUtil;
 import com.jellyone.web.request.EventRequest;
 import com.jellyone.web.response.EventResponse;
@@ -70,6 +71,7 @@ class EventControllerTest {
                 "Test Event",
                 "Test Event Description",
                 "Test Event Location",
+                EventStatus.IN_PROGRESS,
                 LocalDateTime.now(),
                 Collections.singletonList(1L) // Assuming user with ID 1 exists
         );
@@ -122,6 +124,7 @@ class EventControllerTest {
                 "Updated Event",
                 "Updated Event Description",
                 "Updated Event Location",
+                EventStatus.IN_PROGRESS,
                 LocalDateTime.now(),
                 Collections.singletonList(1L) // Assuming user with ID 1 exists
         );
