@@ -1,5 +1,6 @@
 package com.jellyone.controller;
 
+import com.jellyone.domain.enums.EventStatus;
 import com.jellyone.util.AuthUtil;
 import com.jellyone.web.request.EventRequest;
 import com.jellyone.web.response.ChatResponse;
@@ -99,6 +100,7 @@ class ChatControllerTest {
                 "Test Event",
                 "Test Event Description",
                 "Test Event Location",
+                EventStatus.IN_PROGRESS,
                 LocalDateTime.now(),
                 Collections.singletonList(1L)
         );
