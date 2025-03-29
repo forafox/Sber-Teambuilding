@@ -93,23 +93,41 @@ export interface TaskResponse {
 }
 
 export interface MessageRequest {
-  content?: string;
+  content: string;
+  /** @format int64 */
+  replyToMessageId?: number;
 }
 
 export interface MessageResponse {
   /** @format int64 */
-  id?: number;
-  content?: string;
+  id: number;
+  content: string;
   /** User Response */
-  author?: UserResponse;
+  author: UserResponse;
   /** @format date-time */
-  timestamp?: string;
+  timestamp: string;
+  /** @format int64 */
+  replyToMessageId?: number;
+}
+
+export interface TelegramUserRequest {
+  telegramUsername: string;
+}
+
+export interface TelegramUserResponse {
+  /** @format int64 */
+  id: number;
+  telegramUsername: string;
+  /** @format int64 */
+  telegramChatId?: number;
+  /** User Response */
+  user: UserResponse;
 }
 
 export interface ChatResponse {
   /** @format int64 */
-  id?: number;
-  messages?: MessageResponse[];
+  id: number;
+  messages: MessageResponse[];
 }
 
 export interface SignUpRequest {
@@ -158,10 +176,10 @@ export interface SignInRequest {
 }
 
 export interface Page {
-  /** @format int64 */
-  totalElements?: number;
   /** @format int32 */
   totalPages?: number;
+  /** @format int64 */
+  totalElements?: number;
   /** @format int32 */
   size?: number;
   content?: object[];
@@ -170,8 +188,8 @@ export interface Page {
   sort?: SortObject[];
   /** @format int32 */
   numberOfElements?: number;
-  pageable?: PageableObject;
   last?: boolean;
+  pageable?: PageableObject;
   first?: boolean;
   empty?: boolean;
 }
@@ -197,10 +215,10 @@ export interface SortObject {
 }
 
 export interface PageUserResponse {
-  /** @format int64 */
-  totalElements?: number;
   /** @format int32 */
   totalPages?: number;
+  /** @format int64 */
+  totalElements?: number;
   /** @format int32 */
   size?: number;
   content?: UserResponse[];
@@ -209,17 +227,17 @@ export interface PageUserResponse {
   sort?: SortObject[];
   /** @format int32 */
   numberOfElements?: number;
-  pageable?: PageableObject;
   last?: boolean;
+  pageable?: PageableObject;
   first?: boolean;
   empty?: boolean;
 }
 
 export interface PageEventResponse {
-  /** @format int64 */
-  totalElements?: number;
   /** @format int32 */
   totalPages?: number;
+  /** @format int64 */
+  totalElements?: number;
   /** @format int32 */
   size?: number;
   content?: EventResponse[];
@@ -228,17 +246,17 @@ export interface PageEventResponse {
   sort?: SortObject[];
   /** @format int32 */
   numberOfElements?: number;
-  pageable?: PageableObject;
   last?: boolean;
+  pageable?: PageableObject;
   first?: boolean;
   empty?: boolean;
 }
 
 export interface PageTaskResponse {
-  /** @format int64 */
-  totalElements?: number;
   /** @format int32 */
   totalPages?: number;
+  /** @format int64 */
+  totalElements?: number;
   /** @format int32 */
   size?: number;
   content?: TaskResponse[];
@@ -247,8 +265,8 @@ export interface PageTaskResponse {
   sort?: SortObject[];
   /** @format int32 */
   numberOfElements?: number;
-  pageable?: PageableObject;
   last?: boolean;
+  pageable?: PageableObject;
   first?: boolean;
   empty?: boolean;
 }
@@ -598,6 +616,28 @@ export class Api<
         path: `/api/chats/${chatId}/messages/${id}`,
         method: "DELETE",
         secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Telegram User Management
+     * @name CreateTelegramUser
+     * @summary Create telegram user
+     * @request POST:/api/telegram-users
+     * @secure
+     */
+    createTelegramUser: (
+      data: TelegramUserRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<TelegramUserResponse, any>({
+        path: `/api/telegram-users`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
         ...params,
       }),
 

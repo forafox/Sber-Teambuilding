@@ -1,9 +1,10 @@
 import { useGetChat } from "@/api/get-chat";
 import { MessageInput } from "./MessageInput";
 import { MessageList } from "./MessageList";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useWebSocket from "react-use-websocket";
 import { useQueryClient } from "@tanstack/react-query";
+import { Message } from "@/api/get-chat";
 
 type ChatContainerProps = {
   chatId: number;
@@ -13,6 +14,7 @@ export function ChatContainer({ chatId }: ChatContainerProps) {
   const { data: chat, isLoading, error } = useGetChat(chatId);
   const { lastMessage } = useWebSocket("/ws");
   const queryClient = useQueryClient();
+  const [replyToMessage, setReplyToMessage] = useState<Message | null>(null);
 
   // Обновление чата при получении сообщения через WebSocket
   useEffect(() => {
@@ -22,6 +24,14 @@ export function ChatContainer({ chatId }: ChatContainerProps) {
       });
     }
   }, [lastMessage, chatId, queryClient, chat?.id]);
+
+  const handleReply = (message: Message) => {
+    setReplyToMessage(message);
+  };
+
+  const handleCancelReply = () => {
+    setReplyToMessage(null);
+  };
 
   if (isLoading) {
     return (
@@ -52,9 +62,13 @@ export function ChatContainer({ chatId }: ChatContainerProps) {
   return (
     <div className="flex h-full flex-col">
       <div className="flex-1 overflow-hidden">
-        <MessageList chatId={chatId} />
+        <MessageList chatId={chatId} onReply={handleReply} />
       </div>
-      <MessageInput chatId={chatId} />
+      <MessageInput
+        chatId={chatId}
+        replyToMessage={replyToMessage}
+        onCancelReply={handleCancelReply}
+      />
     </div>
   );
 }
