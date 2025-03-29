@@ -72,11 +72,11 @@ public class EventService {
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
     }
 
-    public Page<Event> getAll(String username, int page, int size) {
+    public Page<Event> getAll(String username, EventStatus status, int page, int size) {
         log.info("Try to get all events");
         Pageable pageable = PageRequest.of(page, size);
         User user = userService.getByUsername(username);
-        return eventRepository.findAllWithSomeParameters(user.getId(), pageable);
+        return eventRepository.findAllWithSomeParameters(user.getId(), status, pageable);
     }
 
     public void delete(Long id) {

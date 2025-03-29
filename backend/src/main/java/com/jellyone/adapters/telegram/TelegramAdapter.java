@@ -41,7 +41,7 @@ public class TelegramAdapter implements TelegramApi {
     @Transactional
     public List<EventDTO> getMyEvents(long chatId) {
         String username = telegramUserService.getByTelegramChatId(chatId).getUser().getUsername();
-        Page<Event> page = eventService.getAll(username, 0, 30);
+        Page<Event> page = eventService.getAll(username, null, 0, 30);
         return page.get()
                 .map(eventMap::eventToEventDTO)
                 .toList();
@@ -51,7 +51,7 @@ public class TelegramAdapter implements TelegramApi {
     @Transactional
     public List<TaskDTO> getMyTasks(long chatId) {
         String username = telegramUserService.getByTelegramChatId(chatId).getUser().getUsername();
-        List<Long> idList = eventService.getAll(username, 0, 30).get().map(Event::getId).toList();
+        List<Long> idList = eventService.getAll(username, null, 0, 30).get().map(Event::getId).toList();
         List<TaskDTO> taskDTOList = new ArrayList<>();
         for (Long id : idList) {
             Page<Task> page = taskService.getAll(0, 30, id);

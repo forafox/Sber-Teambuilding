@@ -1,5 +1,6 @@
 package com.jellyone.controller;
 
+import com.jellyone.domain.enums.EventStatus;
 import com.jellyone.service.EventService;
 import com.jellyone.web.request.EventRequest;
 
@@ -31,10 +32,11 @@ public class EventController {
     public Page<EventResponse> getEvents(
             @RequestParam(required = false, defaultValue = "0") int page,
             @RequestParam(required = false, defaultValue = "10") int size,
+            @RequestParam(required = false) EventStatus status,
             Principal principal
     ) {
         log.info("Received request to get all events");
-        return eventService.getAll(principal.getName(), page, size).map(EventResponse::toResponse);
+        return eventService.getAll(principal.getName(), status, page, size).map(EventResponse::toResponse);
     }
 
     @Operation(summary = "Create event")
