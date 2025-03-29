@@ -33,8 +33,8 @@ public class TelegramNotificationService {
         }
     }
 
-    public void sendEventEndNotification(String username, String title) {
-        long chatId = getChatIdByUsername(username);
+    public void sendEventEndNotification(Long participantId, String title) {
+        long chatId = getChatIdByUsername(userService.getById(participantId).getUsername());
         if (chatId != -1) {
             log.info("Sending notification about event ended via telegram to chat with id: {}", chatId);
             notificator.notificatorEventEnd(chatId, title);

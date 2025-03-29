@@ -4,16 +4,15 @@ import com.jellyone.adapters.telegram.TelegramNotificationService;
 import com.jellyone.domain.enums.EventStatus;
 import com.jellyone.service.EventService;
 import com.jellyone.web.request.EventRequest;
-
 import com.jellyone.web.response.EventResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
@@ -79,6 +78,7 @@ public class EventController {
             @Valid @RequestBody EventRequest event
     ) {
         log.info("Received request to update an event with id: {}", id);
+        handleEventStatusChange(event.status(), event.participants(), event.title());
         return EventResponse.toResponse(eventService.update(
                 id,
                 event.title(),
@@ -88,6 +88,13 @@ public class EventController {
                 event.date(),
                 event.participants()
         ));
+    }
+
+    private void handleEventStatusChange(EventStatus status, List<Long> participants, String title) {
+        if (status == EventStatus.DONE) {
+            participants.forEach(participantId ->
+                    telegramNotificationService.sendEventEndNotification(participantId, title));
+        }
     }
 
     @PatchMapping("/events/{id}/participants")
