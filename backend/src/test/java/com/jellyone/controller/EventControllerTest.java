@@ -68,6 +68,8 @@ class EventControllerTest {
     void createEventShouldReturnCreated() {
         EventRequest eventRequest = new EventRequest(
                 "Test Event",
+                "Test Event Description",
+                "Test Event Location",
                 LocalDateTime.now(),
                 Collections.singletonList(1L) // Assuming user with ID 1 exists
         );
@@ -118,6 +120,8 @@ class EventControllerTest {
         int eventId = 1; // Assuming event with ID 1 exists
         EventRequest eventRequest = new EventRequest(
                 "Updated Event",
+                "Updated Event Description",
+                "Updated Event Location",
                 LocalDateTime.now(),
                 Collections.singletonList(1L) // Assuming user with ID 1 exists
         );

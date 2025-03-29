@@ -177,6 +177,8 @@ class MessageControllerTest {
     private void createEvent() {
         EventRequest eventRequest = new EventRequest(
                 "Test Event",
+                "Test Event Description",
+                "Test Event Location",
                 LocalDateTime.now(),
                 Collections.singletonList(1L) // Assuming user with ID 1 exists
         );
