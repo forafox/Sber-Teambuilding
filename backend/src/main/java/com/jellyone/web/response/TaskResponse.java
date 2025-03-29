@@ -14,7 +14,8 @@ public record TaskResponse(
         @Schema(description = "Author") UserResponse author,
         @NotNull @Schema(description = "Task Status") TaskStatus status,
         @Schema(description = "Task Description") String description,
-        @Schema(description = "Expenses") Double expenses
+        @Schema(description = "Expenses") Double expenses,
+        @Schema(description = "Url") String url
 ) {
     public static TaskResponse toResponse(Task task) {
         return new TaskResponse(
@@ -24,7 +25,8 @@ public record TaskResponse(
                 Optional.ofNullable(task.getAuthor()).map(UserResponse::toResponse).orElse(null),
                 task.getStatus(),
                 task.getDescription(),
-                task.getExpenses()
+                task.getExpenses(),
+                task.getUrl()
         );
     }
 }

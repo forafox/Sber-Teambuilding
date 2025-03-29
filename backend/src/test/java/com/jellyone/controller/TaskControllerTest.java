@@ -79,7 +79,8 @@ class TaskControllerTest {
                 "testuser",
                 TaskStatus.IN_PROGRESS,
                 "This is a test task",
-                100.0
+                100.0,
+                "https://buy.me"
         );
 
         RestAssured.given()
@@ -131,7 +132,8 @@ class TaskControllerTest {
                 "testuser",
                 TaskStatus.DONE,
                 "This is an updated task",
-                200.0
+                200.0,
+                "https://buy.me"
         );
 
         RestAssured.given()

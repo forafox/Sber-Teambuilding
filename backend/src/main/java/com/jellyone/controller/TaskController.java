@@ -50,7 +50,8 @@ public class TaskController {
                 task.status(),
                 task.description(),
                 task.expenses(),
-                eventId
+                eventId,
+                task.url()
         ));
     }
 
@@ -87,7 +88,8 @@ public class TaskController {
                 principal.getName(),
                 task.status(),
                 task.description(),
-                task.expenses()
+                task.expenses(),
+                task.url()
         ));
     }
 }
