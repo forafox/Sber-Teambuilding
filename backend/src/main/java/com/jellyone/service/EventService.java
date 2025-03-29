@@ -135,7 +135,7 @@ public class EventService {
             this.createByName(savedEvent, authorUser, taskName);
         });
 
-        return event;
+        return savedEvent;
     }
 
     private Task createByName(Event event, User author, String title) {
