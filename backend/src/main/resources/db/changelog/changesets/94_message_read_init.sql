@@ -9,6 +9,3 @@ CREATE TABLE message_reads
     FOREIGN KEY (message_id) REFERENCES messages (id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
-
-ALTER TABLE events
-    ADD COLUMN status TEXT;
