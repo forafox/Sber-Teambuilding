@@ -32,5 +32,5 @@ logging:
     org.springframework.security: ERROR
 gigachat:
   api:
-    clientId: ${GIGACHAT_CLIENT_ID}
-    authorizationKey: ${GIGACHAT_AUTHORIZATION_KEY}
+    clientId: ${GIGACHAT_CLIENT_ID:client-id}
+    authorizationKey: ${GIGACHAT_AUTHORIZATION_KEY:key}
