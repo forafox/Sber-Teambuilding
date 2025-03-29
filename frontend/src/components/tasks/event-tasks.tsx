@@ -79,18 +79,73 @@ function MakeDoneTask({ task, eventId }: { task: Task; eventId: number }) {
   );
 }
 
+function TaskCard({ task, eventId }: { task: Task; eventId: number }) {
+  const [isOpenUpdateDialog, setIsOpenUpdateDialog] = useState(false);
+
+  const handleEditTask = () => {
+    setIsOpenUpdateDialog(true);
+  };
+
+  return (
+    <Card key={task.id}>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle>
+            <Link
+              to="/events/$eventId/tasks/$taskId"
+              params={{
+                eventId: String(eventId),
+                taskId: String(task.id),
+              }}
+            >
+              {task.title}
+            </Link>
+          </CardTitle>
+        </div>
+        {task.expenses && <CardDescription>{task.expenses}₽</CardDescription>}
+      </CardHeader>
+      <CardContent>
+        <CardDescription>Автор: {task.author.name}</CardDescription>
+      </CardContent>
+      <CardContent>{task.description}</CardContent>
+      {task.assignee && (
+        <div className="bg-primary/15 mx-6 flex flex-col rounded-xl p-4">
+          <CardContent>{task.assignee?.name}</CardContent>
+          <CardContent>
+            <CardDescription>{task.assignee?.email}</CardDescription>
+          </CardContent>
+        </div>
+      )}
+      <CardFooter className="flex gap-3">
+        <Button
+          onClick={handleEditTask}
+          className="hover:bg-primary/10 border-inherit bg-transparent text-inherit"
+        >
+          <PencilIcon className="mr-2 h-4 w-4" />
+          Изменить
+        </Button>
+        <DeleteTaskButton taskId={task.id} eventId={eventId}></DeleteTaskButton>
+        {task.status == "IN_PROGRESS" && (
+          <MakeDoneTask task={task} eventId={eventId} />
+        )}
+      </CardFooter>
+      <UpdateTaskDialog
+        open={isOpenUpdateDialog}
+        onOpenChange={setIsOpenUpdateDialog}
+        defaultTask={task}
+        eventId={eventId}
+      />
+    </Card>
+  );
+}
+
 export function EventTasks({ eventId }: Props) {
   const { data: tasksData } = useSuspenseQuery(getTasksQueryOptions(eventId));
   const [tasksStatus, setTasksStatus] = useState<"IN_PROGRESS" | "DONE">(
     "IN_PROGRESS",
   );
-  const [isOpenUpdateDialog, setIsOpenUpdateDialog] = useState(false);
   const [isOpenCreateDialog, setIsOpenCreateDialog] = useState(false);
   const activeEvents = tasksData || [];
-
-  const handleEditTask = () => {
-    setIsOpenUpdateDialog(true);
-  };
 
   const handleCreateTask = () => {
     setIsOpenCreateDialog(true);
@@ -121,60 +176,7 @@ export function EventTasks({ eventId }: Props) {
         {activeEvents.map((task) => (
           <>
             {task.status == tasksStatus && (
-              <Card key={task.id}>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle>
-                      <Link
-                        to="/events/$eventId/tasks/$taskId"
-                        params={{
-                          eventId: String(eventId),
-                          taskId: String(task.id),
-                        }}
-                      >
-                        {task.title}
-                      </Link>
-                    </CardTitle>
-                  </div>
-                  {task.expenses && (
-                    <CardDescription>{task.expenses}₽</CardDescription>
-                  )}
-                </CardHeader>
-                <CardContent>
-                  <CardDescription>Автор: {task.author.name}</CardDescription>
-                </CardContent>
-                <CardContent>{task.description}</CardContent>
-                {task.assignee && (
-                  <div className="bg-primary/15 mx-6 flex flex-col rounded-xl p-4">
-                    <CardContent>{task.assignee?.name}</CardContent>
-                    <CardContent>
-                      <CardDescription>{task.assignee?.email}</CardDescription>
-                    </CardContent>
-                  </div>
-                )}
-                <CardFooter className="flex gap-3">
-                  <Button
-                    onClick={handleEditTask}
-                    className="hover:bg-primary/10 border-inherit bg-transparent text-inherit"
-                  >
-                    <PencilIcon className="mr-2 h-4 w-4" />
-                    Изменить
-                  </Button>
-                  <DeleteTaskButton
-                    taskId={task.id}
-                    eventId={eventId}
-                  ></DeleteTaskButton>
-                  {task.status == "IN_PROGRESS" && (
-                    <MakeDoneTask task={task} eventId={eventId} />
-                  )}
-                </CardFooter>
-                <UpdateTaskDialog
-                  open={isOpenUpdateDialog}
-                  onOpenChange={setIsOpenUpdateDialog}
-                  defaultTask={task}
-                  eventId={eventId}
-                />
-              </Card>
+              <TaskCard key={task.id} task={task} eventId={eventId} />
             )}
           </>
         ))}
