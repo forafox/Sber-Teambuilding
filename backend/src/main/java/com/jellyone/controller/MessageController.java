@@ -1,5 +1,6 @@
 package com.jellyone.controller;
 
+import com.jellyone.service.MessageReadService;
 import com.jellyone.service.MessageService;
 import com.jellyone.service.PollService;
 import com.jellyone.web.request.MessageRequest;
@@ -24,7 +25,7 @@ import java.util.List;
 public class MessageController {
 
     private final MessageService messageService;
-    private final PollService pollService;
+    private final MessageReadService messageReadService;
 
     @Operation(summary = "Create message")
     @PostMapping
@@ -84,5 +85,16 @@ public class MessageController {
     ) {
         log.info("Received request to update a message with id: {}", id);
         return MessageResponse.toResponse(messageService.update(id, message.content(), message.replyToMessageId(), message.pinned(), message.poll()));
+    }
+
+    @Operation(summary = "Set message read")
+    @PostMapping("/{id}/read")
+    public void setMessageRead(
+            @PathVariable Long chatId,
+            @PathVariable Long id,
+            Principal principal
+    ) {
+        log.info("Received request to set a message read with id: {}", id);
+        messageService.setMessageRead(chatId, id, principal.getName());
     }
 }
