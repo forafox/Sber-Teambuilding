@@ -9,12 +9,7 @@ import {
 import { getTasksQueryOptions, Task } from "@/api/get-tasks";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Button } from "../ui/button";
-import {
-  PlusIcon,
-  CheckIcon,
-  PencilIcon,
-  Trash2Icon,
-} from "lucide-react";
+import { PlusIcon, CheckIcon, PencilIcon, Trash2Icon } from "lucide-react";
 import { useDeleteTaskMutation } from "@/api/delete-task";
 import { useState } from "react";
 import { UpdateTaskDialog } from "./update-task-dialog";
