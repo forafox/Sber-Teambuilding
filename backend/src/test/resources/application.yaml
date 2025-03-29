@@ -1,0 +1,15 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  datasource:
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 6000000000
+      max-lifetime: 1200000000
+      connection-timeout: 300000000
+security:
+  jwt:
+    secret: amF0amhvaWFob2loanE5ZXdqMDlyZWlvZmppZmppc2RqZnBkamZwb3Nkam9zZGZramZvcGpzCBA
+    access: 9900000
+    refresh: 2599000000

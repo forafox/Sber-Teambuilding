@@ -1,0 +1,6 @@
+- `git clone git@github.com:FEgor04/sber-teambuilding.git`
+- дописать в `.env` `MAIL_USER` и `MAIL_PASSWORD`
+- изменить `\backend\telegram-bot\src\main\resources\config.properties`
+- изменить в `\backend\src\main\resources\application.yaml` `spring.profiles.active: telegram, mail`
+- `cd sber-teambuilding/backend`
+- `./gradlew bootRun`

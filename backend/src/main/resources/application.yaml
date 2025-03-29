@@ -1,0 +1,32 @@
+spring:
+  config:
+    import: optional:file:../.env[.properties]
+  datasource:
+    name: ${POSTGRES_DB:postgres}
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost:5432}/${POSTGRES_DB:postgres}
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+    driverClassName: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: ${DDL_MODE:none}
+  profiles:
+    active:
+  jackson:
+    time-zone: UTC
+  mail:
+    host: smtp.yandex.ru
+    protocol: smtp
+    username: ${MAIL_USER}
+    password: ${MAIL_PASSWORD}
+    port: 587
+security:
+  jwt:
+    secret: ${JWT_SECRET}
+    access: ${JWT_ACCESS_TTL}
+    refresh: ${JWT_REFRESH_TTL}
+logging:
+  level:
+    com.jellyone: INFO
+    org.springframework: INFO
+    org.springframework.security: ERROR

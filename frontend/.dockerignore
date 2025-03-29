@@ -1,0 +1,11 @@
+Makefile
+docker
+!docker/nginx.conf
+
+README.md
+.env*
+dist
+node_modules
+vitest.config.ts
+
+coverage

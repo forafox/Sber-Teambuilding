@@ -1,0 +1,12 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+### Expenses Page
+
+- Expenses page route is described at [expenses.tsx](mdc:src/routes/_authenticated/events/$eventId/expenses.tsx) route.
+- Expenses page implicitly reuses layout from [route.tsx](mdc:src/routes/_authenticated/events/$eventId/route.tsx).
+- Expesnes page is implemented in [index.tsx](mdc:src/pages/expenses/index.tsx)
+- Expenses page shows what tasks caused expenses.
+- Expenses page shows optimal transactions so that each participant would bay the same. This algorithm is implemented in [logic.ts](mdc:src/pages/expenses/logic.ts) file. Tests for this algorithm are in [split.test.ts](mdc:src/pages/expenses/split.test.ts) file.

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Смета мероприятия</title>
+
+<!--    что нужно положить в контекст-->
+<!--        eventNumber - номер мероп-->
+<!--        curDate - дата заказа отчета-->
+<!--        totalAmount - общ сумма-->
+<!--        amountSpent - юзер потратил-->
+<!--        amountOwedToYou - скоко должны юзеру-->
+<!--        amountYouOwe - скоко должен юзер-->
+<!--        isEventClosed - закрыт ли ивент (булиан)-->
+<!--        eventEndDate - дата закрытия ивента-->
+
+</head>
+<body style="font-family: Tahoma, sans-serif; margin: 0; padding: 0;">
+<center>
+    <table width="600" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto; background-color: #ffffff;">
+        <tr>
+            <td align="center" style="padding: 30px 20px 0 20px;">
+                <!--                <h1 style="font-size: 36px; color: #333; margin: 0 0 20px; display: flex; justify-content: center;align-items: center;">-->
+                <h1 style="font-size: 36px; color: #333; margin: 0 0 20px;">
+                    <!--                    <img src="../logo.svg" width="75" height="75" alt="Иллюстрация мероприятия">-->
+                    Сбер Тимбилдинг
+                </h1>
+
+                <h2 style="font-size: 32px; color: #333; margin: 20px 0;">Смета мероприятия</h2>
+
+                <div style="font-size: 18px; margin-bottom: 5px;">
+                    Номер мероприятия <span style="color: #5555ff; font-weight: bold;" th:text="${eventNumber}">#65000500</span>
+                </div>
+
+                <div style="color: #555; margin-bottom: 30px;" th:text="${#dates.format(curDate, 'MMMM d, yyyy')}">
+                    Апрель 17, 2021
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid #ddd; width: 100%;">
+            </td>
+        </tr>
+
+        <!-- Элементы сметы с простыми разделителями -->
+        <tr>
+            <td style="padding: 0 30px;">
+                <table width="100%" cellspacing="0" cellpadding="0" border="0">
+                    <tr th:each="item, itemStat : ${tasks}">
+                        <td>
+                            <table width="100%" cellspacing="0" cellpadding="0" border="0">
+                                <tr>
+                                    <td align="left" valign="top" style="padding: 15px 0;">
+                                        <div style="font-weight: bold; font-size: 16px;" th:text="${item.title}">title
+                                        </div>
+                                        <div style="color: #555; font-size: 14px; margin-top: 5px;"
+                                             th:text="${item.description}">description
+                                        </div>
+                                    </td>
+                                    <td align="right" valign="middle" width="100"
+                                        style="padding: 15px 0; font-weight: bold;"
+                                        th:text="${'$' + #numbers.formatDecimal(item.price, 0, 2)}">$20.00
+                                    </td>
+                                </tr>
+                            </table>
+                            <!-- Простая разделительная линия после каждого элемента, кроме последнего -->
+                            <hr th:if="${!itemStat.last}"
+                                style="border: 0; border-top: 1px solid #eee; width: 100%; margin: 0;">
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="padding: 0 30px;">
+                <hr style="border: 0; border-top: 1px solid #ddd; width: 100%; margin: 20px 0;">
+            </td>
+        </tr>
+
+        <!-- Итоги -->
+        <tr>
+            <td style="padding: 0 30px 30px;">
+                <table width="100%" cellspacing="0" cellpadding="0" border="0">
+                    <tr>
+                        <td align="right" style="padding: 8px 0;">Сумма:</td>
+                        <td align="right" width="100" style="padding: 8px 0; font-weight: bold;"
+                            th:text="${'$' + #numbers.formatDecimal(totalAmount, 0, 2)}">$40.00
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right" style="padding: 8px 0;">Вы потратили:</td>
+                        <td align="right" width="100" style="padding: 8px 0; font-weight: bold;"
+                            th:text="${'$' + #numbers.formatDecimal(amountSpent, 0, 2)}">$0.00
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right" style="padding: 8px 0;">Вам должны:</td>
+                        <td align="right" width="100" style="padding: 8px 0; font-weight: bold;"
+                            th:text="${'$' + #numbers.formatDecimal(amountOwedToYou, 0, 2)}">$10.00
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right" style="padding: 8px 0;">Вы должны:</td>
+                        <td align="right" width="100" style="padding: 8px 0; font-weight: bold;"
+                            th:text="${'$' + #numbers.formatDecimal(amountYouOwe, 0, 2)}">$50.00
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+
+        <!--        <tr>-->
+        <!--            <td style="padding: 0 30px;">-->
+        <!--                <hr style="border: 0; border-top: 1px solid #ddd; width: 100%; margin: 20px 0;">-->
+        <!--            </td>-->
+        <!--        </tr>-->
+
+        <tr th:if="${isEventClosed}">
+            <td style="padding: 0 30px 30px;">
+                <table width="100%" cellspacing="0" cellpadding="0" border="0">
+                    <tr>
+                        <td align="left" width="100" style="padding: 8px 0; font-weight: bold;">
+                            Мероприятие закончилось!
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left" width="100" style="padding: 8px 0; font-weight: bold;">
+                            Дата окончания
+                            <div style="color: #555; margin-bottom: 30px;" th:text="${#dates.format(eventEndDate, 'MMMM d, yyyy')}">
+                                Февраль 17, 1970
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="padding: 20px; text-align: center; color: #555; border-top: 1px solid #eee;">
+                Более подробная информация находится в таблице во вложениях
+            </td>
+        </tr>
+    </table>
+</center>
+</body>
+</html>

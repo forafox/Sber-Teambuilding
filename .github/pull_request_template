@@ -1,0 +1,4 @@
+- [ ] Я обновил версии затронутых компонентов в `Makefile` согласно [SemVer](https://semver.org/)
+- [ ] Я описал Pull Request по [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
+- [ ] Я буду мержить только после завершения CI
+- [ ] Я опишу итоговый коммит по [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) и удалю этот текст из описания коммита

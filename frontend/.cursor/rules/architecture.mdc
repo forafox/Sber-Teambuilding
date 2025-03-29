@@ -1,0 +1,11 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+### Project Architecture
+- We use TanStack Router with file-based routing. Routes are described using Tanstack Router in `src/routes` folder. Always provide your routes with loaders to provide optimal UI.
+- We use React Query. Put your queries and mutation in `src/api` folder.
+- We use auto-generated API methods based on swagger. Generated method are in @api.gen.ts file.
+- For each page, create a corresponding component in `src/pages` directory
+- If a component may be helpful in another page, put it in `src/components/{entity}` folder, where `{entity}` is a business entity, i.e. a user, task or an event.

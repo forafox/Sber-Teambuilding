@@ -1,0 +1,23 @@
+---
+networks:
+  traefik-ingress:
+    external: true
+  internal:
+
+services:
+  frontend:
+    networks:
+      - traefik-ingress
+      - internal
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.sberFrontend.entrypoints=webSecure
+      - traefik.http.routers.sberFrontend.rule=PathPrefix(`/`)&&Host(`sber.efedorov.spb.su`)
+      - traefik.http.routers.sberFrontend.tls=true
+      - traefik.http.routers.sberFrontned.tls.certresolver=letsEncrypt
+      - traefik.http.services.sberFrontend.loadbalancer.server.port=80
+  backend:
+    networks:
+      - traefik-ingress
+      - internal
+  # FYI: traefik is provided by another docker container on VM

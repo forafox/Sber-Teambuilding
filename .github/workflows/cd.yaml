@@ -1,0 +1,54 @@
+name: cd
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build-backend:
+    runs-on: ubuntu-latest
+
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log in to registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Build docker image
+        run: make build-backend
+      - name: Push docker image
+        run: make push-backend
+
+  build-frontend:
+    runs-on: ubuntu-latest
+
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log in to registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Build docker image
+        run: make build-frontend
+      - name: Push docker image
+        run: make push-frontend
+        
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build-backend, build-frontend]
+    concurrency: sber.efedorov.spb.su
+    steps:
+      - name: Pull & re-deploy
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 85.208.86.167
+          username: efedorov
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd Projects/sber-teambuilding
+            git pull
+            make prod-up
