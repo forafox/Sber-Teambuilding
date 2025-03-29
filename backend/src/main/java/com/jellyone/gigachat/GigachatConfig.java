@@ -36,6 +36,7 @@ public class GigachatConfig {
                 .verifySslCerts(false)
                 .logRequests(true)
                 .logResponses(true)
+                .connectTimeout(120)
                 .authClient(AuthClient.builder()
                         .withOAuth(AuthClientBuilder.OAuthBuilder.builder()
                                 .scope(Scope.GIGACHAT_API_PERS)
