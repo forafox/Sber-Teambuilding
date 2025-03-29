@@ -73,7 +73,7 @@ export function calculateBalances(
       transactions.push({
         from: debtor.username,
         to: creditor.username,
-        amount: amount
+        amount: amount,
       });
     }
 

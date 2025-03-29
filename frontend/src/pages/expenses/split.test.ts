@@ -166,4 +166,24 @@ describe("calculateBalances", () => {
 
     expect(result).toEqual([]);
   });
+
+  it("#37 bad computations", () => {
+    const participants = [
+      createUser("efedorov"),
+      createUser("akarabanov"),
+      createUser("misha"),
+    ];
+
+    const tasks = [
+      createTask("efedorov", 2500),
+      createTask("efedorov", 2500),
+      createTask("akarabanov", 2500),
+    ];
+
+    const result = calculateBalances(tasks, participants);
+
+    console.log(result);
+
+    assertEqualShare(tasks, participants, result);
+  });
 });
