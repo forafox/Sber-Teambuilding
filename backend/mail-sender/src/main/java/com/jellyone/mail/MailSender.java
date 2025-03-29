@@ -11,7 +11,7 @@ import org.thymeleaf.context.Context;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -23,31 +23,29 @@ public class MailSender {
     private final String excelFileName = "report.xls";
 
     public Context createContext(
-            long eventNumber,
-            Date curDate,
-            int totalAmount,
-            int amountYouSpent,
-            int amountOwedToYou,
-            int amountYouOwe,
+            String eventUrl,
+            String eventTitle,
+            LocalDateTime curDate,
+            double totalAmount,
+            double amountUserSpent,
+            double amountOwedToUser,
             boolean isEventClosed,
-            Date eventEndDate,
+            LocalDateTime eventEndDate,
             List<TaskDTO> tasks
     ) {
         Context context = new Context();
-        context.setVariable("eventNumber", eventNumber);
+        context.setVariable("eventUrl", eventUrl);
+        context.setVariable("eventTitle", eventTitle);
         context.setVariable("curDate", curDate);
         context.setVariable("totalAmount", totalAmount);
-        context.setVariable("amountSpent", amountYouSpent);
-        context.setVariable("amountOwedToYou", amountOwedToYou);
-        context.setVariable("amountYouOwe", amountYouOwe);
+        context.setVariable("amountSpent", amountUserSpent);
+        context.setVariable("amountOwedToUser", amountOwedToUser);
         context.setVariable("isEventClosed", isEventClosed);
         context.setVariable("eventEndDate", eventEndDate);
         context.setVariable("tasks", tasks);
         return context;
     }
 
-    // этот метод потом подправим, мне не нрав, что здесь так много аргументов (как я понимаю их число
-    // должно увеличиться)
     public File createExcel(List<TaskDTO> allTasks, List<TaskDTO> myTasks, List<TaskDTO> otherTasks) {
         byte[] excelBytes = excelGenerator.generateExcel(allTasks, myTasks, otherTasks);
         if (excelBytes.length != 0) {
