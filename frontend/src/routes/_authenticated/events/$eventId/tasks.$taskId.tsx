@@ -1,6 +1,5 @@
 import { getTaskByIdQueryOptions } from "@/api/get-task";
 import { TaskPage } from "@/components/tasks/task-page";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute(
@@ -10,7 +9,7 @@ export const Route = createFileRoute(
   loader: async ({ params, context }) => {
     const eventId = Number(params.eventId);
     const taskId = Number(params.taskId);
-    const { data: task } = await context.queryClient.fetchQuery(
+    const task = await context.queryClient.fetchQuery(
       getTaskByIdQueryOptions(eventId, taskId),
     );
     return { task };
