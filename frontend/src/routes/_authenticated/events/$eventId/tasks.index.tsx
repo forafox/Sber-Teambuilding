@@ -16,7 +16,7 @@ import { UpdateEventDialog } from "@/components/events/update-event-dialog";
 import { EventTasks } from "@/components/tasks/event-tasks";
 import { UserHoverCard } from "@/components/user/user-hover-card";
 
-export const Route = createFileRoute("/_authenticated/events/$eventId/tasks")({
+export const Route = createFileRoute("/_authenticated/events/$eventId/tasks/")({
   component: RouteComponent,
 });
 

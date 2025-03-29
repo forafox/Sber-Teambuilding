@@ -9,9 +9,19 @@ export const taskSchema = z.object({
     .min(3, { message: "Название должно содержать минимум 3 символа" }),
   assignee: userSchema.nullish(),
   author: userSchema,
-  description: z.string().optional(),
-  expenses: z.coerce.number().optional(),
+  description: z
+    .string()
+    .nullish()
+    .transform((it) => it ?? undefined),
+  expenses: z.coerce
+    .number()
+    .nullish()
+    .transform((it) => it ?? undefined),
   status: z.enum(["IN_PROGRESS", "DONE"]),
+  url: z
+    .string()
+    .nullish()
+    .transform((it) => it ?? undefined),
 });
 
 export type Task = z.infer<typeof taskSchema>;

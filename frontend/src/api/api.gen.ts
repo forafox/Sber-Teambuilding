@@ -66,6 +66,7 @@ export interface TaskRequest {
   description?: string;
   /** @format double */
   expenses?: number;
+  url?: string;
 }
 
 /** Task Response */
@@ -90,26 +91,42 @@ export interface TaskResponse {
    * @format double
    */
   expenses?: number;
+  /** Url */
+  url?: string;
 }
 
 export interface MessageRequest {
-  content?: string;
+  content: string;
 }
 
 export interface MessageResponse {
   /** @format int64 */
-  id?: number;
-  content?: string;
+  id: number;
+  content: string;
   /** User Response */
-  author?: UserResponse;
+  author: UserResponse;
   /** @format date-time */
-  timestamp?: string;
+  timestamp: string;
+}
+
+export interface TelegramUserRequest {
+  telegramUsername: string;
+}
+
+export interface TelegramUserResponse {
+  /** @format int64 */
+  id: number;
+  telegramUsername: string;
+  /** @format int64 */
+  telegramChatId?: number;
+  /** User Response */
+  user: UserResponse;
 }
 
 export interface ChatResponse {
   /** @format int64 */
-  id?: number;
-  messages?: MessageResponse[];
+  id: number;
+  messages: MessageResponse[];
 }
 
 export interface SignUpRequest {
@@ -117,6 +134,21 @@ export interface SignUpRequest {
   password: string;
   name: string;
   email: string;
+}
+
+/** JWT Response */
+export interface JwtResponse {
+  /**
+   * User ID
+   * @format int64
+   */
+  id: number;
+  /** Username */
+  username: string;
+  /** Access token */
+  accessToken: string;
+  /** Refresh token */
+  refreshToken: string;
 }
 
 /** Error message model */
@@ -137,21 +169,6 @@ export interface ErrorMessage {
   message: string;
 }
 
-/** JWT Response */
-export interface JwtResponse {
-  /**
-   * User ID
-   * @format int64
-   */
-  id: number;
-  /** Username */
-  username: string;
-  /** Access token */
-  accessToken: string;
-  /** Refresh token */
-  refreshToken: string;
-}
-
 export interface SignInRequest {
   username: string;
   password: string;
@@ -162,6 +179,8 @@ export interface Page {
   totalElements?: number;
   /** @format int32 */
   totalPages?: number;
+  first?: boolean;
+  last?: boolean;
   /** @format int32 */
   size?: number;
   content?: object[];
@@ -171,8 +190,6 @@ export interface Page {
   /** @format int32 */
   numberOfElements?: number;
   pageable?: PageableObject;
-  last?: boolean;
-  first?: boolean;
   empty?: boolean;
 }
 
@@ -180,11 +197,11 @@ export interface PageableObject {
   /** @format int64 */
   offset?: number;
   sort?: SortObject[];
-  paged?: boolean;
   /** @format int32 */
   pageNumber?: number;
   /** @format int32 */
   pageSize?: number;
+  paged?: boolean;
   unpaged?: boolean;
 }
 
@@ -201,6 +218,8 @@ export interface PageUserResponse {
   totalElements?: number;
   /** @format int32 */
   totalPages?: number;
+  first?: boolean;
+  last?: boolean;
   /** @format int32 */
   size?: number;
   content?: UserResponse[];
@@ -210,8 +229,6 @@ export interface PageUserResponse {
   /** @format int32 */
   numberOfElements?: number;
   pageable?: PageableObject;
-  last?: boolean;
-  first?: boolean;
   empty?: boolean;
 }
 
@@ -220,6 +237,8 @@ export interface PageEventResponse {
   totalElements?: number;
   /** @format int32 */
   totalPages?: number;
+  first?: boolean;
+  last?: boolean;
   /** @format int32 */
   size?: number;
   content?: EventResponse[];
@@ -229,8 +248,6 @@ export interface PageEventResponse {
   /** @format int32 */
   numberOfElements?: number;
   pageable?: PageableObject;
-  last?: boolean;
-  first?: boolean;
   empty?: boolean;
 }
 
@@ -239,6 +256,8 @@ export interface PageTaskResponse {
   totalElements?: number;
   /** @format int32 */
   totalPages?: number;
+  first?: boolean;
+  last?: boolean;
   /** @format int32 */
   size?: number;
   content?: TaskResponse[];
@@ -248,8 +267,6 @@ export interface PageTaskResponse {
   /** @format int32 */
   numberOfElements?: number;
   pageable?: PageableObject;
-  last?: boolean;
-  first?: boolean;
   empty?: boolean;
 }
 
@@ -598,6 +615,28 @@ export class Api<
         path: `/api/chats/${chatId}/messages/${id}`,
         method: "DELETE",
         secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Telegram User Management
+     * @name CreateTelegramUser
+     * @summary Create telegram user
+     * @request POST:/api/telegram-users
+     * @secure
+     */
+    createTelegramUser: (
+      data: TelegramUserRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<TelegramUserResponse, any>({
+        path: `/api/telegram-users`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
         ...params,
       }),
 
