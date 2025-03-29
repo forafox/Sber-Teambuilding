@@ -37,4 +37,8 @@ public class Message {
 
     @Column(name = "pinned")
     private boolean pinned;
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "poll_id", unique = true)
+    private Poll poll;
 }

@@ -1,6 +1,7 @@
 package com.jellyone.web.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.jellyone.domain.Message;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
@@ -17,16 +18,18 @@ public record MessageResponse(
         LocalDateTime timestamp,
         Long replyToMessageId,
         @NotNull(message = "Pinned must not be null")
-        boolean pinned
+        boolean pinned,
+        PollResponse poll
 ) {
-    public static MessageResponse toResponse(com.jellyone.domain.Message message) {
+    public static MessageResponse toResponse(Message message) {
         return new MessageResponse(
                 message.getId(),
                 message.getContent(),
                 UserResponse.toResponse(message.getAuthor()),
                 message.getTimestamp(),
                 message.getReplyToMessageId(),
-                message.isPinned()
+                message.isPinned(),
+                message.getPoll() == null ? null : PollResponse.toResponse(message.getPoll())
         );
     }
 }

@@ -1,7 +1,9 @@
 package com.jellyone.controller;
 
 import com.jellyone.service.MessageService;
+import com.jellyone.service.PollService;
 import com.jellyone.web.request.MessageRequest;
+import com.jellyone.web.request.MessageUpdateRequest;
 import com.jellyone.web.response.MessageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -22,6 +24,7 @@ import java.util.List;
 public class MessageController {
 
     private final MessageService messageService;
+    private final PollService pollService;
 
     @Operation(summary = "Create message")
     @PostMapping
@@ -31,7 +34,16 @@ public class MessageController {
             Principal principal
     ) {
         log.info("Received request to create a message with content: {}", message.content());
-        return MessageResponse.toResponse(messageService.create(chatId, message.content(), message.replyToMessageId(), principal.getName(), message.pinned()));
+        return MessageResponse.toResponse(
+                messageService.create(
+                        chatId,
+                        message.content(),
+                        message.replyToMessageId(),
+                        principal.getName(),
+                        message.pinned(),
+                        message.poll()
+                )
+        );
     }
 
     @Operation(summary = "Get message by id")
@@ -68,9 +80,9 @@ public class MessageController {
     public MessageResponse updateMessage(
             @PathVariable Long chatId,
             @PathVariable Long id,
-            @RequestBody MessageRequest message
+            @RequestBody MessageUpdateRequest message
     ) {
         log.info("Received request to update a message with id: {}", id);
-        return MessageResponse.toResponse(messageService.update(id, message.content(), message.replyToMessageId(), message.pinned()));
+        return MessageResponse.toResponse(messageService.update(id, message.content(), message.replyToMessageId(), message.pinned(), message.poll()));
     }
 }
