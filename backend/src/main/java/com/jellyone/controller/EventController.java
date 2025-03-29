@@ -48,6 +48,7 @@ public class EventController {
                 request.title(),
                 request.description(),
                 request.location(),
+                request.status(),
                 principal.getName(),
                 request.date(),
                 request.participants()
@@ -77,6 +78,7 @@ public class EventController {
                 event.title(),
                 event.description(),
                 event.location(),
+                event.status(),
                 event.date(),
                 event.participants()
         ));

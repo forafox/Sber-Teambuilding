@@ -2,6 +2,7 @@ package com.jellyone.web.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jellyone.domain.Event;
+import com.jellyone.domain.enums.EventStatus;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
@@ -13,6 +14,8 @@ public record EventResponse(
         @NotNull String title,
         String description,
         String location,
+        @NotNull
+        EventStatus status,
         @NotNull UserResponse author,
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm'Z'", timezone = "UTC")
         @NotNull LocalDateTime date,
@@ -25,6 +28,7 @@ public record EventResponse(
                 event.getTitle(),
                 event.getDescription(),
                 event.getLocation(),
+                event.getStatus(),
                 Optional.ofNullable(event.getAuthor()).map(UserResponse::toResponse).orElse(null),
                 event.getDate(),
                 event.getParticipants().stream().map(UserResponse::toResponse).toList(),
