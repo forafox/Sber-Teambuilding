@@ -1,6 +1,7 @@
 package com.jellyone.controller;
 
 import com.jellyone.domain.enums.EventStatus;
+import com.jellyone.exception.ErrorMessage;
 import com.jellyone.util.AuthUtil;
 import com.jellyone.web.request.EventRequest;
 import com.jellyone.web.response.EventResponse;
@@ -19,8 +20,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
-
-import static org.junit.Assert.assertNotNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
@@ -84,7 +83,7 @@ class TokenControllerTest {
                 .statusCode(HttpStatus.CONFLICT.value()) // Юзер уже в группе
                 .contentType(ContentType.JSON)
                 .extract()
-                .as(EventResponse.class);
+                .as(ErrorMessage.class);
     }
 
     @Test
@@ -100,7 +99,7 @@ class TokenControllerTest {
                 .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .contentType(ContentType.JSON)
                 .extract()
-                .as(EventResponse.class);
+                .as(ErrorMessage.class);
     }
 
     private void createEvent() {
