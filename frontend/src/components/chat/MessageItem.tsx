@@ -26,6 +26,7 @@ import {
   EditIcon,
   TrashIcon,
   ReplyIcon,
+  PinIcon,
 } from "lucide-react";
 import { isMobileDevice } from "@/lib/utils";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
@@ -36,6 +37,7 @@ type MessageItemProps = {
   chatId: number;
   onReply?: (message: Message) => void;
   scrollToMessage?: (messageId: number) => void;
+  onTogglePin?: (message: Message) => void;
 };
 
 export function MessageItem({
@@ -43,6 +45,7 @@ export function MessageItem({
   chatId,
   onReply,
   scrollToMessage,
+  onTogglePin,
 }: MessageItemProps) {
   const { data: userData } = useSuspenseQuery(getMeQueryOptions());
   const { data: messages } = useSuspenseQuery(getMessagesQueryOptions(chatId));
@@ -95,6 +98,13 @@ export function MessageItem({
     setIsContextMenuOpen(false);
   };
 
+  const handleTogglePinMessage = () => {
+    if (onTogglePin) {
+      onTogglePin(message);
+    }
+    setIsContextMenuOpen(false);
+  };
+
   const handleSaveEdit = () => {
     if (
       editedContent.trim() &&
@@ -107,6 +117,7 @@ export function MessageItem({
           : message.replyToMessageId
             ? message.replyToMessageId
             : undefined,
+        pinned: message.pinned,
       });
     }
     setIsEditDialogOpen(false);
@@ -182,26 +193,37 @@ export function MessageItem({
           isCurrentUser
             ? "bg-primary text-primary-foreground"
             : "bg-muted text-muted-foreground"
-        }`}
+        } ${message.pinned ? "border-primary border" : ""}`}
       >
+        {message.pinned && (
+          <div className="text-xs text-primary-foreground/70 flex items-center gap-1 mb-1">
+            <PinIcon className="h-3 w-3" />
+            <span>Закреплено</span>
+          </div>
+        )}
         <p className="text-sm">{message.content}</p>
       </div>
       <span className="text-muted-foreground mt-1 text-xs">
         {format(message.timestamp, "HH:mm")}
       </span>
 
-      {isContextMenuOpen && (
+      {isContextMenuOpen && contentRef.current && isContextMenuOpen && (
         <div
           ref={contextMenuRef}
           className="bg-popover text-popover-foreground animate-in fade-in-0 zoom-in-95 absolute z-50 min-w-32 rounded-md border p-1 shadow-md"
           style={{
+            position: "fixed",
+            maxWidth: "calc(100vw - 16px)",
             left: isCurrentUser
               ? "auto"
-              : `${contentRef.current?.getBoundingClientRect().left}px`,
+              : Math.max(contentRef.current.getBoundingClientRect().left, 8),
             right: isCurrentUser
-              ? `calc(100% - ${contentRef.current?.getBoundingClientRect().right}px)`
+              ? Math.max(window.innerWidth - contentRef.current.getBoundingClientRect().right, 8)
               : "auto",
-            top: `${contentRef.current?.getBoundingClientRect().bottom}px`,
+            top: Math.min(
+              contentRef.current.getBoundingClientRect().bottom + 8,
+              window.innerHeight - 180
+            ),
           }}
         >
           <div
@@ -218,6 +240,15 @@ export function MessageItem({
             >
               <ReplyIcon className="mr-2 inline-block h-4 w-4" />
               <span>Ответить</span>
+            </div>
+          )}
+          {onTogglePin && (
+            <div
+              className="hover:bg-accent hover:text-accent-foreground cursor-pointer px-2 py-1.5 text-sm"
+              onClick={handleTogglePinMessage}
+            >
+              <PinIcon className="mr-2 inline-block h-4 w-4" />
+              <span>{message.pinned ? "Открепить" : "Закрепить"}</span>
             </div>
           )}
           {isCurrentUser && (
@@ -257,8 +288,14 @@ export function MessageItem({
               isCurrentUser
                 ? "bg-primary text-primary-foreground"
                 : "bg-muted text-muted-foreground"
-            }`}
+            } ${message.pinned ? "border-primary border" : ""}`}
           >
+            {message.pinned && (
+              <div className="text-xs text-primary-foreground/70 flex items-center gap-1 mb-1">
+                <PinIcon className="h-3 w-3" />
+                <span>Закреплено</span>
+              </div>
+            )}
             <p className="text-sm">{message.content}</p>
           </div>
           <span className="text-muted-foreground mt-1 text-xs">
@@ -275,6 +312,12 @@ export function MessageItem({
           <ContextMenuItem onClick={handleReplyMessage}>
             <ReplyIcon className="mr-2 h-4 w-4" />
             <span>Ответить</span>
+          </ContextMenuItem>
+        )}
+        {onTogglePin && (
+          <ContextMenuItem onClick={handleTogglePinMessage}>
+            <PinIcon className="mr-2 h-4 w-4" />
+            <span>{message.pinned ? "Открепить" : "Закрепить"}</span>
           </ContextMenuItem>
         )}
         {isCurrentUser && (
@@ -342,16 +385,12 @@ export function MessageItem({
               </Button>
             </div>
           )}
-          <div className="flex items-center space-y-2">
-            <Input
-              value={editedContent}
-              onChange={(e) => setEditedContent(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="flex-1"
-              autoFocus
-            />
-          </div>
-          <DialogFooter className="sm:justify-start">
+          <Input
+            value={editedContent}
+            onChange={(e) => setEditedContent(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+          <DialogFooter className="gap-2 sm:gap-0">
             <Button
               type="button"
               variant="secondary"
@@ -359,7 +398,7 @@ export function MessageItem({
             >
               Отмена
             </Button>
-            <Button type="button" onClick={handleSaveEdit}>
+            <Button type="submit" onClick={handleSaveEdit}>
               Сохранить
             </Button>
           </DialogFooter>

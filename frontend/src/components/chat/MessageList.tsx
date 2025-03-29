@@ -3,6 +3,8 @@ import { useGetMessages } from "@/api/get-messages";
 import { MessageItem } from "./MessageItem";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Message } from "@/api/get-chat";
+import { PinnedMessages } from "./PinnedMessages";
+import { useUpdateMessage } from "@/api/update-message";
 
 type MessageListProps = {
   chatId: number;
@@ -18,6 +20,21 @@ export function MessageList({ chatId, onReply }: MessageListProps) {
     if (!messages?.length) return [];
     return [...messages].sort((a, b) => a.id - b.id);
   }, [messages]);
+
+  // Получаем только закрепленные сообщения
+  const pinnedMessages = useMemo(() => {
+    return sortedMessages.filter((msg) => msg.pinned);
+  }, [sortedMessages]);
+  
+  const handleTogglePin = (message: Message) => {
+    const updateMessage = useUpdateMessage(chatId, message.id);
+    
+    updateMessage.mutate({
+      content: message.content,
+      replyToMessageId: message.replyToMessageId,
+      pinned: !message.pinned,
+    });
+  };
 
   // Функция прокрутки к указанному сообщению
   const scrollToMessage = (messageId: number) => {
@@ -79,6 +96,11 @@ export function MessageList({ chatId, onReply }: MessageListProps) {
 
   return (
     <ScrollArea ref={scrollAreaRef} className="h-full px-4 py-4">
+      <PinnedMessages 
+        messages={pinnedMessages} 
+        onUnpin={handleTogglePin} 
+        onMessageClick={scrollToMessage} 
+      />
       <div className="flex flex-col gap-4">
         {sortedMessages.map((message) => (
           <MessageItem
@@ -87,6 +109,7 @@ export function MessageList({ chatId, onReply }: MessageListProps) {
             chatId={chatId}
             onReply={onReply}
             scrollToMessage={scrollToMessage}
+            onTogglePin={handleTogglePin}
           />
         ))}
       </div>

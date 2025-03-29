@@ -10,6 +10,7 @@ export const messageSchema = z.object({
   author: userSchema,
   timestamp: z.coerce.date(),
   replyToMessageId: z.number().nullable().optional(),
+  pinned: z.boolean().optional().default(false),
 });
 
 export const chatSchema = z.object({
@@ -25,13 +26,8 @@ export function useGetChat(chatId: number) {
   return useQuery({
     queryKey: ["chats", chatId],
     queryFn: async () => {
-      try {
-        const response = await api.api.getChatById(chatId);
-        return response.data;
-      } catch (error) {
-        console.error("Failed to fetch chat:", error);
-        throw error;
-      }
+      const response = await api.api.getChatById(chatId);
+      return chatSchema.parse(response.data);
     },
   });
 }

@@ -6,6 +6,7 @@ import { Message, messageSchema } from "./get-chat";
 // Расширяем тип MessageRequest для поддержки replyToMessageId
 type ExtendedMessageRequest = MessageRequest & {
   replyToMessageId?: number;
+  pinned?: boolean;
 };
 
 export function useUpdateMessage(chatId: number, messageId: number) {
