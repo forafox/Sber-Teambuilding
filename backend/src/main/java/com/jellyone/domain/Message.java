@@ -34,4 +34,7 @@ public class Message {
 
     @Column(name = "reply_to_message_id")
     private Long replyToMessageId;
+
+    @Column(name = "pinned")
+    private boolean pinned;
 }

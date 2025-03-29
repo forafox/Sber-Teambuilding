@@ -63,7 +63,7 @@ class MessageControllerTest {
     @Test
     @Order(1)
     void createMessageShouldReturnOk() {
-        MessageRequest messageRequest = new MessageRequest("Test Message", null);
+        MessageRequest messageRequest = new MessageRequest("Test Message", null, false);
 
         MessageResponse messageResponse = RestAssured.given()
                 .auth().oauth2(jwtToken)
@@ -114,7 +114,7 @@ class MessageControllerTest {
     @Test
     @Order(4)
     void updateMessageShouldReturnOk() {
-        MessageRequest messageRequest = new MessageRequest("Updated Message", null);
+        MessageRequest messageRequest = new MessageRequest("Updated Message", null, false);
 
         RestAssured.given()
                 .auth().oauth2(jwtToken)
@@ -143,7 +143,7 @@ class MessageControllerTest {
     @Test
     @Order(6)
     void createReplyMessageShouldReturnOk() {
-        MessageRequest messageRequest = new MessageRequest("Test Message", null);
+        MessageRequest messageRequest = new MessageRequest("Test Message", null, false);
 
         MessageResponse messageResponse = RestAssured.given()
                 .auth().oauth2(jwtToken)
@@ -158,7 +158,7 @@ class MessageControllerTest {
                 .as(MessageResponse.class);
 
         messageId = messageResponse.id();
-        MessageRequest messageRequestWithReply = new MessageRequest("Test Message", messageId);
+        MessageRequest messageRequestWithReply = new MessageRequest("Test Message", messageId, false);
 
         MessageResponse messageResponseWithReply = RestAssured.given()
                 .auth().oauth2(jwtToken)
