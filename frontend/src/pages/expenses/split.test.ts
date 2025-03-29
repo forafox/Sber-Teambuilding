@@ -182,8 +182,6 @@ describe("calculateBalances", () => {
 
     const result = calculateBalances(tasks, participants);
 
-    console.log(result);
-
     assertEqualShare(tasks, participants, result);
   });
 });
