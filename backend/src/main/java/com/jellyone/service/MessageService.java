@@ -49,7 +49,7 @@ public class MessageService {
 
     public List<Message> getAllByChatId(Long chatId) {
         log.info("Try to get all messages by chat id: {}", chatId);
-        return messageRepository.findAllByChatId(chatId);
+        return messageRepository.findAllByChatIdOrderByTimestampAsc(chatId);
     }
 
     public Message update(Long id, String content) {

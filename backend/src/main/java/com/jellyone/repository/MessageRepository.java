@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Long>, JpaSpecificationExecutor<Message> {
     List<Message> findAllByChatId(Long chatId);
+
+    List<Message> findAllByChatIdOrderByTimestampAsc(Long chatId);
 }
