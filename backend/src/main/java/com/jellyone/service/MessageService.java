@@ -11,7 +11,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 @Slf4j
@@ -24,12 +26,13 @@ public class MessageService {
     private final ChatService chatService;
     private final WebSocketSessionService webSocketSessionService;
 
-    public Message create(Long chatId, String content, String username) {
+    public Message create(Long chatId, String content, Long replyToMessageId, String username) {
         log.info("Try to create message with content: {}", content);
         Chat chat = chatService.getById(chatId);
         User author = userService.getByUsername(username);
 
-        Message message = messageRepository.save(new Message(0L, chat, author, content, LocalDateTime.now()));
+        Message message = messageRepository.save(new Message(0L, chat, author, content, LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)
+                , replyToMessageId));
         log.info("Message created with id: {}", message.getId());
         webSocketSessionService.sendMessageToAll(ServerChange.MESSAGES_UPDATED.name());
         return message;
@@ -49,13 +52,14 @@ public class MessageService {
 
     public List<Message> getAllByChatId(Long chatId) {
         log.info("Try to get all messages by chat id: {}", chatId);
-        return messageRepository.findAllByChatId(chatId);
+        return messageRepository.findAllByChatIdOrderByTimestampAsc(chatId);
     }
 
-    public Message update(Long id, String content) {
+    public Message update(Long id, String content, Long replyToMessageId) {
         log.info("Try to update message with id: {}", id);
         Message message = get(id);
         message.setContent(content);
+        message.setReplyToMessageId(replyToMessageId);
         message = messageRepository.save(message);
         log.info("Message updated with id: {}", message.getId());
         webSocketSessionService.sendMessageToAll(ServerChange.MESSAGES_UPDATED.name());

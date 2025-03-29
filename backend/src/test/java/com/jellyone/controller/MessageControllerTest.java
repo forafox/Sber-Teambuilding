@@ -23,6 +23,8 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
 @AutoConfigureMockMvc
@@ -60,7 +62,7 @@ class MessageControllerTest {
     @Test
     @Order(1)
     void createMessageShouldReturnOk() {
-        MessageRequest messageRequest = new MessageRequest("Test Message");
+        MessageRequest messageRequest = new MessageRequest("Test Message", null);
 
         MessageResponse messageResponse = RestAssured.given()
                 .auth().oauth2(jwtToken)
@@ -111,7 +113,7 @@ class MessageControllerTest {
     @Test
     @Order(4)
     void updateMessageShouldReturnOk() {
-        MessageRequest messageRequest = new MessageRequest("Updated Message");
+        MessageRequest messageRequest = new MessageRequest("Updated Message", null);
 
         RestAssured.given()
                 .auth().oauth2(jwtToken)
@@ -137,6 +139,40 @@ class MessageControllerTest {
                 .statusCode(HttpStatus.OK.value());
     }
 
+    @Test
+    @Order(6)
+    void createReplyMessageShouldReturnOk() {
+        MessageRequest messageRequest = new MessageRequest("Test Message", null);
+
+        MessageResponse messageResponse = RestAssured.given()
+                .auth().oauth2(jwtToken)
+                .contentType(ContentType.JSON)
+                .body(messageRequest)
+                .when()
+                .post("/api/chats/" + chatId + "/messages")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .contentType(ContentType.JSON)
+                .extract()
+                .as(MessageResponse.class);
+
+        messageId = messageResponse.id();
+        MessageRequest messageRequestWithReply = new MessageRequest("Test Message", messageId);
+
+        MessageResponse messageResponseWithReply = RestAssured.given()
+                .auth().oauth2(jwtToken)
+                .contentType(ContentType.JSON)
+                .body(messageRequestWithReply)
+                .when()
+                .post("/api/chats/" + chatId + "/messages")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .contentType(ContentType.JSON)
+                .extract()
+                .as(MessageResponse.class);
+
+        Assertions.assertEquals(messageId, messageResponseWithReply.replyToMessageId());
+    }
 
     private void createEvent() {
         EventRequest eventRequest = new EventRequest(
