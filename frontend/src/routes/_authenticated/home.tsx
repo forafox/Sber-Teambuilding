@@ -82,7 +82,7 @@ function RouteComponent() {
       <div className="mb-8">
         <div className="mb-4 flex flex-col items-start gap-2 md:flex-row md:items-center md:justify-between">
           <h2 className="text-2xl font-bold">Активные мероприятия</h2>
-          <div className="flex flex-col items-center gap-2 md:flex-row">
+          <div className="flex flex-row-reverse items-center gap-2 md:flex-row">
             <Button variant="outline" onClick={handleCreateEvent}>
               <PlusIcon className="mr-2 h-4 w-4" />
               Создать мероприятие
