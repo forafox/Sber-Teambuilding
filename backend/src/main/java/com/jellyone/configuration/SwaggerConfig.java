@@ -23,7 +23,9 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
                 @Tag(name = "WebSocket", description = "API for WebSocket"),
                 @Tag(name = "Task Management", description = "API for tasks"),
                 @Tag(name = "Message Management", description = "API for messages"),
-                @Tag(name = "Template Management", description = "API for templates"),
+                @Tag(name = "Chat Management", description = "API for chats"),
+                @Tag(name = "Event Token Management", description = "API for event tokens"),
+                @Tag(name = "Template Management", description = "API for templates")
         }
 )
 @SecurityScheme(
