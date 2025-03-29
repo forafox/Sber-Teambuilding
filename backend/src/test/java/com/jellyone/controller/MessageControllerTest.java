@@ -231,6 +231,29 @@ class MessageControllerTest {
         Assertions.assertEquals(1L, response.poll().options().get(0).voters().get(0).id());
     }
 
+    @Test
+    @Order(9)
+    void setMessageReadShouldReturnOk() {
+        RestAssured.given()
+                .auth().oauth2(jwtToken)
+                .when()
+                .post("/api/chats/" + chatId + "/messages/" + messageId + "/read")
+                .then()
+                .statusCode(HttpStatus.OK.value());
+
+        ChatResponse response = RestAssured.given()
+                .auth().oauth2(jwtToken)
+                .when()
+                .get("/api/chats/" + chatId)
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .contentType(ContentType.JSON)
+                .extract()
+                .as(ChatResponse.class);
+
+        Assertions.assertEquals(messageId, response.readMessages().get(1L).id());
+    }
+
     private void createEvent() {
         EventRequest eventRequest = new EventRequest(
                 "Test Event",

@@ -17,6 +17,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -28,6 +29,7 @@ public class MessageService {
     private final ChatService chatService;
     private final PollService pollService;
     private final WebSocketSessionService webSocketSessionService;
+    private final MessageReadService messageReadService;
 
     public Message create(Long chatId, String content, Long replyToMessageId, String username, boolean pinned, PollRequest pollRequest) {
         log.info("Try to create message with content: {}", content);
@@ -74,5 +76,19 @@ public class MessageService {
     public List<Message> getPinnedMessages(Long chatId) {
         log.info("Try to get pinned messages");
         return messageRepository.findAllByChatIdAndPinnedTrue(chatId);
+    }
+
+    public void setMessageRead(Long chatId, Long messageId, String username) {
+        log.info("Try to update message with id: {}", messageId);
+        Chat chat = chatService.getById(chatId);
+        User user = userService.getByUsername(username);
+        Message message = get(messageId);
+        messageReadService.create(message, chat, user);
+        webSocketSessionService.sendMessageToAll(ServerChange.MESSAGES_UPDATED.name());
+    }
+
+    public Map<User, Message> getAllReadMessagesByChat(Long chatId) {
+        log.info("Try to get all read messages by chat id: {}", chatId);
+        return messageReadService.getAllReadMessagesByChat(chatService.getById(chatId));
     }
 }

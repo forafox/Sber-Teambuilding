@@ -20,7 +20,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -126,7 +128,7 @@ public class EventService {
 
         log.info("Trying to create chat for event with title: {}", response.title());
         Chat chat = chatService.create();
-        Event event = new Event(0L, response.title(), "", "", EventStatus.IN_PROGRESS, authorUser, LocalDateTime.now(), participantUsers, chat);
+        Event event = new Event(0L, response.title(), "", "", EventStatus.IN_PROGRESS, authorUser, LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC), participantUsers, chat);
         log.info("Trying to create event with id: {}", event.getId());
         Event savedEvent = eventRepository.save(event);
         webSocketSessionService.sendMessageToAll(ServerChange.EVENTS_UPDATED.name());
