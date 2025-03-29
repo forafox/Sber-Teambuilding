@@ -1,5 +1,6 @@
 package com.jellyone.controller;
 
+import com.jellyone.domain.enums.EventStatus;
 import com.jellyone.domain.enums.TaskStatus;
 import com.jellyone.util.AuthUtil;
 import com.jellyone.web.request.EventRequest;
@@ -79,7 +80,8 @@ class TaskControllerTest {
                 "testuser",
                 TaskStatus.IN_PROGRESS,
                 "This is a test task",
-                100.0
+                100.0,
+                "https://buy.me"
         );
 
         RestAssured.given()
@@ -131,7 +133,8 @@ class TaskControllerTest {
                 "testuser",
                 TaskStatus.DONE,
                 "This is an updated task",
-                200.0
+                200.0,
+                "https://buy.me"
         );
 
         RestAssured.given()
@@ -174,6 +177,9 @@ class TaskControllerTest {
     private void createEvent() {
         EventRequest eventRequest = new EventRequest(
                 "Test Event",
+                "Test Event Description",
+                "Test Event Location",
+                EventStatus.IN_PROGRESS,
                 LocalDateTime.now(),
                 Collections.singletonList(1L) // Assuming user with ID 1 exists
         );

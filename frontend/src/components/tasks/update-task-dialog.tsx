@@ -32,7 +32,7 @@ type Props = {
   eventId: number;
 };
 
-const schema = taskSchema.omit({ status: true });
+const schema = taskSchema.omit({ status: true, id: true, author: true });
 
 export function UpdateTaskDialog({
   open,
@@ -41,10 +41,6 @@ export function UpdateTaskDialog({
   eventId,
 }: Props) {
   const { mutate, error, isPending } = useUpdateTaskMutation();
-  function expenses(exp: number | undefined | string | null) {
-    if (exp) return Number(exp);
-    else return undefined;
-  }
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -52,6 +48,7 @@ export function UpdateTaskDialog({
       assignee: defaultTask.assignee,
       description: defaultTask.description,
       expenses: defaultTask.expenses,
+      url: defaultTask.url,
     },
   });
 
@@ -62,8 +59,9 @@ export function UpdateTaskDialog({
         taskId: defaultTask.id,
         assigneeUsername: data.assignee?.username,
         title: data.title,
-        description: data.description,
-        expenses: expenses(data.expenses),
+        description: data.description ?? "",
+        expenses: data?.expenses ?? undefined,
+        url: data?.url ?? undefined,
         status: "IN_PROGRESS",
       },
       {
@@ -144,6 +142,18 @@ export function UpdateTaskDialog({
                     <Suspense fallback={<></>}>
                       <SelectUser value={value} onChange={onChange} />
                     </Suspense>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="url"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Ссылка</FormLabel>
+                  <FormControl>
+                    <Input type="url" {...field} />
                   </FormControl>
                 </FormItem>
               )}

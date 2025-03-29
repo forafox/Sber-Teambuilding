@@ -9,6 +9,7 @@ export const messageSchema = z.object({
   content: z.string(),
   author: userSchema,
   timestamp: z.coerce.date(),
+  replyToMessageId: z.number().nullable().optional(),
 });
 
 export const chatSchema = z.object({
