@@ -107,8 +107,10 @@ public class TelegramAdapter implements TelegramApi {
         String description = taskDTO.getDescription();
         Double expenses = taskDTO.getExpenses();
         Long eventId = taskDTO.getEventID();
+        // TODO: read URL from Telegram?
+        String url = null;
 
-        taskService.create(title, assigneeUsername, authorUsername, status, description, expenses, eventId);
+        taskService.create(title, assigneeUsername, authorUsername, status, description, expenses, eventId, url);
     }
 
     @Override

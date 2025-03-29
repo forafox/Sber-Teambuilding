@@ -38,4 +38,6 @@ public class Task implements Serializable {
     @ManyToOne
     @JoinColumn(name = "event_id", nullable = false)
     private Event event;
+
+    private String url;
 }

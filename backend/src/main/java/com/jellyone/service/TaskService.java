@@ -31,14 +31,15 @@ public class TaskService {
             TaskStatus status,
             String description,
             Double expenses,
-            Long eventId
+            Long eventId,
+            String url
     ) {
         log.info("Create task with title: {}", title);
         User assigneeUser = (assigneeUsername != null) ? userService.getByUsername(assigneeUsername) : null;
         User authorUser = userService.getByUsername(authorUsername);
         Event event = eventService.getById(eventId);
 
-        Task task = new Task(0L, title, assigneeUser, status, description, expenses, authorUser, event);
+        Task task = new Task(0L, title, assigneeUser, status, description, expenses, authorUser, event, url);
 
         task = taskRepository.save(task);
         log.info("Task created with id: {}", task.getId());
@@ -46,7 +47,7 @@ public class TaskService {
         return task;
     }
 
-    public Task update(Long id, String title, String assigneeUsername, String authorUsername, TaskStatus status, String description, Double expenses) {
+    public Task update(Long id, String title, String assigneeUsername, String authorUsername, TaskStatus status, String description, Double expenses, String url) {
         log.info("Try to update task with id: {}", id);
         Task task = getById(id);
 
@@ -59,6 +60,7 @@ public class TaskService {
         task.setDescription(description);
         task.setExpenses(expenses);
         task.setAuthor(authorUser);
+        task.setUrl(url);
 
         task = taskRepository.save(task);
         log.info("Task updated with id: {}", task.getId());

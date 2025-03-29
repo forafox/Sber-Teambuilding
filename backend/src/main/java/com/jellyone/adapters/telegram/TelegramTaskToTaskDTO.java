@@ -15,6 +15,6 @@ public class TelegramTaskToTaskDTO {
         long author = task.getAuthor().getId();
         long eventId = task.getEvent().getId();
 
-        return new TaskDTO(id, title, description, price, assignee, author, eventId);
+        return new TaskDTO(id, title, description, price, assignee, author, eventId, task.getUrl());
     }
 }
