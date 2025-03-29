@@ -30,3 +30,7 @@ logging:
     com.jellyone: INFO
     org.springframework: INFO
     org.springframework.security: ERROR
+gigachat:
+  api:
+    clientId: ${GIGACHAT_CLIENT_ID}
+    authorizationKey: ${GIGACHAT_AUTHORIZATION_KEY}
