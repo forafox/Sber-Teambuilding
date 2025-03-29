@@ -12,10 +12,12 @@ import {
 } from "@/components/ui/table";
 
 import { DataTablePagination } from "./data-table-pagination";
+import { Task } from "@/api/get-tasks";
+import type { Table as TableType } from "@tanstack/react-table";
 
 interface TasksTableProps<TValue> {
   columns: ColumnDef<Task, TValue>[];
-  table: any;
+  table: TableType<Task>;
 }
 
 export function TasksTable<TValue>({
