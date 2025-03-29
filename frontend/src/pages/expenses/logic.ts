@@ -12,10 +12,9 @@ export function calculateBalances(
   participants: User[],
 ): Transaction[] {
   // Calculate total expenses from all tasks
-  const totalExpenses = tasks.reduce(
-    (sum, task) => sum + (task.expenses || 0),
-    0,
-  );
+  const totalExpenses = tasks
+    .filter((task) => task.assignee)
+    .reduce((sum, task) => sum + (task.expenses || 0), 0);
 
   // Calculate fair share per participant
   const fairShare = totalExpenses / participants.length;
@@ -73,7 +72,7 @@ export function calculateBalances(
       transactions.push({
         from: debtor.username,
         to: creditor.username,
-        amount: Number(amount.toFixed(2)), // Round to 2 decimal places
+        amount: amount,
       });
     }
 

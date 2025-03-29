@@ -1,7 +1,36 @@
 import { describe, it, expect } from "vitest";
-import { calculateBalances } from "./logic";
+import { calculateBalances, Transaction } from "./logic";
 import { Task } from "@/api/get-tasks";
 import { User } from "@/api/get-users";
+
+function assertEqualShare(
+  tasks: Task[],
+  participants: User[],
+  transactions: Transaction[],
+) {
+  const spent: Record<string, number> = {};
+  participants.forEach((participant) => {
+    spent[participant.username] = 0;
+  });
+
+  tasks.forEach((task) => {
+    if (task.assignee && task.expenses) {
+      spent[task.assignee.username] =
+        (spent[task.assignee.username] || 0) + task.expenses;
+    }
+  });
+
+  transactions.forEach((transaction) => {
+    spent[transaction.from] += transaction.amount;
+    spent[transaction.to] -= transaction.amount;
+  });
+
+  const spentArray = Object.values(spent).sort((a, b) => a - b);
+  spentArray.forEach((value, i) => {
+    if (i === spentArray.length - 1) return;
+    expect(value).toBeCloseTo(spentArray[i + 1]);
+  });
+}
 
 describe("calculateBalances", () => {
   // Test helpers
@@ -13,7 +42,10 @@ describe("calculateBalances", () => {
     role: "USER",
   });
 
-  const createTask = (assignee: string, expenses: number): Task => ({
+  const createTask = (
+    assignee: string | undefined,
+    expenses: number,
+  ): Task => ({
     id: 1,
     title: "Task 1",
     status: "IN_PROGRESS",
@@ -24,13 +56,15 @@ describe("calculateBalances", () => {
       email: "user1@example.com",
       role: "USER",
     },
-    assignee: {
-      id: 2,
-      name: assignee,
-      username: assignee,
-      email: assignee,
-      role: "USER",
-    },
+    assignee: assignee
+      ? {
+          id: 2,
+          name: assignee,
+          username: assignee,
+          email: assignee,
+          role: "USER",
+        }
+      : undefined,
     expenses,
   });
 
@@ -56,6 +90,7 @@ describe("calculateBalances", () => {
     const result = calculateBalances(tasks, participants);
 
     expect(result).toEqual([]);
+    assertEqualShare(tasks, participants, result);
   });
 
   it("returns empty array if equal expenses", () => {
@@ -67,6 +102,7 @@ describe("calculateBalances", () => {
     const result = calculateBalances(tasks, participants);
 
     expect(result).toEqual([]);
+    assertEqualShare(tasks, participants, result);
   });
 
   it("returns one transaction if one participant owes money", () => {
@@ -77,7 +113,7 @@ describe("calculateBalances", () => {
 
     const result = calculateBalances(tasks, participants);
 
-    expect(result).toEqual([{ from: "user2", to: "user1", amount: 50 }]);
+    assertEqualShare(tasks, participants, result);
   });
 
   it("handles multiple transactions with three participants", () => {
@@ -89,9 +125,7 @@ describe("calculateBalances", () => {
 
     const result = calculateBalances(tasks, participants);
 
-    // Expected: Each should pay 150, so user2 owes nothing, user3 owes 150
-    expect(result).toHaveLength(1);
-    expect(result).toContainEqual({ from: "user3", to: "user1", amount: 150 });
+    assertEqualShare(tasks, participants, result);
   });
 
   it("handles complex scenario with multiple participants and transactions", () => {
@@ -104,24 +138,7 @@ describe("calculateBalances", () => {
 
     const result = calculateBalances(tasks, participants);
 
-    // Expected fair share: 800 / 4 = 200 per person
-    // user1 paid 300 more than fair share
-    // user2 owes 200, user3 owes 100
-    expect(result).toHaveLength(2);
-
-    // Verify amounts are correct, but don't depend on specific order
-    const totalToUser1 = result
-      .filter((tx) => tx.to === "user1")
-      .reduce((sum, tx) => sum + tx.amount, 0);
-
-    expect(totalToUser1).toBe(300);
-
-    // Verify each debtor is paying the correct amount
-    const user2Paying = result.find((tx) => tx.from === "user2")?.amount;
-    const user3Paying = result.find((tx) => tx.from === "user3")?.amount;
-
-    expect(user2Paying).toBe(200);
-    expect(user3Paying).toBe(100);
+    assertEqualShare(tasks, participants, result);
   });
 
   it("handles one participant paying for everything", () => {
@@ -133,17 +150,7 @@ describe("calculateBalances", () => {
 
     const result = calculateBalances(tasks, participants);
 
-    // Fair share: 300 per person, user1 paid 600 more
-    expect(result).toHaveLength(2);
-
-    const totalToUser1 = result
-      .filter((tx) => tx.to === "user1")
-      .reduce((sum, tx) => sum + tx.amount, 0);
-
-    expect(totalToUser1).toBe(600);
-    expect(result.every((tx) => tx.to === "user1")).toBe(true);
-    expect(result.some((tx) => tx.from === "user2")).toBe(true);
-    expect(result.some((tx) => tx.from === "user3")).toBe(true);
+    assertEqualShare(tasks, participants, result);
   });
 
   it("rounds transaction amounts to 2 decimal places", () => {
@@ -155,13 +162,7 @@ describe("calculateBalances", () => {
 
     const result = calculateBalances(tasks, participants);
 
-    // Fair share: 33.33 per person
-    result.forEach((transaction) => {
-      // Check that amount has at most 2 decimal places
-      const decimalPlaces = (transaction.amount.toString().split(".")[1] || "")
-        .length;
-      expect(decimalPlaces).toBeLessThanOrEqual(2);
-    });
+    assertEqualShare(tasks, participants, result);
   });
 
   it("returns empty array when there are no tasks", () => {
@@ -169,5 +170,33 @@ describe("calculateBalances", () => {
     const result = calculateBalances([], participants);
 
     expect(result).toEqual([]);
+  });
+
+  it("#37 bad computations", () => {
+    const participants = [
+      createUser("efedorov"),
+      createUser("akarabanov"),
+      createUser("misha"),
+    ];
+
+    const tasks = [
+      createTask("efedorov", 2500),
+      createTask("efedorov", 2500),
+      createTask("akarabanov", 2500),
+    ];
+
+    const result = calculateBalances(tasks, participants);
+
+    assertEqualShare(tasks, participants, result);
+  });
+
+  it("empty assignee task", () => {
+    const participants = [createUser("efedorov"), createUser("akarabanov")];
+
+    const tasks = [createTask("efedorov", 2500), createTask(undefined, 2500)];
+
+    const result = calculateBalances(tasks, participants);
+
+    assertEqualShare(tasks, participants, result);
   });
 });
