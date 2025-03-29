@@ -14,6 +14,8 @@ import { Button } from "@/components/ui/button";
 import { CalendarIcon, MailIcon, PlusIcon, UserIcon } from "lucide-react";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
+import { CreateEventPromptDialog } from "@/components/events/create-event-prompt-dialog";
+import { useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/home")({
   component: RouteComponent,
@@ -29,6 +31,7 @@ function RouteComponent() {
   const { data: userData } = useSuspenseQuery(getMeQueryOptions());
   const { data: eventsData } = useSuspenseQuery(getEventsQueryOptions());
   const navigate = useNavigate();
+  const [createOpen, setCreateOpen] = useState(false);
 
   const activeEvents = eventsData || [];
   const userInfo = userData;
@@ -79,10 +82,13 @@ function RouteComponent() {
       <div className="mb-8">
         <div className="mb-4 flex flex-col items-start gap-2 md:flex-row md:items-center md:justify-between">
           <h2 className="text-2xl font-bold">Активные мероприятия</h2>
-          <Button onClick={handleCreateEvent}>
-            <PlusIcon className="mr-2 h-4 w-4" />
-            Создать мероприятие
-          </Button>
+          <div className="flex flex-col items-center gap-2 md:flex-row">
+            <Button variant="outline" onClick={handleCreateEvent}>
+              <PlusIcon className="mr-2 h-4 w-4" />
+              Создать мероприятие
+            </Button>
+            <Button onClick={() => setCreateOpen(true)}>GigaChat</Button>
+          </div>
         </div>
 
         {activeEvents.length === 0 ? (
@@ -134,6 +140,7 @@ function RouteComponent() {
           </div>
         )}
       </div>
+      <CreateEventPromptDialog open={createOpen} onOpenChange={setCreateOpen} />
     </div>
   );
 }

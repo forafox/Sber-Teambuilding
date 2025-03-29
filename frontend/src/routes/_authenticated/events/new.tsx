@@ -31,6 +31,14 @@ const eventSchema = z.object({
     .min(3, { message: "Название должно содержать минимум 3 символа" }),
   date: z.coerce.date(),
   participants: z.array(userSchema),
+  description: z
+    .string()
+    .nullish()
+    .transform((it) => it ?? undefined),
+  location: z
+    .string()
+    .nullish()
+    .transform((it) => it ?? undefined),
 });
 
 function NewEvent() {
@@ -52,6 +60,9 @@ function NewEvent() {
         title: data.title,
         date: new Date(data.date).toISOString(),
         participants: data.participants.map((participant) => participant.id),
+        status: "IN_PROGRESS",
+        description: data.description,
+        location: data.location,
       });
       navigate({
         to: "/events/$eventId/tasks",

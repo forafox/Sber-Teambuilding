@@ -11,6 +11,9 @@
 
 export interface EventRequest {
   title: string;
+  description?: string;
+  location?: string;
+  status: "IN_PROGRESS" | "DONE";
   /** @format date-time */
   date: string;
   participants?: number[];
@@ -20,6 +23,9 @@ export interface EventResponse {
   /** @format int64 */
   id: number;
   title: string;
+  description?: string;
+  location?: string;
+  status: "IN_PROGRESS" | "DONE";
   /** User Response */
   author: UserResponse;
   /** @format date-time */
@@ -97,6 +103,8 @@ export interface TaskResponse {
 
 export interface MessageRequest {
   content: string;
+  /** @format int64 */
+  replyToMessageId?: number;
 }
 
 export interface MessageResponse {
@@ -107,6 +115,8 @@ export interface MessageResponse {
   author: UserResponse;
   /** @format date-time */
   timestamp: string;
+  /** @format int64 */
+  replyToMessageId?: number;
 }
 
 export interface TelegramUserRequest {
@@ -136,21 +146,6 @@ export interface SignUpRequest {
   email: string;
 }
 
-/** JWT Response */
-export interface JwtResponse {
-  /**
-   * User ID
-   * @format int64
-   */
-  id: number;
-  /** Username */
-  username: string;
-  /** Access token */
-  accessToken: string;
-  /** Refresh token */
-  refreshToken: string;
-}
-
 /** Error message model */
 export interface ErrorMessage {
   /**
@@ -167,6 +162,21 @@ export interface ErrorMessage {
   description: string;
   /** @example "The requested resource could not be found" */
   message: string;
+}
+
+/** JWT Response */
+export interface JwtResponse {
+  /**
+   * User ID
+   * @format int64
+   */
+  id: number;
+  /** Username */
+  username: string;
+  /** Access token */
+  accessToken: string;
+  /** Refresh token */
+  refreshToken: string;
 }
 
 export interface SignInRequest {
@@ -679,6 +689,7 @@ export class Api<
          * @default 10
          */
         size?: number;
+        status?: "IN_PROGRESS" | "DONE";
       },
       params: RequestParams = {},
     ) =>
@@ -758,6 +769,24 @@ export class Api<
     ) =>
       this.request<TaskResponse, any>({
         path: `/api/events/${eventId}/tasks`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Event Management
+     * @name CreateFromPrompt
+     * @request POST:/api/events/prompt
+     * @secure
+     */
+    createFromPrompt: (data: string, params: RequestParams = {}) =>
+      this.request<EventResponse, any>({
+        path: `/api/events/prompt`,
         method: "POST",
         body: data,
         secure: true,
