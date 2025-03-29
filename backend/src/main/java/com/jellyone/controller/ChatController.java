@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -29,7 +30,7 @@ public class ChatController {
     public ChatResponse createChat(
     ) {
         log.info("Received request to create a chat");
-        return ChatResponse.toResponse(chatService.create(), List.of());
+        return ChatResponse.toResponse(chatService.create(), List.of(), Map.of());
     }
 
     @Operation(summary = "Get chat by id")
@@ -38,7 +39,9 @@ public class ChatController {
             @PathVariable Long id
     ) {
         log.info("Received request to get a chat with id: {}", id);
-        return ChatResponse.toResponse(chatService.getById(id), messageService.getPinnedMessages(id));
+        return ChatResponse.toResponse(chatService.getById(id),
+                messageService.getPinnedMessages(id),
+                messageService.getAllReadMessagesByChat(id));
     }
 
     @Operation(summary = "Delete chat by id")
