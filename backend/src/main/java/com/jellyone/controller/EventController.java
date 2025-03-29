@@ -46,6 +46,8 @@ public class EventController {
         log.info("Received request to create an event with title: {}", request.title());
         return EventResponse.toResponse(eventService.create(
                 request.title(),
+                request.description(),
+                request.location(),
                 principal.getName(),
                 request.date(),
                 request.participants()
@@ -73,6 +75,8 @@ public class EventController {
         return EventResponse.toResponse(eventService.update(
                 id,
                 event.title(),
+                event.description(),
+                event.location(),
                 event.date(),
                 event.participants()
         ));

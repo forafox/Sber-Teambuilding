@@ -22,6 +22,10 @@ public class Event {
 
     private String title;
 
+    private String description;
+
+    private String location;
+
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)
     private User author;

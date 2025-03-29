@@ -28,7 +28,7 @@ public class EventService {
     private final WebSocketSessionService webSocketSessionService;
     private final ChatService chatService;
 
-    public Event create(String title, String authorUsername, LocalDateTime date, List<Long> participants) {
+    public Event create(String title, String description, String location, String authorUsername, LocalDateTime date, List<Long> participants) {
         log.info("Try to create event with title: {}", title);
         User authorUser = userService.getByUsername(authorUsername);
         List<User> participantUsers = (participants != null)
@@ -37,7 +37,7 @@ public class EventService {
 
         log.info("Trying to create chat with event title: {}", title);
         Chat chat = chatService.create();
-        Event event = new Event(0L, title, authorUser, date, participantUsers, chat);
+        Event event = new Event(0L, title, description, location, authorUser, date, participantUsers, chat);
         log.info("Trying to create event with id: {}", event.getId());
         event = eventRepository.save(event);
         webSocketSessionService.sendMessageToAll(ServerChange.EVENTS_UPDATED.name());
@@ -45,7 +45,7 @@ public class EventService {
         return event;
     }
 
-    public Event update(Long id, String title, LocalDateTime date, List<Long> participants) {
+    public Event update(Long id, String title, String description, String location, LocalDateTime date, List<Long> participants) {
         log.info("Try to update event with id: {}", id);
         Event event = getById(id);
         List<User> participantUsers = (participants != null)
@@ -55,6 +55,8 @@ public class EventService {
         event.setTitle(title);
         event.setDate(date);
         event.setParticipants(participantUsers);
+        event.setDescription(description);
+        event.setLocation(location);
 
         event = eventRepository.save(event);
         log.info("Event updated with id: {}", event.getId());
