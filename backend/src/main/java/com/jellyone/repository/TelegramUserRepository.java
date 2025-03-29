@@ -11,4 +11,5 @@ public interface TelegramUserRepository extends JpaRepository<TelegramUser, Long
 
     Optional<TelegramUser> findByTelegramUsername(String telegramUsername);
     Optional<TelegramUser> findByTelegramChatId(Long telegramChatId);
+    Optional<TelegramUser> findTelegramUserByUser_Username(String userName);
 }

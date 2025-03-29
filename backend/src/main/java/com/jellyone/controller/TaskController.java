@@ -1,5 +1,6 @@
 package com.jellyone.controller;
 
+import com.jellyone.adapters.telegram.TelegramNotificationService;
 import com.jellyone.service.TaskService;
 import com.jellyone.web.request.TaskRequest;
 import com.jellyone.web.response.TaskResponse;
@@ -23,6 +24,7 @@ import java.security.Principal;
 public class TaskController {
 
     private final TaskService taskService;
+    private final TelegramNotificationService telegramNotificationService;
 
     @Operation(summary = "Get all tasks")
     @GetMapping("/tasks")
@@ -43,6 +45,7 @@ public class TaskController {
             Principal principal
     ) {
         log.info("Received request to create a task with title: {}", task.title());
+        telegramNotificationService.sendTaskNotification(task.assigneeUsername(), task.title(), task.description());
         return TaskResponse.toResponse(taskService.create(
                 task.title(),
                 task.assigneeUsername(),

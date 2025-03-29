@@ -1,5 +1,6 @@
 package com.jellyone.controller;
 
+import com.jellyone.adapters.telegram.TelegramNotificationService;
 import com.jellyone.service.EventService;
 import com.jellyone.web.request.EventRequest;
 
@@ -25,6 +26,7 @@ import java.util.List;
 public class EventController {
 
     private final EventService eventService;
+    private final TelegramNotificationService telegramNotificationService;
 
     @Operation(summary = "Get all events")
     @GetMapping("/events")
@@ -44,6 +46,8 @@ public class EventController {
             Principal principal
     ) {
         log.info("Received request to create an event with title: {}", request.title());
+        request.participants().forEach(participantId ->
+                telegramNotificationService.sendNewEventNotification(participantId, request.title()));
         return EventResponse.toResponse(eventService.create(
                 request.title(),
                 principal.getName(),
