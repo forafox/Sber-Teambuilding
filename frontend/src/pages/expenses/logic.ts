@@ -12,10 +12,9 @@ export function calculateBalances(
   participants: User[],
 ): Transaction[] {
   // Calculate total expenses from all tasks
-  const totalExpenses = tasks.reduce(
-    (sum, task) => sum + (task.expenses || 0),
-    0,
-  );
+  const totalExpenses = tasks
+    .filter((task) => task.assignee)
+    .reduce((sum, task) => sum + (task.expenses || 0), 0);
 
   // Calculate fair share per participant
   const fairShare = totalExpenses / participants.length;

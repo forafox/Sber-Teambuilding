@@ -42,7 +42,10 @@ describe("calculateBalances", () => {
     role: "USER",
   });
 
-  const createTask = (assignee: string, expenses: number): Task => ({
+  const createTask = (
+    assignee: string | undefined,
+    expenses: number,
+  ): Task => ({
     id: 1,
     title: "Task 1",
     status: "IN_PROGRESS",
@@ -53,13 +56,15 @@ describe("calculateBalances", () => {
       email: "user1@example.com",
       role: "USER",
     },
-    assignee: {
-      id: 2,
-      name: assignee,
-      username: assignee,
-      email: assignee,
-      role: "USER",
-    },
+    assignee: assignee
+      ? {
+          id: 2,
+          name: assignee,
+          username: assignee,
+          email: assignee,
+          role: "USER",
+        }
+      : undefined,
     expenses,
   });
 
@@ -179,6 +184,16 @@ describe("calculateBalances", () => {
       createTask("efedorov", 2500),
       createTask("akarabanov", 2500),
     ];
+
+    const result = calculateBalances(tasks, participants);
+
+    assertEqualShare(tasks, participants, result);
+  });
+
+  it("empty assignee task", () => {
+    const participants = [createUser("efedorov"), createUser("akarabanov")];
+
+    const tasks = [createTask("efedorov", 2500), createTask(undefined, 2500)];
 
     const result = calculateBalances(tasks, participants);
 
