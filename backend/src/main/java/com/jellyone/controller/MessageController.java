@@ -2,7 +2,6 @@ package com.jellyone.controller;
 
 import com.jellyone.service.MessageReadService;
 import com.jellyone.service.MessageService;
-import com.jellyone.service.PollService;
 import com.jellyone.web.request.MessageRequest;
 import com.jellyone.web.request.MessageUpdateRequest;
 import com.jellyone.web.response.MessageResponse;
