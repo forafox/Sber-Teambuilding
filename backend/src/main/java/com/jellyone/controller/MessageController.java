@@ -31,7 +31,7 @@ public class MessageController {
             Principal principal
     ) {
         log.info("Received request to create a message with content: {}", message.content());
-        return MessageResponse.toResponse(messageService.create(chatId, message.content(), message.replyToMessageId(), principal.getName()));
+        return MessageResponse.toResponse(messageService.create(chatId, message.content(), message.replyToMessageId(), principal.getName(), message.pinned()));
     }
 
     @Operation(summary = "Get message by id")
@@ -71,6 +71,6 @@ public class MessageController {
             @RequestBody MessageRequest message
     ) {
         log.info("Received request to update a message with id: {}", id);
-        return MessageResponse.toResponse(messageService.update(id, message.content(), message.replyToMessageId()));
+        return MessageResponse.toResponse(messageService.update(id, message.content(), message.replyToMessageId(), message.pinned()));
     }
 }

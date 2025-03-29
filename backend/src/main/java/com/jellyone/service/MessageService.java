@@ -1,7 +1,6 @@
 package com.jellyone.service;
 
 import com.jellyone.domain.Chat;
-import com.jellyone.domain.Event;
 import com.jellyone.domain.Message;
 import com.jellyone.domain.User;
 import com.jellyone.domain.enums.ServerChange;
@@ -26,13 +25,13 @@ public class MessageService {
     private final ChatService chatService;
     private final WebSocketSessionService webSocketSessionService;
 
-    public Message create(Long chatId, String content, Long replyToMessageId, String username) {
+    public Message create(Long chatId, String content, Long replyToMessageId, String username, boolean pinned) {
         log.info("Try to create message with content: {}", content);
         Chat chat = chatService.getById(chatId);
         User author = userService.getByUsername(username);
 
         Message message = messageRepository.save(new Message(0L, chat, author, content, LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)
-                , replyToMessageId));
+                , replyToMessageId, pinned));
         log.info("Message created with id: {}", message.getId());
         webSocketSessionService.sendMessageToAll(ServerChange.MESSAGES_UPDATED.name());
         return message;
@@ -55,14 +54,20 @@ public class MessageService {
         return messageRepository.findAllByChatIdOrderByTimestampAsc(chatId);
     }
 
-    public Message update(Long id, String content, Long replyToMessageId) {
+    public Message update(Long id, String content, Long replyToMessageId, boolean pinned) {
         log.info("Try to update message with id: {}", id);
         Message message = get(id);
         message.setContent(content);
         message.setReplyToMessageId(replyToMessageId);
+        message.setPinned(pinned);
         message = messageRepository.save(message);
         log.info("Message updated with id: {}", message.getId());
         webSocketSessionService.sendMessageToAll(ServerChange.MESSAGES_UPDATED.name());
         return message;
+    }
+
+    public List<Message> getPinnedMessages(Long chatId) {
+        log.info("Try to get pinned messages");
+        return messageRepository.findAllByChatIdAndPinnedTrue(chatId);
     }
 }

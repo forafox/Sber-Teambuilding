@@ -15,7 +15,9 @@ public record MessageResponse(
         @NotNull(message = "Timestamp must not be null")
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm'Z'", timezone = "UTC")
         LocalDateTime timestamp,
-        Long replyToMessageId
+        Long replyToMessageId,
+        @NotNull(message = "Pinned must not be null")
+        boolean pinned
 ) {
     public static MessageResponse toResponse(com.jellyone.domain.Message message) {
         return new MessageResponse(
@@ -23,7 +25,8 @@ public record MessageResponse(
                 message.getContent(),
                 UserResponse.toResponse(message.getAuthor()),
                 message.getTimestamp(),
-                message.getReplyToMessageId()
+                message.getReplyToMessageId(),
+                message.isPinned()
         );
     }
 }
