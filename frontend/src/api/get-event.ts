@@ -9,6 +9,14 @@ export const eventSchema = z.object({
   participants: userSchema.array(),
   author: userSchema,
   chatId: z.number(),
+  description: z
+    .string()
+    .nullish()
+    .transform((it) => it ?? undefined),
+  location: z
+    .string()
+    .nullish()
+    .transform((it) => it ?? undefined),
 });
 
 export type Event = z.infer<typeof eventSchema>;

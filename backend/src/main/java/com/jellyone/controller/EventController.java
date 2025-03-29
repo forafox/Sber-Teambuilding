@@ -101,4 +101,12 @@ public class EventController {
                 participants
         ));
     }
+
+    @PostMapping("/events/prompt")
+    public EventResponse createFromPrompt(
+            @Valid @RequestBody String prompt,
+            Principal principal
+    ) {
+        return EventResponse.toResponse(eventService.createFromPrompt(principal.getName(), prompt));
+    }
 }

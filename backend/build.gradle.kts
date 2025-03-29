@@ -33,6 +33,9 @@ dependencies {
     implementation("org.projectlombok:lombok:1.18.28")
     implementation("org.liquibase:liquibase-core")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf:3.4.3")
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.3.1")
+    implementation("org.apache.httpcomponents.core5:httpcore5:5.2.5")
+    implementation("org.apache.httpcomponents.core5:httpcore5-h2:5.2.5")
 
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.5")
@@ -54,6 +57,8 @@ dependencies {
 
     implementation(project(":telegram"))
     implementation(project(":mail"))
+
+    implementation("chat.giga:gigachat-java:0.1.2")
 }
 
 java {

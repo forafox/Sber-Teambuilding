@@ -52,6 +52,9 @@ export function UpdateEventDialog({ open, onOpenChange, defaultEvent }: Props) {
         date: data.date.toISOString(),
         title: data.title,
         participants: data.participants.map((it) => it.id),
+        status: "IN_PROGRESS",
+        description: data.description,
+        location: data.location,
       },
       {
         onSuccess: () => {

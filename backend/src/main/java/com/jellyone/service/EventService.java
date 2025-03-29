@@ -2,12 +2,17 @@ package com.jellyone.service;
 
 import com.jellyone.domain.Chat;
 import com.jellyone.domain.Event;
+import com.jellyone.domain.Task;
 import com.jellyone.domain.User;
 import com.jellyone.domain.enums.EventStatus;
 import com.jellyone.domain.enums.ServerChange;
+import com.jellyone.domain.enums.TaskStatus;
 import com.jellyone.exception.ResourceAlreadyExistsException;
 import com.jellyone.exception.ResourceNotFoundException;
+import com.jellyone.gigachat.LLMClient;
 import com.jellyone.repository.EventRepository;
+import com.jellyone.repository.TaskRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -16,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +34,8 @@ public class EventService {
     private final UserService userService;
     private final WebSocketSessionService webSocketSessionService;
     private final ChatService chatService;
+    private final LLMClient llmClient;
+    private final TaskRepository taskRepository;
 
     public Event create(String title, String description, String location, EventStatus status, String authorUsername, LocalDateTime date, List<Long> participants) {
         log.info("Try to create event with title: {}", title);
@@ -105,5 +113,38 @@ public class EventService {
 
     private boolean checkIfUserAlreadyParticipant(Long userId, List<User> participants) {
         return participants.stream().anyMatch(user -> user.getId().equals(userId));
+    }
+
+    @Transactional
+    public Event createFromPrompt(String authorUsername, String prompt) {
+        User authorUser = userService.getByUsername(authorUsername);
+
+        log.info("Creating event from prompt: {}", prompt);
+        var response = this.llmClient.generateEvent(prompt);
+
+        List<User> participantUsers = List.of();
+
+        log.info("Trying to create chat for event with title: {}", response.title());
+        Chat chat = chatService.create();
+        Event event = new Event(0L, response.title(), "", "", EventStatus.IN_PROGRESS, authorUser, LocalDateTime.now(), participantUsers, chat);
+        log.info("Trying to create event with id: {}", event.getId());
+        Event savedEvent = eventRepository.save(event);
+        webSocketSessionService.sendMessageToAll(ServerChange.EVENTS_UPDATED.name());
+
+        response.tasks().forEach((taskName) -> {
+            this.createByName(savedEvent, authorUser, taskName);
+        });
+
+        return savedEvent;
+    }
+
+    private Task createByName(Event event, User author, String title) {
+        Task task = new Task();
+        task.setTitle(title);
+        task.setEvent(event);
+        task.setAuthor(author);
+        task.setStatus(TaskStatus.IN_PROGRESS);
+
+        return this.taskRepository.save(task);
     }
 }
