@@ -2,12 +2,14 @@ import { useEffect, useRef, useMemo } from "react";
 import { useGetMessages } from "@/api/get-messages";
 import { MessageItem } from "./MessageItem";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Message } from "@/api/get-chat";
 
 type MessageListProps = {
   chatId: number;
+  onReply: (message: Message) => void;
 };
 
-export function MessageList({ chatId }: MessageListProps) {
+export function MessageList({ chatId, onReply }: MessageListProps) {
   const { data: messages, isLoading, error } = useGetMessages(chatId);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
@@ -16,6 +18,26 @@ export function MessageList({ chatId }: MessageListProps) {
     if (!messages?.length) return [];
     return [...messages].sort((a, b) => a.id - b.id);
   }, [messages]);
+
+  // Функция прокрутки к указанному сообщению
+  const scrollToMessage = (messageId: number) => {
+    // Находим DOM-элемент сообщения по ID
+    const messageElement = document.getElementById(`message-${messageId}`);
+
+    if (messageElement) {
+      // Прокручиваем элемент в видимую область
+      messageElement.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+
+      // Добавляем временное подсвечивание для лучшей видимости
+      messageElement.classList.add("bg-primary/10");
+      setTimeout(() => {
+        messageElement.classList.remove("bg-primary/10");
+      }, 2000);
+    }
+  };
 
   // Scroll to bottom when new messages are received
   useEffect(() => {
@@ -59,7 +81,13 @@ export function MessageList({ chatId }: MessageListProps) {
     <ScrollArea ref={scrollAreaRef} className="h-full px-4 py-4">
       <div className="flex flex-col gap-4">
         {sortedMessages.map((message) => (
-          <MessageItem key={message.id} message={message} chatId={chatId} />
+          <MessageItem
+            key={message.id}
+            message={message}
+            chatId={chatId}
+            onReply={onReply}
+            scrollToMessage={scrollToMessage}
+          />
         ))}
       </div>
     </ScrollArea>

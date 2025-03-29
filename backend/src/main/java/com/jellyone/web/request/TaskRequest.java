@@ -8,5 +8,6 @@ public record TaskRequest(
         String assigneeUsername,
         @NotNull TaskStatus status,
         String description,
-        Double expenses
+        Double expenses,
+        String url
 ) {}

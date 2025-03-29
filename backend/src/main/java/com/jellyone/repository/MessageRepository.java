@@ -12,4 +12,6 @@ public interface MessageRepository extends JpaRepository<Message, Long>, JpaSpec
     List<Message> findAllByChatId(Long chatId);
 
     List<Message> findAllByChatIdOrderByTimestampAsc(Long chatId);
+
+    List<Message> findAllByChatIdAndPinnedTrue(Long chatId);
 }

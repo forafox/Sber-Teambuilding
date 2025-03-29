@@ -18,9 +18,10 @@ import { Route as IndexImport } from "./routes/index";
 import { Route as AuthenticatedHomeImport } from "./routes/_authenticated/home";
 import { Route as AuthenticatedEventsNewImport } from "./routes/_authenticated/events/new";
 import { Route as AuthenticatedEventsEventIdRouteImport } from "./routes/_authenticated/events/$eventId/route";
-import { Route as AuthenticatedEventsEventIdTasksImport } from "./routes/_authenticated/events/$eventId/tasks";
 import { Route as AuthenticatedEventsEventIdExpensesImport } from "./routes/_authenticated/events/$eventId/expenses";
 import { Route as AuthenticatedEventsEventIdChatImport } from "./routes/_authenticated/events/$eventId/chat";
+import { Route as AuthenticatedEventsEventIdTasksIndexImport } from "./routes/_authenticated/events/$eventId/tasks.index";
+import { Route as AuthenticatedEventsEventIdTasksTaskIdImport } from "./routes/_authenticated/events/$eventId/tasks.$taskId";
 
 // Create/Update Routes
 
@@ -66,13 +67,6 @@ const AuthenticatedEventsEventIdRouteRoute =
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any);
 
-const AuthenticatedEventsEventIdTasksRoute =
-  AuthenticatedEventsEventIdTasksImport.update({
-    id: "/tasks",
-    path: "/tasks",
-    getParentRoute: () => AuthenticatedEventsEventIdRouteRoute,
-  } as any);
-
 const AuthenticatedEventsEventIdExpensesRoute =
   AuthenticatedEventsEventIdExpensesImport.update({
     id: "/expenses",
@@ -84,6 +78,20 @@ const AuthenticatedEventsEventIdChatRoute =
   AuthenticatedEventsEventIdChatImport.update({
     id: "/chat",
     path: "/chat",
+    getParentRoute: () => AuthenticatedEventsEventIdRouteRoute,
+  } as any);
+
+const AuthenticatedEventsEventIdTasksIndexRoute =
+  AuthenticatedEventsEventIdTasksIndexImport.update({
+    id: "/tasks/",
+    path: "/tasks/",
+    getParentRoute: () => AuthenticatedEventsEventIdRouteRoute,
+  } as any);
+
+const AuthenticatedEventsEventIdTasksTaskIdRoute =
+  AuthenticatedEventsEventIdTasksTaskIdImport.update({
+    id: "/tasks/$taskId",
+    path: "/tasks/$taskId",
     getParentRoute: () => AuthenticatedEventsEventIdRouteRoute,
   } as any);
 
@@ -154,11 +162,18 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthenticatedEventsEventIdExpensesImport;
       parentRoute: typeof AuthenticatedEventsEventIdRouteImport;
     };
-    "/_authenticated/events/$eventId/tasks": {
-      id: "/_authenticated/events/$eventId/tasks";
+    "/_authenticated/events/$eventId/tasks/$taskId": {
+      id: "/_authenticated/events/$eventId/tasks/$taskId";
+      path: "/tasks/$taskId";
+      fullPath: "/events/$eventId/tasks/$taskId";
+      preLoaderRoute: typeof AuthenticatedEventsEventIdTasksTaskIdImport;
+      parentRoute: typeof AuthenticatedEventsEventIdRouteImport;
+    };
+    "/_authenticated/events/$eventId/tasks/": {
+      id: "/_authenticated/events/$eventId/tasks/";
       path: "/tasks";
       fullPath: "/events/$eventId/tasks";
-      preLoaderRoute: typeof AuthenticatedEventsEventIdTasksImport;
+      preLoaderRoute: typeof AuthenticatedEventsEventIdTasksIndexImport;
       parentRoute: typeof AuthenticatedEventsEventIdRouteImport;
     };
   }
@@ -169,7 +184,8 @@ declare module "@tanstack/react-router" {
 interface AuthenticatedEventsEventIdRouteRouteChildren {
   AuthenticatedEventsEventIdChatRoute: typeof AuthenticatedEventsEventIdChatRoute;
   AuthenticatedEventsEventIdExpensesRoute: typeof AuthenticatedEventsEventIdExpensesRoute;
-  AuthenticatedEventsEventIdTasksRoute: typeof AuthenticatedEventsEventIdTasksRoute;
+  AuthenticatedEventsEventIdTasksTaskIdRoute: typeof AuthenticatedEventsEventIdTasksTaskIdRoute;
+  AuthenticatedEventsEventIdTasksIndexRoute: typeof AuthenticatedEventsEventIdTasksIndexRoute;
 }
 
 const AuthenticatedEventsEventIdRouteRouteChildren: AuthenticatedEventsEventIdRouteRouteChildren =
@@ -177,7 +193,10 @@ const AuthenticatedEventsEventIdRouteRouteChildren: AuthenticatedEventsEventIdRo
     AuthenticatedEventsEventIdChatRoute: AuthenticatedEventsEventIdChatRoute,
     AuthenticatedEventsEventIdExpensesRoute:
       AuthenticatedEventsEventIdExpensesRoute,
-    AuthenticatedEventsEventIdTasksRoute: AuthenticatedEventsEventIdTasksRoute,
+    AuthenticatedEventsEventIdTasksTaskIdRoute:
+      AuthenticatedEventsEventIdTasksTaskIdRoute,
+    AuthenticatedEventsEventIdTasksIndexRoute:
+      AuthenticatedEventsEventIdTasksIndexRoute,
   };
 
 const AuthenticatedEventsEventIdRouteRouteWithChildren =
@@ -211,7 +230,8 @@ export interface FileRoutesByFullPath {
   "/events/new": typeof AuthenticatedEventsNewRoute;
   "/events/$eventId/chat": typeof AuthenticatedEventsEventIdChatRoute;
   "/events/$eventId/expenses": typeof AuthenticatedEventsEventIdExpensesRoute;
-  "/events/$eventId/tasks": typeof AuthenticatedEventsEventIdTasksRoute;
+  "/events/$eventId/tasks/$taskId": typeof AuthenticatedEventsEventIdTasksTaskIdRoute;
+  "/events/$eventId/tasks": typeof AuthenticatedEventsEventIdTasksIndexRoute;
 }
 
 export interface FileRoutesByTo {
@@ -224,7 +244,8 @@ export interface FileRoutesByTo {
   "/events/new": typeof AuthenticatedEventsNewRoute;
   "/events/$eventId/chat": typeof AuthenticatedEventsEventIdChatRoute;
   "/events/$eventId/expenses": typeof AuthenticatedEventsEventIdExpensesRoute;
-  "/events/$eventId/tasks": typeof AuthenticatedEventsEventIdTasksRoute;
+  "/events/$eventId/tasks/$taskId": typeof AuthenticatedEventsEventIdTasksTaskIdRoute;
+  "/events/$eventId/tasks": typeof AuthenticatedEventsEventIdTasksIndexRoute;
 }
 
 export interface FileRoutesById {
@@ -238,7 +259,8 @@ export interface FileRoutesById {
   "/_authenticated/events/new": typeof AuthenticatedEventsNewRoute;
   "/_authenticated/events/$eventId/chat": typeof AuthenticatedEventsEventIdChatRoute;
   "/_authenticated/events/$eventId/expenses": typeof AuthenticatedEventsEventIdExpensesRoute;
-  "/_authenticated/events/$eventId/tasks": typeof AuthenticatedEventsEventIdTasksRoute;
+  "/_authenticated/events/$eventId/tasks/$taskId": typeof AuthenticatedEventsEventIdTasksTaskIdRoute;
+  "/_authenticated/events/$eventId/tasks/": typeof AuthenticatedEventsEventIdTasksIndexRoute;
 }
 
 export interface FileRouteTypes {
@@ -253,6 +275,7 @@ export interface FileRouteTypes {
     | "/events/new"
     | "/events/$eventId/chat"
     | "/events/$eventId/expenses"
+    | "/events/$eventId/tasks/$taskId"
     | "/events/$eventId/tasks";
   fileRoutesByTo: FileRoutesByTo;
   to:
@@ -265,6 +288,7 @@ export interface FileRouteTypes {
     | "/events/new"
     | "/events/$eventId/chat"
     | "/events/$eventId/expenses"
+    | "/events/$eventId/tasks/$taskId"
     | "/events/$eventId/tasks";
   id:
     | "__root__"
@@ -277,7 +301,8 @@ export interface FileRouteTypes {
     | "/_authenticated/events/new"
     | "/_authenticated/events/$eventId/chat"
     | "/_authenticated/events/$eventId/expenses"
-    | "/_authenticated/events/$eventId/tasks";
+    | "/_authenticated/events/$eventId/tasks/$taskId"
+    | "/_authenticated/events/$eventId/tasks/";
   fileRoutesById: FileRoutesById;
 }
 
@@ -338,7 +363,8 @@ export const routeTree = rootRoute
       "children": [
         "/_authenticated/events/$eventId/chat",
         "/_authenticated/events/$eventId/expenses",
-        "/_authenticated/events/$eventId/tasks"
+        "/_authenticated/events/$eventId/tasks/$taskId",
+        "/_authenticated/events/$eventId/tasks/"
       ]
     },
     "/_authenticated/events/new": {
@@ -353,8 +379,12 @@ export const routeTree = rootRoute
       "filePath": "_authenticated/events/$eventId/expenses.tsx",
       "parent": "/_authenticated/events/$eventId"
     },
-    "/_authenticated/events/$eventId/tasks": {
-      "filePath": "_authenticated/events/$eventId/tasks.tsx",
+    "/_authenticated/events/$eventId/tasks/$taskId": {
+      "filePath": "_authenticated/events/$eventId/tasks.$taskId.tsx",
+      "parent": "/_authenticated/events/$eventId"
+    },
+    "/_authenticated/events/$eventId/tasks/": {
+      "filePath": "_authenticated/events/$eventId/tasks.index.tsx",
       "parent": "/_authenticated/events/$eventId"
     }
   }

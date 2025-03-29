@@ -12,13 +12,19 @@ import { calculateBalances } from "./logic";
 import { User } from "@/api/get-users";
 import { Task } from "@/api/get-tasks";
 import { UserHoverCard } from "@/components/user/user-hover-card";
+import { ExpensesRowActions } from "@/components/expenses/expenses-row-actions";
 
 interface ExpensesPageProps {
   tasks: Task[];
   participants: User[];
+  eventId: number;
 }
 
-export function ExpensesPage({ tasks, participants }: ExpensesPageProps) {
+export function ExpensesPage({
+  tasks,
+  participants,
+  eventId,
+}: ExpensesPageProps) {
   const tasksWithExpenses = tasks.filter((task) => task.expenses !== undefined);
 
   // Calculate balances between participants
@@ -57,6 +63,7 @@ export function ExpensesPage({ tasks, participants }: ExpensesPageProps) {
                   <TableHead>Исполнитель</TableHead>
                   <TableHead>Автор</TableHead>
                   <TableHead className="text-right">Сумма</TableHead>
+                  <TableHead className="w-[50px]"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -75,6 +82,9 @@ export function ExpensesPage({ tasks, participants }: ExpensesPageProps) {
                         currency: "RUB",
                       })}
                     </TableCell>
+                    <TableCell>
+                      <ExpensesRowActions task={task} eventId={eventId} />
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -87,6 +97,7 @@ export function ExpensesPage({ tasks, participants }: ExpensesPageProps) {
                       currency: "RUB",
                     })}
                   </TableCell>
+                  <TableCell />
                 </TableRow>
               </TableFooter>
             </Table>

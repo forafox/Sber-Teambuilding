@@ -3,6 +3,7 @@ package com.jellyone.service;
 import com.jellyone.domain.Chat;
 import com.jellyone.domain.Event;
 import com.jellyone.domain.User;
+import com.jellyone.domain.enums.EventStatus;
 import com.jellyone.domain.enums.ServerChange;
 import com.jellyone.exception.ResourceAlreadyExistsException;
 import com.jellyone.exception.ResourceNotFoundException;
@@ -28,7 +29,7 @@ public class EventService {
     private final WebSocketSessionService webSocketSessionService;
     private final ChatService chatService;
 
-    public Event create(String title, String authorUsername, LocalDateTime date, List<Long> participants) {
+    public Event create(String title, String description, String location, EventStatus status, String authorUsername, LocalDateTime date, List<Long> participants) {
         log.info("Try to create event with title: {}", title);
         User authorUser = userService.getByUsername(authorUsername);
         List<User> participantUsers = (participants != null)
@@ -37,7 +38,7 @@ public class EventService {
 
         log.info("Trying to create chat with event title: {}", title);
         Chat chat = chatService.create();
-        Event event = new Event(0L, title, authorUser, date, participantUsers, chat);
+        Event event = new Event(0L, title, description, location, status, authorUser, date, participantUsers, chat);
         log.info("Trying to create event with id: {}", event.getId());
         event = eventRepository.save(event);
         webSocketSessionService.sendMessageToAll(ServerChange.EVENTS_UPDATED.name());
@@ -45,7 +46,7 @@ public class EventService {
         return event;
     }
 
-    public Event update(Long id, String title, LocalDateTime date, List<Long> participants) {
+    public Event update(Long id, String title, String description, String location, EventStatus status, LocalDateTime date, List<Long> participants) {
         log.info("Try to update event with id: {}", id);
         Event event = getById(id);
         List<User> participantUsers = (participants != null)
@@ -55,6 +56,9 @@ public class EventService {
         event.setTitle(title);
         event.setDate(date);
         event.setParticipants(participantUsers);
+        event.setDescription(description);
+        event.setLocation(location);
+        event.setStatus(status);
 
         event = eventRepository.save(event);
         log.info("Event updated with id: {}", event.getId());
@@ -68,11 +72,11 @@ public class EventService {
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
     }
 
-    public Page<Event> getAll(String username, int page, int size) {
+    public Page<Event> getAll(String username, EventStatus status, int page, int size) {
         log.info("Try to get all events");
         Pageable pageable = PageRequest.of(page, size);
         User user = userService.getByUsername(username);
-        return eventRepository.findAllWithSomeParameters(user.getId(), pageable);
+        return eventRepository.findAllWithSomeParameters(user.getId(), status, pageable);
     }
 
     public void delete(Long id) {

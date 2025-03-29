@@ -21,24 +21,43 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useUpdateMessage } from "@/api/update-message";
 import { useDeleteMessage } from "@/api/delete-message";
-import { ClipboardCopyIcon, EditIcon, TrashIcon } from "lucide-react";
+import {
+  ClipboardCopyIcon,
+  EditIcon,
+  TrashIcon,
+  ReplyIcon,
+} from "lucide-react";
 import { isMobileDevice } from "@/lib/utils";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
+import { getMessagesQueryOptions } from "@/api/get-messages";
 
 type MessageItemProps = {
   message: Message;
   chatId: number;
+  onReply?: (message: Message) => void;
+  scrollToMessage?: (messageId: number) => void;
 };
 
-export function MessageItem({ message, chatId }: MessageItemProps) {
+export function MessageItem({
+  message,
+  chatId,
+  onReply,
+  scrollToMessage,
+}: MessageItemProps) {
   const { data: userData } = useSuspenseQuery(getMeQueryOptions());
+  const { data: messages } = useSuspenseQuery(getMessagesQueryOptions(chatId));
   const isCurrentUser = userData?.id === message.author?.id;
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editedContent, setEditedContent] = useState(message.content);
+  const [isRemoveReply, setIsRemoveReply] = useState(false);
   const [isContextMenuOpen, setIsContextMenuOpen] = useState(false);
   const isMobile = isMobileDevice();
   const contextMenuRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+
+  const replyToMessage = message.replyToMessageId
+    ? (messages?.find((msg) => msg.id === message.replyToMessageId) ?? null)
+    : null;
 
   useOutsideClick(contextMenuRef, () => {
     if (isContextMenuOpen) {
@@ -64,13 +83,31 @@ export function MessageItem({ message, chatId }: MessageItemProps) {
 
   const handleEditMessage = () => {
     setEditedContent(message.content);
+    setIsRemoveReply(false);
     setIsEditDialogOpen(true);
     setIsContextMenuOpen(false);
   };
 
+  const handleReplyMessage = () => {
+    if (onReply) {
+      onReply(message);
+    }
+    setIsContextMenuOpen(false);
+  };
+
   const handleSaveEdit = () => {
-    if (editedContent.trim() && editedContent !== message.content) {
-      updateMessage.mutate({ content: editedContent.trim() });
+    if (
+      editedContent.trim() &&
+      (editedContent !== message.content || isRemoveReply)
+    ) {
+      updateMessage.mutate({
+        content: editedContent.trim(),
+        replyToMessageId: isRemoveReply
+          ? undefined
+          : message.replyToMessageId
+            ? message.replyToMessageId
+            : undefined,
+      });
     }
     setIsEditDialogOpen(false);
   };
@@ -95,12 +132,177 @@ export function MessageItem({ message, chatId }: MessageItemProps) {
     }
   };
 
+  const handleReplyClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Предотвращаем всплытие события
+    if (message.replyToMessageId && scrollToMessage) {
+      scrollToMessage(message.replyToMessageId);
+    }
+  };
+
+  const renderReplyInfo = () => {
+    if (!message.replyToMessageId) return null;
+
+    return (
+      <div
+        className="bg-muted/30 hover:bg-muted/50 mb-1 cursor-pointer rounded px-2 py-1 transition-colors"
+        onClick={handleReplyClick}
+      >
+        <div className="flex items-center">
+          <div className="bg-primary mr-2 h-3 w-0.5 rounded-full"></div>
+          <div className="flex-1 text-xs leading-tight">
+            <div className="text-primary font-semibold">
+              {replyToMessage
+                ? replyToMessage.author.name
+                : "Удалённое сообщение"}
+            </div>
+            {replyToMessage && (
+              <div className="text-muted-foreground truncate">
+                {replyToMessage.content.length > 50
+                  ? replyToMessage.content.substring(0, 50) + "..."
+                  : replyToMessage.content}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderMobileMessage = () => (
+    <div
+      ref={contentRef}
+      className={`flex max-w-[80%] flex-col ${
+        isCurrentUser ? "items-end" : "items-start"
+      }`}
+      onClick={handleMessageClick}
+    >
+      {renderReplyInfo()}
+      <div
+        className={`rounded-lg px-3 py-2 ${
+          isCurrentUser
+            ? "bg-primary text-primary-foreground"
+            : "bg-muted text-muted-foreground"
+        }`}
+      >
+        <p className="text-sm">{message.content}</p>
+      </div>
+      <span className="text-muted-foreground mt-1 text-xs">
+        {format(message.timestamp, "HH:mm")}
+      </span>
+
+      {isContextMenuOpen && (
+        <div
+          ref={contextMenuRef}
+          className="bg-popover text-popover-foreground animate-in fade-in-0 zoom-in-95 absolute z-50 min-w-32 rounded-md border p-1 shadow-md"
+          style={{
+            left: isCurrentUser
+              ? "auto"
+              : `${contentRef.current?.getBoundingClientRect().left}px`,
+            right: isCurrentUser
+              ? `calc(100% - ${contentRef.current?.getBoundingClientRect().right}px)`
+              : "auto",
+            top: `${contentRef.current?.getBoundingClientRect().bottom}px`,
+          }}
+        >
+          <div
+            className="hover:bg-accent hover:text-accent-foreground cursor-pointer px-2 py-1.5 text-sm"
+            onClick={handleCopyMessage}
+          >
+            <ClipboardCopyIcon className="mr-2 inline-block h-4 w-4" />
+            <span>Копировать</span>
+          </div>
+          {onReply && (
+            <div
+              className="hover:bg-accent hover:text-accent-foreground cursor-pointer px-2 py-1.5 text-sm"
+              onClick={handleReplyMessage}
+            >
+              <ReplyIcon className="mr-2 inline-block h-4 w-4" />
+              <span>Ответить</span>
+            </div>
+          )}
+          {isCurrentUser && (
+            <>
+              <div
+                className="hover:bg-accent hover:text-accent-foreground cursor-pointer px-2 py-1.5 text-sm"
+                onClick={handleEditMessage}
+              >
+                <EditIcon className="mr-2 inline-block h-4 w-4" />
+                <span>Изменить</span>
+              </div>
+              <div
+                className="text-destructive hover:bg-destructive hover:text-destructive-foreground cursor-pointer px-2 py-1.5 text-sm"
+                onClick={handleDeleteMessage}
+              >
+                <TrashIcon className="mr-2 inline-block h-4 w-4" />
+                <span>Удалить</span>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+
+  const renderDesktopMessage = () => (
+    <ContextMenu>
+      <ContextMenuTrigger>
+        <div
+          className={`flex max-w-[80%] flex-col ${
+            isCurrentUser ? "items-end" : "items-start"
+          }`}
+        >
+          {renderReplyInfo()}
+          <div
+            className={`rounded-lg px-3 py-2 ${
+              isCurrentUser
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground"
+            }`}
+          >
+            <p className="text-sm">{message.content}</p>
+          </div>
+          <span className="text-muted-foreground mt-1 text-xs">
+            {format(message.timestamp, "HH:mm")}
+          </span>
+        </div>
+      </ContextMenuTrigger>
+      <ContextMenuContent>
+        <ContextMenuItem onClick={handleCopyMessage}>
+          <ClipboardCopyIcon className="mr-2 h-4 w-4" />
+          <span>Копировать</span>
+        </ContextMenuItem>
+        {onReply && (
+          <ContextMenuItem onClick={handleReplyMessage}>
+            <ReplyIcon className="mr-2 h-4 w-4" />
+            <span>Ответить</span>
+          </ContextMenuItem>
+        )}
+        {isCurrentUser && (
+          <>
+            <ContextMenuItem onClick={handleEditMessage}>
+              <EditIcon className="mr-2 h-4 w-4" />
+              <span>Изменить</span>
+            </ContextMenuItem>
+            <ContextMenuItem
+              onClick={handleDeleteMessage}
+              variant="destructive"
+            >
+              <TrashIcon className="mr-2 h-4 w-4" />
+              <span>Удалить</span>
+            </ContextMenuItem>
+          </>
+        )}
+      </ContextMenuContent>
+    </ContextMenu>
+  );
+
   return (
     <>
       <div
         className={`flex items-start gap-3 ${
           isCurrentUser ? "flex-row-reverse" : "flex-row"
         }`}
+        id={`message-${message.id}`}
       >
         <Avatar className="h-8 w-8">
           <AvatarImage src="" alt={message.author?.name || ""} />
@@ -108,115 +310,7 @@ export function MessageItem({ message, chatId }: MessageItemProps) {
             {message.author?.name ? getInitials(message.author.name) : ""}
           </AvatarFallback>
         </Avatar>
-
-        {isMobile ? (
-          <div
-            ref={contentRef}
-            className={`flex max-w-[80%] flex-col ${
-              isCurrentUser ? "items-end" : "items-start"
-            }`}
-            onClick={handleMessageClick}
-          >
-            <div
-              className={`rounded-lg px-3 py-2 ${
-                isCurrentUser
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground"
-              }`}
-            >
-              <p className="text-sm">{message.content}</p>
-            </div>
-            <span className="text-muted-foreground mt-1 text-xs">
-              {format(message.timestamp, "HH:mm")}
-            </span>
-
-            {isContextMenuOpen && (
-              <div
-                ref={contextMenuRef}
-                className="bg-popover text-popover-foreground animate-in fade-in-0 zoom-in-95 absolute z-50 min-w-32 rounded-md border p-1 shadow-md"
-                style={{
-                  left: isCurrentUser
-                    ? "auto"
-                    : `${contentRef.current?.getBoundingClientRect().left}px`,
-                  right: isCurrentUser
-                    ? `calc(100% - ${contentRef.current?.getBoundingClientRect().right}px)`
-                    : "auto",
-                  top: `${contentRef.current?.getBoundingClientRect().bottom}px`,
-                }}
-              >
-                <div
-                  className="hover:bg-accent hover:text-accent-foreground cursor-pointer px-2 py-1.5 text-sm"
-                  onClick={handleCopyMessage}
-                >
-                  <ClipboardCopyIcon className="mr-2 inline-block h-4 w-4" />
-                  <span>Копировать</span>
-                </div>
-                {isCurrentUser && (
-                  <>
-                    <div
-                      className="hover:bg-accent hover:text-accent-foreground cursor-pointer px-2 py-1.5 text-sm"
-                      onClick={handleEditMessage}
-                    >
-                      <EditIcon className="mr-2 inline-block h-4 w-4" />
-                      <span>Изменить</span>
-                    </div>
-                    <div
-                      className="text-destructive hover:bg-destructive hover:text-destructive-foreground cursor-pointer px-2 py-1.5 text-sm"
-                      onClick={handleDeleteMessage}
-                    >
-                      <TrashIcon className="mr-2 inline-block h-4 w-4" />
-                      <span>Удалить</span>
-                    </div>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
-        ) : (
-          <ContextMenu>
-            <ContextMenuTrigger>
-              <div
-                className={`flex max-w-[80%] flex-col ${
-                  isCurrentUser ? "items-end" : "items-start"
-                }`}
-              >
-                <div
-                  className={`rounded-lg px-3 py-2 ${
-                    isCurrentUser
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-muted-foreground"
-                  }`}
-                >
-                  <p className="text-sm">{message.content}</p>
-                </div>
-                <span className="text-muted-foreground mt-1 text-xs">
-                  {format(message.timestamp, "HH:mm")}
-                </span>
-              </div>
-            </ContextMenuTrigger>
-            <ContextMenuContent>
-              <ContextMenuItem onClick={handleCopyMessage}>
-                <ClipboardCopyIcon className="mr-2 h-4 w-4" />
-                <span>Копировать</span>
-              </ContextMenuItem>
-              {isCurrentUser && (
-                <>
-                  <ContextMenuItem onClick={handleEditMessage}>
-                    <EditIcon className="mr-2 h-4 w-4" />
-                    <span>Изменить</span>
-                  </ContextMenuItem>
-                  <ContextMenuItem
-                    onClick={handleDeleteMessage}
-                    variant="destructive"
-                  >
-                    <TrashIcon className="mr-2 h-4 w-4" />
-                    <span>Удалить</span>
-                  </ContextMenuItem>
-                </>
-              )}
-            </ContextMenuContent>
-          </ContextMenu>
-        )}
+        {isMobile ? renderMobileMessage() : renderDesktopMessage()}
       </div>
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
@@ -224,6 +318,30 @@ export function MessageItem({ message, chatId }: MessageItemProps) {
           <DialogHeader>
             <DialogTitle>Изменить сообщение</DialogTitle>
           </DialogHeader>
+          {message.replyToMessageId && (
+            <div className="text-muted-foreground flex items-center justify-between text-sm">
+              <div className="flex-1">
+                {replyToMessage ? (
+                  <>
+                    <span>Ответ на сообщение от </span>
+                    <span className="font-semibold">
+                      {replyToMessage.author.name}
+                    </span>
+                  </>
+                ) : (
+                  <span>Ответ на удалённое сообщение</span>
+                )}
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsRemoveReply(!isRemoveReply)}
+                className={isRemoveReply ? "text-destructive" : ""}
+              >
+                {isRemoveReply ? "Восстановить ответ" : "Убрать ответ"}
+              </Button>
+            </div>
+          )}
           <div className="flex items-center space-y-2">
             <Input
               value={editedContent}

@@ -1,5 +1,6 @@
 package com.jellyone.controller;
 
+import com.jellyone.domain.enums.EventStatus;
 import com.jellyone.util.AuthUtil;
 import com.jellyone.web.request.EventRequest;
 import com.jellyone.web.request.MessageRequest;
@@ -62,7 +63,7 @@ class MessageControllerTest {
     @Test
     @Order(1)
     void createMessageShouldReturnOk() {
-        MessageRequest messageRequest = new MessageRequest("Test Message", null);
+        MessageRequest messageRequest = new MessageRequest("Test Message", null, false);
 
         MessageResponse messageResponse = RestAssured.given()
                 .auth().oauth2(jwtToken)
@@ -113,7 +114,7 @@ class MessageControllerTest {
     @Test
     @Order(4)
     void updateMessageShouldReturnOk() {
-        MessageRequest messageRequest = new MessageRequest("Updated Message", null);
+        MessageRequest messageRequest = new MessageRequest("Updated Message", null, false);
 
         RestAssured.given()
                 .auth().oauth2(jwtToken)
@@ -142,7 +143,7 @@ class MessageControllerTest {
     @Test
     @Order(6)
     void createReplyMessageShouldReturnOk() {
-        MessageRequest messageRequest = new MessageRequest("Test Message", null);
+        MessageRequest messageRequest = new MessageRequest("Test Message", null, false);
 
         MessageResponse messageResponse = RestAssured.given()
                 .auth().oauth2(jwtToken)
@@ -157,7 +158,7 @@ class MessageControllerTest {
                 .as(MessageResponse.class);
 
         messageId = messageResponse.id();
-        MessageRequest messageRequestWithReply = new MessageRequest("Test Message", messageId);
+        MessageRequest messageRequestWithReply = new MessageRequest("Test Message", messageId, false);
 
         MessageResponse messageResponseWithReply = RestAssured.given()
                 .auth().oauth2(jwtToken)
@@ -177,6 +178,9 @@ class MessageControllerTest {
     private void createEvent() {
         EventRequest eventRequest = new EventRequest(
                 "Test Event",
+                "Test Event Description",
+                "Test Event Location",
+                EventStatus.IN_PROGRESS,
                 LocalDateTime.now(),
                 Collections.singletonList(1L) // Assuming user with ID 1 exists
         );

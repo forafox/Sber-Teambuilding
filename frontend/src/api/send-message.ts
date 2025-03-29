@@ -3,11 +3,16 @@ import { api } from "./api";
 import { MessageRequest } from "./api.gen";
 import { Message, messageSchema } from "./get-chat";
 
+// Расширяем тип MessageRequest для поддержки replyToMessageId
+type ExtendedMessageRequest = MessageRequest & {
+  replyToMessageId?: number;
+};
+
 export function useSendMessage(chatId: number) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (message: MessageRequest) => {
+    mutationFn: async (message: ExtendedMessageRequest) => {
       const response = await api.api.createMessage(chatId, message);
       return messageSchema.parse(response.data);
     },

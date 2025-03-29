@@ -13,6 +13,7 @@ public class TaskDTO implements Printable {
     private long assignedID;
     private long authorID;
     private long eventID;
+    private String url;
 
     public TaskDTO(long eventID, long authorID) {
         this.eventID = eventID;
