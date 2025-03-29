@@ -9,12 +9,18 @@ import {
 import { getTasksQueryOptions, Task } from "@/api/get-tasks";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Button } from "../ui/button";
-import { PlusIcon, CheckIcon, PencilIcon, Trash2Icon } from "lucide-react";
+import {
+  PlusIcon,
+  CheckIcon,
+  PencilIcon,
+  Trash2Icon,
+} from "lucide-react";
 import { useDeleteTaskMutation } from "@/api/delete-task";
 import { useState } from "react";
 import { UpdateTaskDialog } from "./update-task-dialog";
 import { CreateTaskDialog } from "./create-task-dialog";
 import { useUpdateTaskMutation } from "@/api/update-task";
+import { Link } from "@tanstack/react-router";
 
 type Props = {
   eventId: number;
@@ -86,7 +92,6 @@ export function EventTasks({ eventId }: Props) {
   const [isOpenUpdateDialog, setIsOpenUpdateDialog] = useState(false);
   const [isOpenCreateDialog, setIsOpenCreateDialog] = useState(false);
   const activeEvents = tasksData || [];
-  console.log(activeEvents);
 
   const handleEditTask = () => {
     setIsOpenUpdateDialog(true);
@@ -124,11 +129,21 @@ export function EventTasks({ eventId }: Props) {
               <Card key={task.id}>
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle>{task.title}</CardTitle>
-                    <div className="border-primary/25 rounded-full border-2">
-                      <CardContent>{task.expenses}₽</CardContent>
-                    </div>
+                    <CardTitle>
+                      <Link
+                        to="/events/$eventId/tasks/$taskId"
+                        params={{
+                          eventId: String(eventId),
+                          taskId: String(task.id),
+                        }}
+                      >
+                        {task.title}
+                      </Link>
+                    </CardTitle>
                   </div>
+                  {task.expenses && (
+                    <CardDescription>{task.expenses}₽</CardDescription>
+                  )}
                 </CardHeader>
                 <CardContent>
                   <CardDescription>Автор: {task.author.name}</CardDescription>

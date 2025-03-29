@@ -10,17 +10,18 @@
 
 // Import Routes
 
-import { Route as rootRoute } from "./routes/__root";
-import { Route as SignUpImport } from "./routes/sign-up";
-import { Route as SignInImport } from "./routes/sign-in";
-import { Route as AuthenticatedRouteImport } from "./routes/_authenticated/route";
-import { Route as IndexImport } from "./routes/index";
-import { Route as AuthenticatedHomeImport } from "./routes/_authenticated/home";
-import { Route as AuthenticatedEventsNewImport } from "./routes/_authenticated/events/new";
-import { Route as AuthenticatedEventsEventIdRouteImport } from "./routes/_authenticated/events/$eventId/route";
-import { Route as AuthenticatedEventsEventIdTasksImport } from "./routes/_authenticated/events/$eventId/tasks";
-import { Route as AuthenticatedEventsEventIdExpensesImport } from "./routes/_authenticated/events/$eventId/expenses";
-import { Route as AuthenticatedEventsEventIdChatImport } from "./routes/_authenticated/events/$eventId/chat";
+import { Route as rootRoute } from "./routes/__root"
+import { Route as SignUpImport } from "./routes/sign-up"
+import { Route as SignInImport } from "./routes/sign-in"
+import { Route as AuthenticatedRouteImport } from "./routes/_authenticated/route"
+import { Route as IndexImport } from "./routes/index"
+import { Route as AuthenticatedHomeImport } from "./routes/_authenticated/home"
+import { Route as AuthenticatedEventsNewImport } from "./routes/_authenticated/events/new"
+import { Route as AuthenticatedEventsEventIdRouteImport } from "./routes/_authenticated/events/$eventId/route"
+import { Route as AuthenticatedEventsEventIdExpensesImport } from "./routes/_authenticated/events/$eventId/expenses"
+import { Route as AuthenticatedEventsEventIdChatImport } from "./routes/_authenticated/events/$eventId/chat"
+import { Route as AuthenticatedEventsEventIdTasksIndexImport } from "./routes/_authenticated/events/$eventId/tasks.index"
+import { Route as AuthenticatedEventsEventIdTasksTaskIdImport } from "./routes/_authenticated/events/$eventId/tasks.$taskId"
 
 // Create/Update Routes
 
@@ -28,148 +29,163 @@ const SignUpRoute = SignUpImport.update({
   id: "/sign-up",
   path: "/sign-up",
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
 const SignInRoute = SignInImport.update({
   id: "/sign-in",
   path: "/sign-in",
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
 const AuthenticatedRouteRoute = AuthenticatedRouteImport.update({
   id: "/_authenticated",
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
 const IndexRoute = IndexImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
 const AuthenticatedHomeRoute = AuthenticatedHomeImport.update({
   id: "/home",
   path: "/home",
   getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+} as any)
 
 const AuthenticatedEventsNewRoute = AuthenticatedEventsNewImport.update({
   id: "/events/new",
   path: "/events/new",
   getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+} as any)
 
 const AuthenticatedEventsEventIdRouteRoute =
   AuthenticatedEventsEventIdRouteImport.update({
     id: "/events/$eventId",
     path: "/events/$eventId",
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
-
-const AuthenticatedEventsEventIdTasksRoute =
-  AuthenticatedEventsEventIdTasksImport.update({
-    id: "/tasks",
-    path: "/tasks",
-    getParentRoute: () => AuthenticatedEventsEventIdRouteRoute,
-  } as any);
+  } as any)
 
 const AuthenticatedEventsEventIdExpensesRoute =
   AuthenticatedEventsEventIdExpensesImport.update({
     id: "/expenses",
     path: "/expenses",
     getParentRoute: () => AuthenticatedEventsEventIdRouteRoute,
-  } as any);
+  } as any)
 
 const AuthenticatedEventsEventIdChatRoute =
   AuthenticatedEventsEventIdChatImport.update({
     id: "/chat",
     path: "/chat",
     getParentRoute: () => AuthenticatedEventsEventIdRouteRoute,
-  } as any);
+  } as any)
+
+const AuthenticatedEventsEventIdTasksIndexRoute =
+  AuthenticatedEventsEventIdTasksIndexImport.update({
+    id: "/tasks/",
+    path: "/tasks/",
+    getParentRoute: () => AuthenticatedEventsEventIdRouteRoute,
+  } as any)
+
+const AuthenticatedEventsEventIdTasksTaskIdRoute =
+  AuthenticatedEventsEventIdTasksTaskIdImport.update({
+    id: "/tasks/$taskId",
+    path: "/tasks/$taskId",
+    getParentRoute: () => AuthenticatedEventsEventIdRouteRoute,
+  } as any)
 
 // Populate the FileRoutesByPath interface
 
 declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
     "/": {
-      id: "/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof IndexImport;
-      parentRoute: typeof rootRoute;
-    };
+      id: "/"
+      path: "/"
+      fullPath: "/"
+      preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
     "/_authenticated": {
-      id: "/_authenticated";
-      path: "";
-      fullPath: "";
-      preLoaderRoute: typeof AuthenticatedRouteImport;
-      parentRoute: typeof rootRoute;
-    };
+      id: "/_authenticated"
+      path: ""
+      fullPath: ""
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRoute
+    }
     "/sign-in": {
-      id: "/sign-in";
-      path: "/sign-in";
-      fullPath: "/sign-in";
-      preLoaderRoute: typeof SignInImport;
-      parentRoute: typeof rootRoute;
-    };
+      id: "/sign-in"
+      path: "/sign-in"
+      fullPath: "/sign-in"
+      preLoaderRoute: typeof SignInImport
+      parentRoute: typeof rootRoute
+    }
     "/sign-up": {
-      id: "/sign-up";
-      path: "/sign-up";
-      fullPath: "/sign-up";
-      preLoaderRoute: typeof SignUpImport;
-      parentRoute: typeof rootRoute;
-    };
+      id: "/sign-up"
+      path: "/sign-up"
+      fullPath: "/sign-up"
+      preLoaderRoute: typeof SignUpImport
+      parentRoute: typeof rootRoute
+    }
     "/_authenticated/home": {
-      id: "/_authenticated/home";
-      path: "/home";
-      fullPath: "/home";
-      preLoaderRoute: typeof AuthenticatedHomeImport;
-      parentRoute: typeof AuthenticatedRouteImport;
-    };
+      id: "/_authenticated/home"
+      path: "/home"
+      fullPath: "/home"
+      preLoaderRoute: typeof AuthenticatedHomeImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
     "/_authenticated/events/$eventId": {
-      id: "/_authenticated/events/$eventId";
-      path: "/events/$eventId";
-      fullPath: "/events/$eventId";
-      preLoaderRoute: typeof AuthenticatedEventsEventIdRouteImport;
-      parentRoute: typeof AuthenticatedRouteImport;
-    };
+      id: "/_authenticated/events/$eventId"
+      path: "/events/$eventId"
+      fullPath: "/events/$eventId"
+      preLoaderRoute: typeof AuthenticatedEventsEventIdRouteImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
     "/_authenticated/events/new": {
-      id: "/_authenticated/events/new";
-      path: "/events/new";
-      fullPath: "/events/new";
-      preLoaderRoute: typeof AuthenticatedEventsNewImport;
-      parentRoute: typeof AuthenticatedRouteImport;
-    };
+      id: "/_authenticated/events/new"
+      path: "/events/new"
+      fullPath: "/events/new"
+      preLoaderRoute: typeof AuthenticatedEventsNewImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
     "/_authenticated/events/$eventId/chat": {
-      id: "/_authenticated/events/$eventId/chat";
-      path: "/chat";
-      fullPath: "/events/$eventId/chat";
-      preLoaderRoute: typeof AuthenticatedEventsEventIdChatImport;
-      parentRoute: typeof AuthenticatedEventsEventIdRouteImport;
-    };
+      id: "/_authenticated/events/$eventId/chat"
+      path: "/chat"
+      fullPath: "/events/$eventId/chat"
+      preLoaderRoute: typeof AuthenticatedEventsEventIdChatImport
+      parentRoute: typeof AuthenticatedEventsEventIdRouteImport
+    }
     "/_authenticated/events/$eventId/expenses": {
-      id: "/_authenticated/events/$eventId/expenses";
-      path: "/expenses";
-      fullPath: "/events/$eventId/expenses";
-      preLoaderRoute: typeof AuthenticatedEventsEventIdExpensesImport;
-      parentRoute: typeof AuthenticatedEventsEventIdRouteImport;
-    };
-    "/_authenticated/events/$eventId/tasks": {
-      id: "/_authenticated/events/$eventId/tasks";
-      path: "/tasks";
-      fullPath: "/events/$eventId/tasks";
-      preLoaderRoute: typeof AuthenticatedEventsEventIdTasksImport;
-      parentRoute: typeof AuthenticatedEventsEventIdRouteImport;
-    };
+      id: "/_authenticated/events/$eventId/expenses"
+      path: "/expenses"
+      fullPath: "/events/$eventId/expenses"
+      preLoaderRoute: typeof AuthenticatedEventsEventIdExpensesImport
+      parentRoute: typeof AuthenticatedEventsEventIdRouteImport
+    }
+    "/_authenticated/events/$eventId/tasks/$taskId": {
+      id: "/_authenticated/events/$eventId/tasks/$taskId"
+      path: "/tasks/$taskId"
+      fullPath: "/events/$eventId/tasks/$taskId"
+      preLoaderRoute: typeof AuthenticatedEventsEventIdTasksTaskIdImport
+      parentRoute: typeof AuthenticatedEventsEventIdRouteImport
+    }
+    "/_authenticated/events/$eventId/tasks/": {
+      id: "/_authenticated/events/$eventId/tasks/"
+      path: "/tasks"
+      fullPath: "/events/$eventId/tasks"
+      preLoaderRoute: typeof AuthenticatedEventsEventIdTasksIndexImport
+      parentRoute: typeof AuthenticatedEventsEventIdRouteImport
+    }
   }
 }
 
 // Create and export the route tree
 
 interface AuthenticatedEventsEventIdRouteRouteChildren {
-  AuthenticatedEventsEventIdChatRoute: typeof AuthenticatedEventsEventIdChatRoute;
-  AuthenticatedEventsEventIdExpensesRoute: typeof AuthenticatedEventsEventIdExpensesRoute;
-  AuthenticatedEventsEventIdTasksRoute: typeof AuthenticatedEventsEventIdTasksRoute;
+  AuthenticatedEventsEventIdChatRoute: typeof AuthenticatedEventsEventIdChatRoute
+  AuthenticatedEventsEventIdExpensesRoute: typeof AuthenticatedEventsEventIdExpensesRoute
+  AuthenticatedEventsEventIdTasksTaskIdRoute: typeof AuthenticatedEventsEventIdTasksTaskIdRoute
+  AuthenticatedEventsEventIdTasksIndexRoute: typeof AuthenticatedEventsEventIdTasksIndexRoute
 }
 
 const AuthenticatedEventsEventIdRouteRouteChildren: AuthenticatedEventsEventIdRouteRouteChildren =
@@ -177,18 +193,21 @@ const AuthenticatedEventsEventIdRouteRouteChildren: AuthenticatedEventsEventIdRo
     AuthenticatedEventsEventIdChatRoute: AuthenticatedEventsEventIdChatRoute,
     AuthenticatedEventsEventIdExpensesRoute:
       AuthenticatedEventsEventIdExpensesRoute,
-    AuthenticatedEventsEventIdTasksRoute: AuthenticatedEventsEventIdTasksRoute,
-  };
+    AuthenticatedEventsEventIdTasksTaskIdRoute:
+      AuthenticatedEventsEventIdTasksTaskIdRoute,
+    AuthenticatedEventsEventIdTasksIndexRoute:
+      AuthenticatedEventsEventIdTasksIndexRoute,
+  }
 
 const AuthenticatedEventsEventIdRouteRouteWithChildren =
   AuthenticatedEventsEventIdRouteRoute._addFileChildren(
     AuthenticatedEventsEventIdRouteRouteChildren,
-  );
+  )
 
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute;
-  AuthenticatedEventsEventIdRouteRoute: typeof AuthenticatedEventsEventIdRouteRouteWithChildren;
-  AuthenticatedEventsNewRoute: typeof AuthenticatedEventsNewRoute;
+  AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
+  AuthenticatedEventsEventIdRouteRoute: typeof AuthenticatedEventsEventIdRouteRouteWithChildren
+  AuthenticatedEventsNewRoute: typeof AuthenticatedEventsNewRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -196,53 +215,56 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEventsEventIdRouteRoute:
     AuthenticatedEventsEventIdRouteRouteWithChildren,
   AuthenticatedEventsNewRoute: AuthenticatedEventsNewRoute,
-};
+}
 
 const AuthenticatedRouteRouteWithChildren =
-  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren);
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute;
-  "": typeof AuthenticatedRouteRouteWithChildren;
-  "/sign-in": typeof SignInRoute;
-  "/sign-up": typeof SignUpRoute;
-  "/home": typeof AuthenticatedHomeRoute;
-  "/events/$eventId": typeof AuthenticatedEventsEventIdRouteRouteWithChildren;
-  "/events/new": typeof AuthenticatedEventsNewRoute;
-  "/events/$eventId/chat": typeof AuthenticatedEventsEventIdChatRoute;
-  "/events/$eventId/expenses": typeof AuthenticatedEventsEventIdExpensesRoute;
-  "/events/$eventId/tasks": typeof AuthenticatedEventsEventIdTasksRoute;
+  "/": typeof IndexRoute
+  "": typeof AuthenticatedRouteRouteWithChildren
+  "/sign-in": typeof SignInRoute
+  "/sign-up": typeof SignUpRoute
+  "/home": typeof AuthenticatedHomeRoute
+  "/events/$eventId": typeof AuthenticatedEventsEventIdRouteRouteWithChildren
+  "/events/new": typeof AuthenticatedEventsNewRoute
+  "/events/$eventId/chat": typeof AuthenticatedEventsEventIdChatRoute
+  "/events/$eventId/expenses": typeof AuthenticatedEventsEventIdExpensesRoute
+  "/events/$eventId/tasks/$taskId": typeof AuthenticatedEventsEventIdTasksTaskIdRoute
+  "/events/$eventId/tasks": typeof AuthenticatedEventsEventIdTasksIndexRoute
 }
 
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute;
-  "": typeof AuthenticatedRouteRouteWithChildren;
-  "/sign-in": typeof SignInRoute;
-  "/sign-up": typeof SignUpRoute;
-  "/home": typeof AuthenticatedHomeRoute;
-  "/events/$eventId": typeof AuthenticatedEventsEventIdRouteRouteWithChildren;
-  "/events/new": typeof AuthenticatedEventsNewRoute;
-  "/events/$eventId/chat": typeof AuthenticatedEventsEventIdChatRoute;
-  "/events/$eventId/expenses": typeof AuthenticatedEventsEventIdExpensesRoute;
-  "/events/$eventId/tasks": typeof AuthenticatedEventsEventIdTasksRoute;
+  "/": typeof IndexRoute
+  "": typeof AuthenticatedRouteRouteWithChildren
+  "/sign-in": typeof SignInRoute
+  "/sign-up": typeof SignUpRoute
+  "/home": typeof AuthenticatedHomeRoute
+  "/events/$eventId": typeof AuthenticatedEventsEventIdRouteRouteWithChildren
+  "/events/new": typeof AuthenticatedEventsNewRoute
+  "/events/$eventId/chat": typeof AuthenticatedEventsEventIdChatRoute
+  "/events/$eventId/expenses": typeof AuthenticatedEventsEventIdExpensesRoute
+  "/events/$eventId/tasks/$taskId": typeof AuthenticatedEventsEventIdTasksTaskIdRoute
+  "/events/$eventId/tasks": typeof AuthenticatedEventsEventIdTasksIndexRoute
 }
 
 export interface FileRoutesById {
-  __root__: typeof rootRoute;
-  "/": typeof IndexRoute;
-  "/_authenticated": typeof AuthenticatedRouteRouteWithChildren;
-  "/sign-in": typeof SignInRoute;
-  "/sign-up": typeof SignUpRoute;
-  "/_authenticated/home": typeof AuthenticatedHomeRoute;
-  "/_authenticated/events/$eventId": typeof AuthenticatedEventsEventIdRouteRouteWithChildren;
-  "/_authenticated/events/new": typeof AuthenticatedEventsNewRoute;
-  "/_authenticated/events/$eventId/chat": typeof AuthenticatedEventsEventIdChatRoute;
-  "/_authenticated/events/$eventId/expenses": typeof AuthenticatedEventsEventIdExpensesRoute;
-  "/_authenticated/events/$eventId/tasks": typeof AuthenticatedEventsEventIdTasksRoute;
+  __root__: typeof rootRoute
+  "/": typeof IndexRoute
+  "/_authenticated": typeof AuthenticatedRouteRouteWithChildren
+  "/sign-in": typeof SignInRoute
+  "/sign-up": typeof SignUpRoute
+  "/_authenticated/home": typeof AuthenticatedHomeRoute
+  "/_authenticated/events/$eventId": typeof AuthenticatedEventsEventIdRouteRouteWithChildren
+  "/_authenticated/events/new": typeof AuthenticatedEventsNewRoute
+  "/_authenticated/events/$eventId/chat": typeof AuthenticatedEventsEventIdChatRoute
+  "/_authenticated/events/$eventId/expenses": typeof AuthenticatedEventsEventIdExpensesRoute
+  "/_authenticated/events/$eventId/tasks/$taskId": typeof AuthenticatedEventsEventIdTasksTaskIdRoute
+  "/_authenticated/events/$eventId/tasks/": typeof AuthenticatedEventsEventIdTasksIndexRoute
 }
 
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
+  fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | "/"
     | ""
@@ -253,8 +275,9 @@ export interface FileRouteTypes {
     | "/events/new"
     | "/events/$eventId/chat"
     | "/events/$eventId/expenses"
-    | "/events/$eventId/tasks";
-  fileRoutesByTo: FileRoutesByTo;
+    | "/events/$eventId/tasks/$taskId"
+    | "/events/$eventId/tasks"
+  fileRoutesByTo: FileRoutesByTo
   to:
     | "/"
     | ""
@@ -265,7 +288,8 @@ export interface FileRouteTypes {
     | "/events/new"
     | "/events/$eventId/chat"
     | "/events/$eventId/expenses"
-    | "/events/$eventId/tasks";
+    | "/events/$eventId/tasks/$taskId"
+    | "/events/$eventId/tasks"
   id:
     | "__root__"
     | "/"
@@ -277,15 +301,16 @@ export interface FileRouteTypes {
     | "/_authenticated/events/new"
     | "/_authenticated/events/$eventId/chat"
     | "/_authenticated/events/$eventId/expenses"
-    | "/_authenticated/events/$eventId/tasks";
-  fileRoutesById: FileRoutesById;
+    | "/_authenticated/events/$eventId/tasks/$taskId"
+    | "/_authenticated/events/$eventId/tasks/"
+  fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren;
-  SignInRoute: typeof SignInRoute;
-  SignUpRoute: typeof SignUpRoute;
+  IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  SignInRoute: typeof SignInRoute
+  SignUpRoute: typeof SignUpRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -293,11 +318,11 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
-};
+}
 
 export const routeTree = rootRoute
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()
 
 /* ROUTE_MANIFEST_START
 {
@@ -338,7 +363,8 @@ export const routeTree = rootRoute
       "children": [
         "/_authenticated/events/$eventId/chat",
         "/_authenticated/events/$eventId/expenses",
-        "/_authenticated/events/$eventId/tasks"
+        "/_authenticated/events/$eventId/tasks/$taskId",
+        "/_authenticated/events/$eventId/tasks/"
       ]
     },
     "/_authenticated/events/new": {
@@ -353,8 +379,12 @@ export const routeTree = rootRoute
       "filePath": "_authenticated/events/$eventId/expenses.tsx",
       "parent": "/_authenticated/events/$eventId"
     },
-    "/_authenticated/events/$eventId/tasks": {
-      "filePath": "_authenticated/events/$eventId/tasks.tsx",
+    "/_authenticated/events/$eventId/tasks/$taskId": {
+      "filePath": "_authenticated/events/$eventId/tasks.$taskId.tsx",
+      "parent": "/_authenticated/events/$eventId"
+    },
+    "/_authenticated/events/$eventId/tasks/": {
+      "filePath": "_authenticated/events/$eventId/tasks.index.tsx",
       "parent": "/_authenticated/events/$eventId"
     }
   }
