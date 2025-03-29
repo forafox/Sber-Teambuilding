@@ -73,7 +73,7 @@ export function calculateBalances(
       transactions.push({
         from: debtor.username,
         to: creditor.username,
-        amount: Number(amount.toFixed(2)), // Round to 2 decimal places
+        amount: amount
       });
     }
 

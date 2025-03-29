@@ -11,7 +11,8 @@
     "prettier": "prettier . --write",
     "generate-api": "npx swagger-typescript-api -p http://localhost:8080/v3/api-docs -o src/api -n api.gen.ts --axios",
     "generate-routes": "tsr generate",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.3",
