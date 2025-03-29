@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record MessageRequest(
         @NotNull(message = "Content must not be null")
-        String content
+        String content,
+        Long replyToMessageId
 ) {
 }

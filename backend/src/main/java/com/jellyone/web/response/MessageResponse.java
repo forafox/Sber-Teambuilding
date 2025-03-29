@@ -14,14 +14,16 @@ public record MessageResponse(
         UserResponse author,
         @NotNull(message = "Timestamp must not be null")
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm'Z'", timezone = "UTC")
-        LocalDateTime timestamp
+        LocalDateTime timestamp,
+        Long replyToMessageId
 ) {
     public static MessageResponse toResponse(com.jellyone.domain.Message message) {
         return new MessageResponse(
                 message.getId(),
                 message.getContent(),
                 UserResponse.toResponse(message.getAuthor()),
-                message.getTimestamp()
+                message.getTimestamp(),
+                message.getReplyToMessageId()
         );
     }
 }
