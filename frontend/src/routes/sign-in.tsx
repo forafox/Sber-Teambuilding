@@ -14,6 +14,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod"; // Importing zodResolver
 import { useSignInMutation } from "@/api/sign-in";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 
 export const Route = createFileRoute("/sign-in")({
   component: RouteComponent,
@@ -26,6 +28,7 @@ const signInSchema = z.object({
 
 function RouteComponent() {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -42,6 +45,10 @@ function RouteComponent() {
       },
     });
   }
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   return (
     <div className="flex h-screen flex-col items-center justify-center px-4 md:px-0">
@@ -70,13 +77,33 @@ function RouteComponent() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Пароль</FormLabel>
-                    <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
+                    <div className="relative">
+                      <FormControl>
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          {...field}
+                        />
+                      </FormControl>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute top-0 right-0 h-full px-3"
+                        onClick={togglePasswordVisibility}
+                      >
+                        {showPassword ? (
+                          <EyeOffIcon className="h-4 w-4" />
+                        ) : (
+                          <EyeIcon className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
                   </FormItem>
                 )}
               />
-              <FormMessage>{error?.message}</FormMessage>
+              <FormMessage className="text-destructive">
+                {error?.message}
+              </FormMessage>
               <div className="flex flex-col gap-2 md:flex-row">
                 <Button disabled={isPending} type="submit">
                   Войти
