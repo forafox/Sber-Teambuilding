@@ -1,6 +1,7 @@
 package com.jellyone.adapters.telegram;
 
 import com.jellyone.domain.TelegramUser;
+import com.jellyone.exception.ResourceNotFoundException;
 import com.jellyone.service.TelegramUserService;
 import com.jellyone.service.UserService;
 import com.jellyone.telegram.bot.api.Notificator;
@@ -41,8 +42,14 @@ public class TelegramNotificationService {
     }
 
     private long getChatIdByUsername(String username) {
-        TelegramUser telegramUser = telegramUserService.getByUsername(username);
-        if (telegramUser != null && telegramUser.getTelegramChatId() != null) {
+        TelegramUser telegramUser;
+        try {
+            telegramUser = telegramUserService.getByUsername(username);
+        } catch (ResourceNotFoundException e) {
+            log.info("User not found: {}", username);
+            return -1;
+        }
+        if (telegramUser.getTelegramChatId() != null) {
             return telegramUser.getTelegramChatId();
         }
         return -1;
