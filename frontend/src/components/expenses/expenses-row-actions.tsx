@@ -43,4 +43,4 @@ export function ExpensesRowActions({ task, eventId }: ExpensesRowActionsProps) {
       />
     </>
   );
-} 
+}
