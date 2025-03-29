@@ -30,7 +30,11 @@ function Component() {
   return (
     <div className="container mx-auto space-y-8 px-4 py-6">
       <h2 className="text-2xl font-bold">Расходы</h2>
-      <ExpensesPage tasks={tasks} participants={event.participants} />
+      <ExpensesPage
+        tasks={tasks}
+        participants={event.participants}
+        eventId={eventId}
+      />
     </div>
   );
 }
