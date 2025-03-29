@@ -14,6 +14,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSignUpMutation } from "@/api/sign-up";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 
 export const Route = createFileRoute("/sign-up")({
   component: RouteComponent,
@@ -29,6 +31,7 @@ const signUpSchema = z.object({
 });
 
 function RouteComponent() {
+  const [showPassword, setShowPassword] = useState(false);
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -40,6 +43,10 @@ function RouteComponent() {
   });
   const { mutate, error, isPending } = useSignUpMutation();
   const navigate = useNavigate();
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const handleSubmit = async (data: z.infer<typeof signUpSchema>) => {
     mutate(
@@ -118,14 +125,34 @@ function RouteComponent() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Пароль</FormLabel>
-                    <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
+                    <div className="relative">
+                      <FormControl>
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          {...field}
+                        />
+                      </FormControl>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute top-0 right-0 h-full px-3"
+                        onClick={togglePasswordVisibility}
+                      >
+                        {showPassword ? (
+                          <EyeOffIcon className="h-4 w-4" />
+                        ) : (
+                          <EyeIcon className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <FormMessage>{error?.message}</FormMessage>
+              <FormMessage className="text-destructive">
+                {error?.message}
+              </FormMessage>
               <div className="flex flex-col gap-2 md:flex-row">
                 <Button type="submit" disabled={isPending}>
                   Зарегистрироваться
