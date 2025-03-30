@@ -13,6 +13,7 @@ import {
 
 import "@tanstack/react-query";
 import { AxiosError } from "axios";
+import { ZodError } from "zod";
 
 declare module "@tanstack/react-query" {
   interface Register {
@@ -24,6 +25,9 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry(failureCount, error) {
+        if (error instanceof ZodError) {
+          return false;
+        }
         if (error.response?.status) {
           const status = error.response.status;
           if (400 <= status && status < 500) {

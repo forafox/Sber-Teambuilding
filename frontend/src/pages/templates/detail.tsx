@@ -1,5 +1,5 @@
 import { getTemplateQueryOptions, useCreateTemplate } from "@/api/template";
-import { useParams } from "@tanstack/react-router";
+import { useNavigate, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
   Card,
@@ -16,6 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { ArrowLeftIcon } from "lucide-react";
+import TemplateTasksTable from "./detail-tasks";
 
 export function TemplateDetailPage() {
   const { id } = useParams({ from: "/_authenticated/templates/$id" });
@@ -26,11 +27,16 @@ export function TemplateDetailPage() {
     error,
   } = useQuery(getTemplateQueryOptions(templateId));
   const createTemplateMutation = useCreateTemplate();
+  const navigate = useNavigate();
 
   const handleApplyTemplate = async () => {
     try {
-      await createTemplateMutation.mutateAsync(templateId);
+      const event = await createTemplateMutation.mutateAsync(templateId);
       toast.success("Шаблон успешно применен");
+      navigate({
+        to: "/events/$eventId/tasks",
+        params: { eventId: String(event.id) },
+      });
     } catch (error) {
       toast.error("Не удалось применить шаблон", {
         description:
@@ -72,7 +78,7 @@ export function TemplateDetailPage() {
         <h1 className="text-2xl font-bold">Шаблон мероприятия</h1>
       </div>
 
-      <Card className="mx-auto max-w-3xl">
+      <Card className="mx-auto mb-8 max-w-3xl">
         <CardHeader>
           <CardTitle className="text-xl">{template.title}</CardTitle>
           {template.description && (
@@ -87,27 +93,6 @@ export function TemplateDetailPage() {
               <h3 className="mb-1 text-sm font-medium">Дата создания</h3>
               <p>{format(template.date, "PPP", { locale: ru })}</p>
             </div>
-            <div>
-              <h3 className="mb-1 text-sm font-medium">Автор</h3>
-              <p>{template.author.name}</p>
-            </div>
-            {template.location && (
-              <div>
-                <h3 className="mb-1 text-sm font-medium">Место</h3>
-                <p>{template.location}</p>
-              </div>
-            )}
-          </div>
-
-          <div>
-            <h3 className="mb-2 text-sm font-medium">Участники</h3>
-            <ul className="grid grid-cols-1 gap-2 md:grid-cols-2">
-              {template.participants.map((participant) => (
-                <li key={participant.id} className="flex items-center">
-                  <span>{participant.name}</span>
-                </li>
-              ))}
-            </ul>
           </div>
         </CardContent>
         <CardFooter>
@@ -122,6 +107,10 @@ export function TemplateDetailPage() {
           </Button>
         </CardFooter>
       </Card>
+
+      <div className="mx-auto max-w-3xl">
+        <TemplateTasksTable />
+      </div>
     </div>
   );
 }

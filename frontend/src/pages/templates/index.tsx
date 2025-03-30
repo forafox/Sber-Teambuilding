@@ -32,6 +32,7 @@ export function TemplatesPage() {
         <p className="text-destructive">
           Произошла ошибка при загрузке шаблонов
         </p>
+        <p>{error.message}</p>
       </div>
     );
   }
