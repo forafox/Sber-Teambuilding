@@ -315,7 +315,7 @@ function TaskList({
   handleEditTask,
 }: TaskListProps) {
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-3 gap-4 max-[1285px]:grid-cols-2 max-[1029px]:grid-cols-1">
       {activeTasks.map((task) => (
         <>
           {tasksStatus.includes(task.status) && (
@@ -356,18 +356,20 @@ function TaskList({
                   </CardContent>
                 </div>
               )}
-              <CardFooter className="flex gap-3">
-                <Button
-                  onClick={() => handleEditTask(task)}
-                  className="hover:bg-primary/10 border-inherit bg-transparent text-inherit"
-                >
-                  <PencilIcon className="mr-2 h-4 w-4" />
-                  Изменить
-                </Button>
-                <DeleteTaskButton
-                  taskId={task.id}
-                  eventId={eventId}
-                ></DeleteTaskButton>
+              <CardFooter className="flex gap-3 max-[447px]:flex-col">
+                <div className="flex gap-3">
+                  <Button
+                    onClick={() => handleEditTask(task)}
+                    className="hover:bg-primary/10 border-inherit bg-transparent text-inherit"
+                  >
+                    <PencilIcon className="mr-2 h-4 w-4" />
+                    Изменить
+                  </Button>
+                  <DeleteTaskButton
+                    taskId={task.id}
+                    eventId={eventId}
+                  ></DeleteTaskButton>
+                </div>
                 {task.status == "IN_PROGRESS" && (
                   <MakeDoneTask task={task} eventId={eventId} />
                 )}
