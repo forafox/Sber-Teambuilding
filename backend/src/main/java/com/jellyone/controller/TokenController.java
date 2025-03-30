@@ -79,7 +79,7 @@ public class TokenController {
         return tokenService.encryptEventId(eventId);
     }
 
-    @PostMapping("/verify")
+    @PostMapping(path = "/verify", consumes = org.springframework.http.MediaType.TEXT_PLAIN_VALUE)
     @Operation(summary = "Verify and use participation token",
             description = """
                     Validates an event participation token and adds the current user to the event.

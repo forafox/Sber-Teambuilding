@@ -7,13 +7,18 @@ import useWebSocket from "react-use-websocket";
 
 export const Route = createFileRoute("/_authenticated")({
   component: RouteComponent,
-  beforeLoad: async ({ context }) => {
+  beforeLoad: async ({ context, location }) => {
     try {
       await context.queryClient.fetchQuery(getMeQueryOptions());
       context.queryClient.fetchQuery(getUsersQueryOptions());
     } catch (e) {
       console.error(e);
-      return redirect({ to: "/sign-in" });
+      const currentPath = location.pathname;
+      return redirect({
+        to: "/sign-in",
+        // TODO: fixme
+        search: { redirect: currentPath + location.searchStr },
+      });
     }
   },
 });

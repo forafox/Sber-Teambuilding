@@ -15,7 +15,7 @@ export const messageSchema = z.object({
 export const chatSchema = z.object({
   id: z.number(),
   messages: messageSchema.array(),
-  pinnedMessages: messageSchema.array().optional(),
+  pinnedMessages: messageSchema.array(),
 });
 
 export type Message = z.infer<typeof messageSchema>;

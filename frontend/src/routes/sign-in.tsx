@@ -17,8 +17,13 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 
+const search = z.object({
+  redirect: z.string().optional(),
+});
+
 export const Route = createFileRoute("/sign-in")({
   component: RouteComponent,
+  validateSearch: search,
 });
 
 const signInSchema = z.object({
@@ -28,6 +33,7 @@ const signInSchema = z.object({
 
 function RouteComponent() {
   const navigate = useNavigate();
+  const { redirect } = Route.useSearch();
   const [showPassword, setShowPassword] = useState(false);
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
@@ -41,7 +47,7 @@ function RouteComponent() {
   async function onSubmit(data: z.infer<typeof signInSchema>) {
     mutate(data, {
       onSuccess: () => {
-        navigate({ to: "/home" });
+        navigate({ to: redirect || "/home" });
       },
     });
   }
@@ -109,7 +115,9 @@ function RouteComponent() {
                   Войти
                 </Button>
                 <Button variant="link" asChild>
-                  <Link to="/sign-up">Зарегистрироваться</Link>
+                  <Link to="/sign-up" search={{ redirect: redirect }}>
+                    Зарегистрироваться
+                  </Link>
                 </Button>
               </div>
             </form>

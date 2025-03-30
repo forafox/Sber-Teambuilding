@@ -30,6 +30,8 @@ import {
   PinIcon,
 } from "lucide-react";
 import { isMobileDevice } from "@/lib/utils";
+import { getMeQueryOptions } from "@/api/get-me";
+import { useQuery } from "@tanstack/react-query";
 
 type MessageItemProps = {
   message: Message;
@@ -56,7 +58,13 @@ export function MessageItem({
   const updateMessage = useUpdateMessage();
   const queryClient = useQueryClient();
   const isMobile = isMobileDevice();
-  const isCurrentUser = message.author.id === 1; // Заглушка, в реальном приложении должно быть получено из auth
+
+  // Получаем данные текущего пользователя
+  const { data: currentUser } = useQuery(getMeQueryOptions());
+
+  // Проверяем, является ли сообщение сообщением текущего пользователя
+  const isCurrentUser = currentUser?.id === message.author.id;
+
   const replyToMessage = queryClient
     .getQueryData<Message[]>(getMessagesQueryOptions(chatId).queryKey)
     ?.find((msg) => msg.id === message.replyToMessageId);
