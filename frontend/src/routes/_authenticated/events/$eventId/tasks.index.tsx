@@ -15,7 +15,7 @@ import { useState } from "react";
 import { UpdateEventDialog } from "@/components/events/update-event-dialog";
 import { EventTasks } from "@/components/tasks/event-tasks";
 import { UserHoverCard } from "@/components/user/user-hover-card";
-import { EventLink } from "@/pages/events/event-link";
+import { MapDialog } from "@/components/map/map-dialog";
 
 export const Route = createFileRoute("/_authenticated/events/$eventId/tasks/")({
   component: RouteComponent,
@@ -27,6 +27,11 @@ function RouteComponent() {
   const { data: event } = useSuspenseQuery(getEventQueryOptions(eventId));
   const { data: me } = useSuspenseQuery(getMeQueryOptions());
   const [updateOpen, setUpdateOpen] = useState(false);
+  const [mapOpen, setMapOpen] = useState(false);
+
+  const handleOpenMap = () => {
+    // setMapOpen(true);
+  };
 
   const isAuthor = me?.id === event.author.id;
   const formattedDate = event.date.toLocaleString("ru-RU", {
@@ -51,15 +56,12 @@ function RouteComponent() {
                 {formattedDate}
               </CardDescription>
             </div>
-            <div className="flex items-center gap-2">
-              {isAuthor && (
-                <Button variant="outline" onClick={() => setUpdateOpen(true)}>
-                  <Pencil className="mr-2 h-4 w-4" />
-                  Изменить
-                </Button>
-              )}
-              {isAuthor && <EventLink eventId={eventId} title={event.title} />}
-            </div>
+            {isAuthor && (
+              <Button variant="outline" onClick={() => setUpdateOpen(true)}>
+                <Pencil className="mr-2 h-4 w-4" />
+                Изменить
+              </Button>
+            )}
           </div>
         </CardHeader>
         <CardContent>
@@ -87,6 +89,20 @@ function RouteComponent() {
                 </p>
               )}
             </div>
+
+            {event.location && (
+              <p className="text-muted-foreground mb-2 text-sm">
+                Место проведения:{" "}
+                <Button onClick={handleOpenMap}>{event.location}</Button>
+              </p>
+            )}
+
+            {event.description && (
+              <p className="text-muted-foreground mb-2 text-sm">
+                Цель мероприятия:{" "}
+                <Button onClick={handleOpenMap}>{event.description}</Button>
+              </p>
+            )}
           </div>
         </CardContent>
         <UpdateEventDialog
@@ -96,6 +112,11 @@ function RouteComponent() {
         />
       </Card>
       <EventTasks eventId={event.id} />
+      <MapDialog
+        open={mapOpen}
+        onOpenChange={setMapOpen}
+        position={[59.965112, 30.28907]}
+      />
     </div>
   );
 }

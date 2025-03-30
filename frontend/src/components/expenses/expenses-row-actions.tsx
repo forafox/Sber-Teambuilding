@@ -16,7 +16,9 @@ interface ExpensesRowActionsProps {
 }
 
 export function ExpensesRowActions({ task, eventId }: ExpensesRowActionsProps) {
-  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState<Task | null>(
+    null,
+  );
 
   return (
     <>
@@ -28,7 +30,7 @@ export function ExpensesRowActions({ task, eventId }: ExpensesRowActionsProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => setIsUpdateDialogOpen(true)}>
+          <DropdownMenuItem onClick={() => setIsUpdateDialogOpen(task)}>
             <PencilIcon />
             Редактировать
           </DropdownMenuItem>
@@ -36,7 +38,7 @@ export function ExpensesRowActions({ task, eventId }: ExpensesRowActionsProps) {
       </DropdownMenu>
 
       <UpdateTaskDialog
-        open={isUpdateDialogOpen}
+        open={Boolean(isUpdateDialogOpen)}
         onOpenChange={setIsUpdateDialogOpen}
         defaultTask={task}
         eventId={eventId}

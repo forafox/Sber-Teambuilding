@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "./api";
 import { Message, messageSchema } from "./get-chat";
+import { PollUpdateRequest } from "./api.gen";
 
 // Параметры для обновления сообщения
 type UpdateMessageParams = {
@@ -9,6 +10,7 @@ type UpdateMessageParams = {
   content: string;
   replyToMessageId?: number;
   pinned?: boolean;
+  poll?: PollUpdateRequest;
 };
 
 export function useUpdateMessage() {
@@ -25,6 +27,7 @@ export function useUpdateMessage() {
         content: message.content,
         replyToMessageId: message.replyToMessageId,
         pinned: message.pinned !== undefined ? message.pinned : false,
+        poll: message.poll,
       });
       return messageSchema.parse(response.data);
     },
