@@ -49,14 +49,10 @@ export function BalanceTable({ balances, participants }: BalanceTableProps) {
           {balances.map((balance) => (
             <TableRow key={`${balance.from}-${balance.to}`}>
               <TableCell>
-                <UserHoverCard
-                  user={getParticipantByUsername(balance.from)!}
-                />
+                <UserHoverCard user={getParticipantByUsername(balance.from)!} />
               </TableCell>
               <TableCell>
-                <UserHoverCard
-                  user={getParticipantByUsername(balance.to)!}
-                />
+                <UserHoverCard user={getParticipantByUsername(balance.to)!} />
               </TableCell>
               <TableCell className="text-right">
                 {balance.amount.toLocaleString("ru-RU", {
@@ -70,4 +66,4 @@ export function BalanceTable({ balances, participants }: BalanceTableProps) {
       </Table>
     </div>
   );
-} 
+}

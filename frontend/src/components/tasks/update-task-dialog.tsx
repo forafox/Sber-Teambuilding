@@ -52,6 +52,7 @@ export function UpdateTaskDialog({
       description: defaultTask.description,
       expenses: defaultTask.expenses,
       url: defaultTask.url,
+      status: defaultTask.status ?? "IN_PROGRESS",
     },
   });
 

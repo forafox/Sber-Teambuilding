@@ -15,6 +15,8 @@ import { UserHoverCard } from "@/components/user/user-hover-card";
 import { ExpensesRowActions } from "@/components/expenses/expenses-row-actions";
 import { TransactionsPage } from "./transactions";
 import { BalanceTable } from "@/components/expenses/balance-table";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { getEventTransactionsQueryOptions } from "@/api/transactions";
 
 interface ExpensesPageProps {
   tasks: Task[];
@@ -27,10 +29,22 @@ export function ExpensesPage({
   participants,
   eventId,
 }: ExpensesPageProps) {
+  const { data: transactions } = useSuspenseQuery(
+    getEventTransactionsQueryOptions(eventId),
+  );
+
   const tasksWithExpenses = tasks.filter((task) => task.expenses !== undefined);
 
   // Calculate balances between participants
-  const balances = calculateBalances(tasksWithExpenses, participants);
+  const balances = calculateBalances(
+    tasksWithExpenses,
+    participants,
+    transactions.map((transaction) => ({
+      from: transaction.sender.username,
+      to: transaction.recipient.username,
+      amount: transaction.amount,
+    })),
+  );
   const filteredTasks = tasksWithExpenses.sort((a, b) => {
     if (a.expenses === undefined) return 1;
     if (b.expenses === undefined) return -1;
@@ -41,12 +55,6 @@ export function ExpensesPage({
     (acc, task) => acc + (task.expenses || 0),
     0,
   );
-
-  function getParticipantByUsername(username: string) {
-    return participants.find(
-      (participant) => participant.username === username,
-    );
-  }
 
   return (
     <div className="space-y-8">
