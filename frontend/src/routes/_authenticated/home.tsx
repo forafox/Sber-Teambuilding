@@ -103,6 +103,16 @@ function RouteComponent() {
     },
   });
 
+  const telegramSchema = z.object({
+    username: z.string().min(5, "Минимум 5 символов"),
+  });
+
+  const telegramForm = useForm<z.infer<typeof telegramSchema>>({
+    resolver: zodResolver(telegramSchema),
+    defaultValues: {
+      username: "",
+    },
+  });
   const onSubmitTelegram = (values: z.infer<typeof telegramSchema>) => {
     telegramMutation.mutate(values.username, {
       onSuccess: () => {
@@ -114,7 +124,7 @@ function RouteComponent() {
         toast.error("Не удалось подключить Telegram. Попробуйте еще раз.");
       },
     });
-  };                                             
+  };
   const fuse = new Fuse(eventsData, {
     keys: ["title"],
     includeScore: false,
