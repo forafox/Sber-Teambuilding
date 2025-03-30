@@ -152,6 +152,20 @@ function NewEvent() {
 
               <FormField
                 control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Цель мероприятия</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Укажите цель" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="participants"
                 render={({ field }) => (
                   <FormItem>

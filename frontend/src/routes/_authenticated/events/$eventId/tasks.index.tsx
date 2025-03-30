@@ -96,6 +96,13 @@ function RouteComponent() {
                 <Button onClick={handleOpenMap}>{event.location}</Button>
               </p>
             )}
+
+            {event.description && (
+              <p className="text-muted-foreground mb-2 text-sm">
+                Цель мероприятия:{" "}
+                <Button onClick={handleOpenMap}>{event.description}</Button>
+              </p>
+            )}
           </div>
         </CardContent>
         <UpdateEventDialog

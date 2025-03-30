@@ -78,7 +78,8 @@ export function UpdateEventDialog({ open, onOpenChange, defaultEvent }: Props) {
         <DialogHeader>
           <DialogTitle>Редактирование события</DialogTitle>
           <DialogDescription>
-            Вы можете изменить название события, дату и участников.
+            Вы можете изменить название события, дату, участников, цель и место
+            проведения.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -123,6 +124,20 @@ export function UpdateEventDialog({ open, onOpenChange, defaultEvent }: Props) {
                   <FormLabel>Место проведения</FormLabel>
                   <FormControl>
                     <Input placeholder="Введите координаты" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Цель мероприятия</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Укажите цель" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
