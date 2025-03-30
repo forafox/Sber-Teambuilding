@@ -3,9 +3,10 @@ import { api } from "./api";
 import { MessageRequest } from "./api.gen";
 import { Message, messageSchema } from "./get-chat";
 
-// Расширяем тип MessageRequest для поддержки replyToMessageId
-type ExtendedMessageRequest = MessageRequest & {
+// Расширяем тип MessageRequest для поддержки replyToMessageId и pinned
+type ExtendedMessageRequest = Omit<MessageRequest, "replyToMessageId"> & {
   replyToMessageId?: number;
+  pinned?: boolean;
 };
 
 export function useSendMessage(chatId: number) {

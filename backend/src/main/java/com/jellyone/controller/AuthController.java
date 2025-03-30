@@ -26,18 +26,22 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @Validated
-@Tag(name = "Authorization and Registration")
+@Tag(name = "Authorization and Registration",
+        description = "Endpoints for user authentication, registration and token management")
 @ApiResponses({
-        @ApiResponse(
-                responseCode = "200",
-                description = "Successful operation",
-                content = @Content(schema = @Schema(implementation = JwtResponse.class), mediaType = "application/json")
-        ),
-        @ApiResponse(
-                responseCode = "400",
-                description = "Invalid input",
-                content = @Content(schema = @Schema(implementation = ErrorMessage.class), mediaType = "application/json")
-        )
+        @ApiResponse(responseCode = "200", description = "Successful operation"),
+        @ApiResponse(responseCode = "400",
+                description = "Invalid input parameters or malformed request",
+                content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
+        @ApiResponse(responseCode = "401",
+                description = "Unauthorized - Invalid credentials or expired token",
+                content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
+        @ApiResponse(responseCode = "403",
+                description = "Forbidden - Insufficient permissions",
+                content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
+        @ApiResponse(responseCode = "500",
+                description = "Internal server error",
+                content = @Content(schema = @Schema(implementation = ErrorMessage.class)))
 })
 public class AuthController {
 
@@ -45,59 +49,62 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("/login")
-    @Operation(
-            summary = "User login",
-            description = "Authenticates user based on provided credentials and generates JWT token",
-            operationId = "login"
-    )
+    @Operation(summary = "Authenticate user",
+            description = "Validates user credentials and returns JWT tokens for authorization",
+            operationId = "loginUser")
     @ApiResponses({
-            @ApiResponse(
-                    responseCode = "404",
+            @ApiResponse(responseCode = "200",
+                    description = "Authentication successful",
+                    content = @Content(schema = @Schema(implementation = JwtResponse.class))),
+            @ApiResponse(responseCode = "404",
                     description = "User not found",
-                    content = @Content(schema = @Schema(implementation = ErrorMessage.class), mediaType = "application/json")
-            )
+                    content = @Content(schema = @Schema(implementation = ErrorMessage.class)))
     })
-    public JwtResponse login(@Valid @RequestBody SignInRequest loginRequest) {
-        log.info("Received login request with username: {}", loginRequest.username());
+    public JwtResponse login(
+            @Parameter(description = "User credentials", required = true)
+            @Valid @RequestBody SignInRequest loginRequest) {
+        log.info("Login attempt for username: {}", loginRequest.username());
         return authService.login(new JwtRequest(loginRequest.username(), loginRequest.password()));
     }
 
     @PostMapping("/register")
-    @Operation(
-            summary = "User registration",
-            description = "Registers a new user with provided details and generates JWT token",
-            operationId = "register"
-    )
+    @Operation(summary = "Register new user",
+            description = "Creates new user account and returns authentication tokens",
+            operationId = "registerUser")
     @ApiResponses({
-            @ApiResponse(
-                    responseCode = "409",
-                    description = "",
-                    content = @Content(schema = @Schema(implementation = ErrorMessage.class), mediaType = "application/json")
-            )
+            @ApiResponse(responseCode = "200",
+                    description = "Registration successful",
+                    content = @Content(schema = @Schema(implementation = JwtResponse.class))),
+            @ApiResponse(responseCode = "409",
+                    description = "Conflict - User already exists",
+                    content = @Content(schema = @Schema(implementation = ErrorMessage.class)))
     })
-    public JwtResponse register(@RequestBody SignUpRequest request) {
+    public JwtResponse register(
+            @Parameter(description = "User registration details", required = true)
+            @Valid @RequestBody SignUpRequest request) {
         userService.register(
                 request.username(),
                 request.password(),
                 request.name(),
                 request.email()
         );
-        log.info("Received registration request with username: {}", request.username());
+        log.info("New user registration: {}", request.username());
         return authService.login(new JwtRequest(request.username(), request.password()));
     }
 
     @PostMapping("/refresh")
-    @Operation(
-            summary = "Refresh token",
-            description = "Refreshes JWT token based on provided refresh token",
-            operationId = "refresh"
-    )
+    @Operation(summary = "Refresh authentication tokens",
+            description = "Generates new access/refresh token pair using valid refresh token",
+            operationId = "refreshTokens")
+    @ApiResponse(responseCode = "200",
+            description = "Tokens refreshed successfully",
+            content = @Content(schema = @Schema(implementation = JwtResponse.class)))
     public JwtResponse refresh(
-            @RequestBody @Valid
-            @NotBlank @Parameter(description = "Refresh token used to generate a new JWT token", required = true)
-            String refreshToken
-    ) {
-        log.info("Received refresh request with refresh token: {}", refreshToken);
+            @Parameter(description = "Valid refresh token",
+                    required = true,
+                    example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
+            @RequestBody @Valid @NotBlank String refreshToken) {
+        log.debug("Token refresh request received");
         return authService.refresh(refreshToken);
     }
 }

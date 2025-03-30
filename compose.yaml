@@ -34,6 +34,8 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - JWT_ACCESS_TTL=${JWT_ACCESS_TTL}
       - JWT_REFRESH_TTL=${JWT_REFRESH_TTL}
+      - GIGACHAT_CLIENT_ID=${GIGACHAT_CLIENT_ID}
+      - GIGACHAT_AUTHORIZATION_KEY=${GIGACHAT_AUTHORIZATION_KEY}
     depends_on:
       postgres:
         condition: "service_healthy"

@@ -257,6 +257,7 @@ export interface MessageUpdateRequest {
   pinned: boolean;
   /** Poll update request payload */
   poll?: PollUpdateRequest;
+
 }
 
 /** Poll option update request payload */
@@ -282,6 +283,7 @@ export interface OptionUpdateRequest {
   voters: number[];
 }
 
+
 /** Poll update request payload */
 export type PollUpdateRequest = {
   /**
@@ -302,7 +304,14 @@ export type PollUpdateRequest = {
    * Updated type of the poll
    * @example "MULTIPLE_CHOICE"
    */
-  pollType: "SINGLE" | "MULTIPLE" | "SINGLE_CHOICE" | "MULTIPLE_CHOICE" | "OPEN_ENDED";
+
+  pollType:
+    | "SINGLE"
+    | "MULTIPLE"
+    | "SINGLE_CHOICE"
+    | "MULTIPLE_CHOICE"
+    | "OPEN_ENDED";
+
   /** Updated list of poll options */
   options: OptionUpdateRequest[];
 } | null;
@@ -344,6 +353,8 @@ export interface MessageResponse {
   pinned: boolean;
   /** Poll response with configuration and voting options */
   poll?: PollResponse;
+
+
 }
 
 /** Poll option response with voters information */
@@ -365,6 +376,7 @@ export interface OptionResponse {
   /** List of users who voted for this option */
   voters: UserResponse[];
 }
+
 
 /** Poll response with configuration and voting options */
 export type PollResponse = {
@@ -442,6 +454,7 @@ export interface ChatResponse {
   pinnedMessages: MessageResponse[];
   /** Map of read messages by user ID */
   readMessages: Record<string, MessageResponse>;
+
 }
 
 /** Message content and metadata */
@@ -465,6 +478,7 @@ export interface MessageRequest {
   /** Poll creation request payload */
   poll?: PollRequest;
 }
+
 
 /** Poll option request payload */
 export interface OptionRequest {
@@ -578,11 +592,9 @@ export interface Page {
   /** @format int32 */
   number?: number;
   sort?: SortObject[];
+  pageable?: PageableObject;
   /** @format int32 */
   numberOfElements?: number;
-  last?: boolean;
-  pageable?: PageableObject;
-  first?: boolean;
   empty?: boolean;
 }
 
@@ -591,11 +603,11 @@ export interface PageableObject {
   offset?: number;
   sort?: SortObject[];
   paged?: boolean;
+  unpaged?: boolean;
   /** @format int32 */
   pageNumber?: number;
   /** @format int32 */
   pageSize?: number;
-  unpaged?: boolean;
 }
 
 export interface SortObject {
@@ -606,7 +618,15 @@ export interface SortObject {
   ignoreCase?: boolean;
 }
 
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
+
+import type {
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  HeadersDefaults,
+  ResponseType,
+} from "axios";
+
 import axios from "axios";
 
 export type QueryParamsType = Record<string | number, any>;
@@ -828,7 +848,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request PUT:/api/events/{eventId}/tasks/{id}
      * @secure
      */
-    updateTask: (id: number, eventId: number, data: TaskRequest, params: RequestParams = {}) =>
+
+    updateTask: (
+      id: number,
+      eventId: number,
+      data: TaskRequest,
+      params: RequestParams = {},
+    ) =>
+
       this.request<TaskResponse, ErrorMessage>({
         path: `/api/events/${eventId}/tasks/${id}`,
         method: "PUT",
@@ -881,7 +908,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request PUT:/api/chats/{chatId}/messages/{id}
      * @secure
      */
-    updateMessage: (chatId: number, id: number, data: MessageUpdateRequest, params: RequestParams = {}) =>
+
+    updateMessage: (
+      chatId: number,
+      id: number,
+      data: MessageUpdateRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<MessageResponse, ErrorMessage>({
         path: `/api/chats/${chatId}/messages/${id}`,
         method: "PUT",
@@ -910,6 +943,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 
     /**
      * @description Validates an event participation token and adds the current user to the event.
+
      *
      * @tags Token Management
      * @name VerifyEventToken
@@ -923,7 +957,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         method: "POST",
         body: data,
         secure: true,
-        type: ContentType.Json,
+        type: ContentType.Text,
         ...params,
       }),
 
@@ -964,13 +998,19 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     /**
      * @description Links a Telegram username with the authenticated user account.
      *
+
      * @tags Telegram Management
      * @name CreateTelegramUser
      * @summary Create Telegram user association
      * @request POST:/api/telegram-users
      * @secure
      */
-    createTelegramUser: (data: TelegramUserRequest, params: RequestParams = {}) =>
+
+    createTelegramUser: (
+      data: TelegramUserRequest,
+      params: RequestParams = {},
+    ) =>
+
       this.request<TelegramUserResponse, ErrorMessage>({
         path: `/api/telegram-users`,
         method: "POST",
@@ -1101,7 +1141,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/api/events/{eventId}/tasks
      * @secure
      */
-    createTask: (eventId: number, data: TaskRequest, params: RequestParams = {}) =>
+
+    createTask: (
+      eventId: number,
+      data: TaskRequest,
+      params: RequestParams = {},
+    ) =>
+
       this.request<TaskResponse, ErrorMessage>({
         path: `/api/events/${eventId}/tasks`,
         method: "POST",
@@ -1173,7 +1219,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/api/chats/{chatId}/messages
      * @secure
      */
-    createMessage: (chatId: number, data: MessageRequest, params: RequestParams = {}) =>
+
+    createMessage: (
+      chatId: number,
+      data: MessageRequest,
+      params: RequestParams = {},
+    ) =>
+
       this.request<MessageResponse, ErrorMessage>({
         path: `/api/chats/${chatId}/messages`,
         method: "POST",
@@ -1260,7 +1312,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request PATCH:/api/events/{id}/participants
      * @secure
      */
-    updateEventParticipants: (id: number, data: number[], params: RequestParams = {}) =>
+
+    updateEventParticipants: (
+      id: number,
+      data: number[],
+      params: RequestParams = {},
+    ) =>
+
       this.request<EventResponse, ErrorMessage>({
         path: `/api/events/${id}/participants`,
         method: "PATCH",
@@ -1389,7 +1447,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request GET:/api/templates/events/{eventId}/tasks/{id}
      * @secure
      */
-    getTaskTemplateById: (eventId: number, id: number, params: RequestParams = {}) =>
+
+    getTaskTemplateById: (
+      eventId: number,
+      id: number,
+      params: RequestParams = {},
+    ) =>
+
       this.request<TaskResponse, ErrorMessage>({
         path: `/api/templates/events/${eventId}/tasks/${id}`,
         method: "GET",

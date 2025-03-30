@@ -31,6 +31,10 @@ import {
 } from "lucide-react";
 import { isMobileDevice } from "@/lib/utils";
 
+import { getMeQueryOptions } from "@/api/get-me";
+import { useQuery } from "@tanstack/react-query";
+
+
 type MessageItemProps = {
   message: Message;
   chatId: number;
@@ -56,7 +60,15 @@ export function MessageItem({
   const updateMessage = useUpdateMessage();
   const queryClient = useQueryClient();
   const isMobile = isMobileDevice();
-  const isCurrentUser = message.author.id === 1; // Заглушка, в реальном приложении должно быть получено из auth
+
+
+  // Получаем данные текущего пользователя
+  const { data: currentUser } = useQuery(getMeQueryOptions());
+
+  // Проверяем, является ли сообщение сообщением текущего пользователя
+  const isCurrentUser = currentUser?.id === message.author.id;
+
+
   const replyToMessage = queryClient
     .getQueryData<Message[]>(getMessagesQueryOptions(chatId).queryKey)
     ?.find((msg) => msg.id === message.replyToMessageId);
@@ -310,7 +322,7 @@ export function MessageItem({
                 <span>Изменить</span>
               </div>
               <div
-                className="text-destructive hover:bg-destructive hover:text-destructive-foreground cursor-pointer px-2 py-1.5 text-sm"
+                className="hover:bg-accent hover:text-accent-foreground text-destructive cursor-pointer px-2 py-1.5 text-sm"
                 onClick={handleDeleteMessage}
               >
                 <TrashIcon className="mr-2 inline-block h-4 w-4" />
@@ -331,19 +343,14 @@ export function MessageItem({
               value={editedContent}
               onChange={(e) => setEditedContent(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="flex-1"
-              autoFocus
             />
           </div>
-          <DialogFooter className="sm:justify-start">
+          <DialogFooter>
             <Button
-              type="button"
-              variant="secondary"
-              onClick={() => setIsEditDialogOpen(false)}
+              type="submit"
+              onClick={handleSaveEdit}
+              disabled={!editedContent.trim()}
             >
-              Отмена
-            </Button>
-            <Button type="button" onClick={handleSaveEdit}>
               Сохранить
             </Button>
           </DialogFooter>

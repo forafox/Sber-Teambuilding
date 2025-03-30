@@ -8,7 +8,7 @@ export function useSignUpMutation() {
   return useMutation({
     mutationFn: async (data: SignUpRequest) => {
       try {
-        const { data: result } = await api.api.register(data);
+        const { data: result } = await api.api.registerUser(data);
         return result;
       } catch (error) {
         if (isAxiosError(error) && error.response?.status === 409) {

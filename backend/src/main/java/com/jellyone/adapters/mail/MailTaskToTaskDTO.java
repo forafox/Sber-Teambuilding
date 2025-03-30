@@ -7,6 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 @RequiredArgsConstructor
 @Profile("mail")
@@ -21,5 +24,9 @@ public class MailTaskToTaskDTO {
         UserDTO author = userToUserDTO.userToUserDTO(task.getAuthor());
 
         return new TaskDTO(id, title, description, author, price);
+    }
+
+    public List<TaskDTO> taskToTaskDTO(List<Task> tasks){
+        return tasks.stream().map(this::taskToTaskDTO).collect(Collectors.toList());
     }
 }
