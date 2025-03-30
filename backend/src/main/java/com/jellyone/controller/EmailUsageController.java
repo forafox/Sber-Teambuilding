@@ -1,7 +1,12 @@
 package com.jellyone.controller;
 
 import com.jellyone.adapters.mail.SenderService;
+import com.jellyone.exception.ErrorMessage;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +24,37 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityRequirement(name = "JWT")
 @RequiredArgsConstructor
 @Profile("mail")
+@Tag(name = "Email API",
+        description = "Endpoints for sending email notifications and reports")
+@SecurityRequirement(name = "JWT")
+@ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Successful operation"),
+        @ApiResponse(responseCode = "400",
+                description = "Invalid input parameters or malformed request",
+                content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
+        @ApiResponse(responseCode = "401",
+                description = "Unauthorized - Invalid or expired JWT token",
+                content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
+        @ApiResponse(responseCode = "403",
+                description = "Forbidden - Insufficient permissions",
+                content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
+        @ApiResponse(responseCode = "404",
+                description = "Event not found",
+                content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
+        @ApiResponse(responseCode = "500",
+                description = "Internal server error",
+                content = @Content(schema = @Schema(implementation = ErrorMessage.class)))
+})
 public class EmailUsageController {
     private final SenderService senderService;
 
-    @Operation(summary = "Send simple email")
+    @Operation(summary = "Send email report",
+            description = """
+                    Sends a formatted email report
+                    """,
+            operationId = "sendEmailReport")
+    @ApiResponse(responseCode = "200",
+            description = "Email sent successfully")
     @PostMapping("/simple-email")
     public void sendSimpleEmail(
             @RequestParam(defaultValue = "email") String email,
