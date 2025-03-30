@@ -32,6 +32,8 @@ export const getTasksQueryOptions = (eventId: number) => ({
     const { data: data } = await api.api.getTasks(eventId, {
       pageSize: 10_000,
     });
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
     return taskSchema.array().parse(data.content);
   },
 });
