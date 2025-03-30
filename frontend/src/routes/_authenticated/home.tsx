@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import {
   BotIcon,
   CalendarIcon,
+  LogOutIcon,
   MailIcon,
   PlusIcon,
   UserIcon,
@@ -24,6 +25,15 @@ import { CreateEventPromptDialog } from "@/components/events/create-event-prompt
 import { useState } from "react";
 import Fuse from "fuse.js";
 import { Input } from "@/components/ui/input";
+import { clearTokens } from "@/api/tokens";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 type fuseResult = {
   title: string;
@@ -63,6 +73,7 @@ function RouteComponent() {
   const { data: eventsData } = useSuspenseQuery(getEventsQueryOptions());
   const navigate = useNavigate();
   const [createOpen, setCreateOpen] = useState(false);
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
 
   const [activeEvents, setActiveEvents] = useState(eventsData || []);
   const userInfo = userData;
@@ -89,9 +100,24 @@ function RouteComponent() {
     navigate({ to: "/events/new" });
   };
 
+  const handleLogout = () => {
+    clearTokens();
+    navigate({ to: "/sign-in" });
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="mb-8 text-3xl font-bold">Личный кабинет</h1>
+      <div className="mb-8 flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Личный кабинет</h1>
+        <Button
+          variant="outline"
+          className="flex items-center gap-2"
+          onClick={() => setLogoutDialogOpen(true)}
+        >
+          <LogOutIcon className="h-4 w-4" />
+          Выйти
+        </Button>
+      </div>
 
       {/* User Information Card */}
       <Card className="mb-8">
@@ -214,6 +240,31 @@ function RouteComponent() {
           </div>
         )}
       </div>
+
+      {/* Confirmation Dialog for Logout */}
+      <Dialog open={logoutDialogOpen} onOpenChange={setLogoutDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Выход из аккаунта</DialogTitle>
+            <DialogDescription>
+              Вы уверены, что хотите выйти из личного кабинета?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex justify-end gap-2 sm:justify-end">
+            <Button
+              variant="outline"
+              onClick={() => setLogoutDialogOpen(false)}
+            >
+              Отмена
+            </Button>
+            <Button variant="default" onClick={handleLogout}>
+              Выйти
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Event Dialog */}
       <CreateEventPromptDialog open={createOpen} onOpenChange={setCreateOpen} />
     </div>
   );
