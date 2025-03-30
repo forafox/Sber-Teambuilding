@@ -208,41 +208,61 @@ export function PollDisplay({
           {showResults ? (
             // Показываем результаты опроса
             <div className="space-y-4">
-              {poll.options?.map((option) => (
-                <div key={option.id} className="space-y-2">
-                  <div className="flex justify-between font-medium">
-                    <span className="text-foreground">{option.title}</span>
-                    <span className="text-primary font-bold">
-                      {getPercentage(option.id)}%
-                    </span>
-                  </div>
-                  <Progress
-                    value={getPercentage(option.id)}
-                    className="h-2.5"
-                  />
-                  <div className="flex items-center justify-between">
-                    <div className="text-muted-foreground text-xs">
-                      {option.voters.length}{" "}
-                      {option.voters.length === 1
-                        ? "голос"
-                        : option.voters.length >= 2 && option.voters.length <= 4
-                          ? "голоса"
-                          : "голосов"}
-                    </div>
-                    {option.voters.length > 0 && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-6 px-2 text-xs"
-                        onClick={() => handleShowVoters(option)}
+              {poll.options?.map((option) => {
+                const userVotedForThisOption = 
+                  currentUser &&
+                  option.voters.some((voter) => voter.id === currentUser.id);
+                return (
+                  <div
+                    key={option.id}
+                    className={`space-y-2 ${
+                      userVotedForThisOption
+                        ? "border-primary/20 rounded-md border p-2 bg-primary/5"
+                        : ""
+                    }`}
+                  >
+                    <div className="flex justify-between font-medium">
+                      <span
+                        className={`text-foreground ${
+                          userVotedForThisOption ? "font-bold" : ""
+                        }`}
                       >
-                        <UserIcon className="mr-1 h-3 w-3" />
-                        Кто голосовал
-                      </Button>
-                    )}
+                        {option.title}
+                      </span>
+                      <span className="text-primary font-bold">
+                        {getPercentage(option.id)}%
+                      </span>
+                    </div>
+                    <Progress
+                      value={getPercentage(option.id)}
+                      className={`h-2.5 ${
+                        userVotedForThisOption ? "bg-muted/50" : ""
+                      }`}
+                    />
+                    <div className="flex items-center justify-between">
+                      <div className="text-muted-foreground text-xs">
+                        {option.voters.length}{" "}
+                        {option.voters.length === 1
+                          ? "голос"
+                          : option.voters.length >= 2 && option.voters.length <= 4
+                            ? "голоса"
+                            : "голосов"}
+                      </div>
+                      {option.voters.length > 0 && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-6 px-2 text-xs"
+                          onClick={() => handleShowVoters(option)}
+                        >
+                          <UserIcon className="mr-1 h-3 w-3" />
+                          Кто голосовал
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
               <div className="text-muted-foreground pt-2 text-center text-sm">
                 {totalVoters > 0
                   ? `Всего: ${totalVoters} ${
@@ -323,14 +343,16 @@ export function PollDisplay({
           {hasVoted && (
             <div className="text-muted-foreground mt-4 flex items-center justify-between border-t pt-4">
               <span className="text-xs">Вы проголосовали</span>
-              <Button
-                size="sm"
-                variant="outline"
-                className="text-xs"
-                onClick={() => setShowVotersDialog(true)}
-              >
-                Результаты
-              </Button>
+              <div className="ml-8">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-xs"
+                  onClick={() => setShowVotersDialog(true)}
+                >
+                  Результаты
+                </Button>
+              </div>
             </div>
           )}
 
