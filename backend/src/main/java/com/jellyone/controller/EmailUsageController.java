@@ -64,4 +64,15 @@ public class EmailUsageController {
         log.info("Send simple email");
         senderService.sendMail(email, userId, eventId);
     }
+
+    @Operation(summary = "Send attached email")
+    @PostMapping("/attached-email")
+    public void sendAttachedEmail(
+            @RequestParam(defaultValue = "email") String email,
+            @RequestParam(defaultValue = "userId") Long userId,
+            @RequestParam(defaultValue = "0") Long eventId
+    ) {
+        log.info("Send attached email");
+        senderService.sendAttachedMail(email, userId, eventId);
+    }
 }

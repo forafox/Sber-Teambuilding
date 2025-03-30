@@ -28,11 +28,6 @@ public class ExcelGenerator {
         Sheet sheetYouOwe = workbook.createSheet("You owe");
         sheetBuilder(theirTasks, sheetYouOwe);
 
-        // еще нужна табличка сколько кому ты должен
-        // типа посчитать там сумму всего того что было куплено не тобой
-        // и поделить на n людей
-        // потому что у нас всё по честному и каждый платит свою часть TODO
-
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
             workbook.write(outputStream);

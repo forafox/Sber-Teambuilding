@@ -15,4 +15,14 @@ public class NoSenderService implements SenderService {
     public void sendMail(Long userId, Long eventId) {
 
     }
+
+    @Override
+    public void sendAttachedMail(String email, Long userId, Long eventId) {
+
+    }
+
+    @Override
+    public void sendAttachedMail(Long userId, Long eventId) {
+
+    }
 }
