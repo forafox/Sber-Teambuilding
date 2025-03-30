@@ -46,6 +46,3 @@ prod-up:
 prod-down:
 	docker compose -f compose.yaml -f compose.prod.yaml down
 
-.env: .env.example
-	cp .env.example .env
-
