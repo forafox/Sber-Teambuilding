@@ -2,17 +2,26 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "./api";
 import { Message } from "./get-chat";
 
-export function useDeleteMessage(chatId: number, messageId: number) {
+// Параметры для удаления сообщения
+type DeleteMessageParams = {
+  chatId: number;
+  messageId: number;
+};
+
+export function useDeleteMessage() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async () => {
+    mutationFn: async ({ chatId, messageId }: DeleteMessageParams) => {
       await api.api.deleteMessage(chatId, messageId);
-      return messageId;
+      return { chatId, messageId };
     },
-    onSuccess: (deletedMessageId) => {
+    onSuccess: ({ chatId, messageId }) => {
       queryClient.invalidateQueries({
         queryKey: ["chats", chatId, "messages"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["chats", chatId],
       });
       queryClient.setQueryData<Message[]>(
         ["chats", chatId, "messages"],
@@ -20,7 +29,7 @@ export function useDeleteMessage(chatId: number, messageId: number) {
           if (!oldMessages) return [];
           // Удаляем сообщение из массива и сохраняем сортировку по id
           return oldMessages
-            .filter((msg) => msg.id !== deletedMessageId)
+            .filter((msg) => msg.id !== messageId)
             .sort((a, b) => a.id - b.id);
         },
       );

@@ -6,6 +6,7 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -50,6 +51,7 @@ public class MailService {
     public void sendMail(String email, String subject, Context context) {
         try {
             sendSimpleMail(email, subject, context);
+        } catch (MailSendException ignored) {
         } catch (MessagingException e) {
             throw new MailException(e.getMessage());
         }
@@ -58,6 +60,7 @@ public class MailService {
     public void sendAttachMail(String email, String name, File file, Context context) {
         try {
             sendEmailWithAttachment(email, name, file, context);
+        } catch (MailSendException ignored) {
         } catch (MessagingException e) {
             throw new MailException(e.getMessage());
         }

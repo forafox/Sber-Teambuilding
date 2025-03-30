@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "./api";
 import { z } from "zod";
-import { eventSchema } from "./get-event";
 import { userSchema } from "./get-users";
 
 export const messageSchema = z.object({
@@ -10,12 +9,13 @@ export const messageSchema = z.object({
   author: userSchema,
   timestamp: z.coerce.date(),
   replyToMessageId: z.number().nullable().optional(),
+  pinned: z.boolean().optional(),
 });
 
 export const chatSchema = z.object({
   id: z.number(),
-  event: eventSchema,
   messages: messageSchema.array(),
+  pinnedMessages: messageSchema.array(),
 });
 
 export type Message = z.infer<typeof messageSchema>;

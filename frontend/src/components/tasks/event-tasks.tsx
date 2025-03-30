@@ -256,6 +256,10 @@ export function EventTasks({ eventId }: Props) {
     setIsOpenCreateDialog(true);
   };
 
+  const sortedEvents = activeEvents.sort((a, b) => {
+    return a.id - b.id;
+  });
+
   return (
     <Card className="gap-y-3 px-6">
       <div className="mb-4 flex w-full items-center justify-between gap-4 max-[470px]:flex-col max-[470px]:justify-center">
@@ -292,6 +296,15 @@ export function EventTasks({ eventId }: Props) {
           eventId={eventId}
         />
       )}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {sortedEvents.map((task) => (
+          <>
+            {task.status == tasksStatus && (
+              <TaskCard key={task.id} task={task} eventId={eventId} />
+            )}
+          </>
+        ))}
+      </div>
       <CreateTaskDialog
         open={isOpenCreateDialog}
         onOpenChange={setIsOpenCreateDialog}

@@ -5,7 +5,7 @@ import { eventSchema } from "./get-event";
 export function useCreateEventFromPrompt() {
   return useMutation({
     mutationFn: async (prompt: string) => {
-      const { data } = await api.api.createFromPrompt(prompt);
+      const { data } = await api.api.createEventFromPrompt(prompt);
       return eventSchema.parse(data);
     },
   });

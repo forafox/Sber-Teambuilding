@@ -62,9 +62,10 @@ export function UpdateTaskDialog({
         taskId: defaultTask.id,
         assigneeUsername: data.assignee?.username,
         title: data.title,
-        description: data.description,
-        expenses: expenses(data.expenses),
-        status: "IN_PROGRESS",
+        description: data.description ?? "",
+        expenses: data?.expenses ?? undefined,
+        url: data?.url ?? undefined,
+        status: data.status,
       },
       {
         onSuccess: () => {
