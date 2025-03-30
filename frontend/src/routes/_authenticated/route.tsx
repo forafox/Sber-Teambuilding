@@ -16,7 +16,6 @@ export const Route = createFileRoute("/_authenticated")({
       const currentPath = location.pathname;
       return redirect({
         to: "/sign-in",
-        // TODO: fixme
         search: { redirect: currentPath + location.searchStr },
       });
     }
