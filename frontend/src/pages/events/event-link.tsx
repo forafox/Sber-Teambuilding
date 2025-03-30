@@ -6,7 +6,13 @@ import { toast } from "sonner";
 
 const HOST = window.location.origin;
 
-export function EventLink({ eventId }: { eventId: number }) {
+export function EventLink({
+  eventId,
+  title,
+}: {
+  eventId: number;
+  title: string;
+}) {
   const { mutate } = useCreateInviteTokenMutation();
   const [isCopied, setIsCopied] = useState(false);
   return (
@@ -16,7 +22,9 @@ export function EventLink({ eventId }: { eventId: number }) {
         mutate(eventId, {
           onSuccess: (token) => {
             setIsCopied(true);
-            const link = `${HOST}/sign-up?token=${token}`;
+            const link = `${HOST}/token?token=${token}&title=${encodeURIComponent(
+              title,
+            )}`;
             navigator.clipboard.writeText(link);
             toast.success("Пригласительная ссылка скопирована в буфер обмена");
           },

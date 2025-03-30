@@ -58,7 +58,7 @@ function RouteComponent() {
                   Изменить
                 </Button>
               )}
-              {isAuthor && <EventLink eventId={eventId} />}
+              {isAuthor && <EventLink eventId={eventId} title={event.title} />}
             </div>
           </div>
         </CardHeader>
