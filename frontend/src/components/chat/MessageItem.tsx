@@ -28,8 +28,14 @@ import {
   Trash as TrashIcon,
   ReplyIcon,
   PinIcon,
+  XCircleIcon,
 } from "lucide-react";
 import { isMobileDevice } from "@/lib/utils";
+import { getMeQueryOptions } from "@/api/get-me";
+import { useQuery } from "@tanstack/react-query";
+import { PollDisplay } from "./PollDisplay";
+import { PollUpdateRequest } from "@/api/api.gen";
+import { toast } from "sonner";
 
 type MessageItemProps = {
   message: Message;
@@ -56,13 +62,45 @@ export function MessageItem({
   const updateMessage = useUpdateMessage();
   const queryClient = useQueryClient();
   const isMobile = isMobileDevice();
-  const isCurrentUser = message.author.id === 1; // Заглушка, в реальном приложении должно быть получено из auth
+
+  // Получаем данные текущего пользователя
+  const { data: currentUser } = useQuery(getMeQueryOptions());
+
+  // Проверяем, является ли сообщение сообщением текущего пользователя
+  const isCurrentUser = currentUser?.id === message.author.id;
+
+  // Проверяем, голосовал ли текущий пользователь в этом опросе
+  const hasVotedInPoll =
+    currentUser &&
+    message.poll &&
+    message.poll.options.some((option) =>
+      option.voters.some((voter) => voter.id === currentUser.id),
+    );
+
   const replyToMessage = queryClient
     .getQueryData<Message[]>(getMessagesQueryOptions(chatId).queryKey)
     ?.find((msg) => msg.id === message.replyToMessageId);
 
   // Определяем, нужен ли перенос строк для содержимого сообщения
   const isShortMessage = message.content.length <= 35;
+
+  // Функция для преобразования Poll в PollUpdateRequest с корректными voters
+  const formatPollForUpdate = (
+    messagePoll: Message["poll"],
+  ): PollUpdateRequest | undefined => {
+    if (!messagePoll) return undefined;
+
+    return {
+      id: messagePoll.id,
+      title: messagePoll.title,
+      pollType: messagePoll.pollType,
+      options: messagePoll.options.map((option) => ({
+        id: option.id,
+        title: option.title,
+        voters: option.voters.map((voter) => voter.id),
+      })),
+    };
+  };
 
   useOutsideClick(messageRef, () => {
     if (isContextMenuOpen) {
@@ -111,8 +149,53 @@ export function MessageItem({
       content: message.content,
       pinned: message.pinned !== undefined ? !message.pinned : true,
       replyToMessageId: message.replyToMessageId || undefined,
+      poll: formatPollForUpdate(message.poll),
     });
     setIsContextMenuOpen(false);
+  };
+
+  const handleRemoveVote = () => {
+    if (!message.poll || !currentUser) return;
+
+    // Создаем объект для обновления опроса без голоса текущего пользователя
+    const updatedPoll = {
+      id: message.poll.id,
+      title: message.poll.title,
+      pollType: message.poll.pollType,
+      options: message.poll.options.map((option) => ({
+        id: option.id,
+        title: option.title,
+        // Удаляем голос текущего пользователя из списка голосов
+        voters: option.voters
+          .filter((voter) => voter.id !== currentUser.id)
+          .map((voter) => voter.id),
+      })),
+    };
+
+    updateMessage.mutate(
+      {
+        chatId,
+        messageId: message.id,
+        content: message.content,
+        replyToMessageId: message.replyToMessageId || undefined,
+        pinned: message.pinned !== undefined ? message.pinned : false,
+        poll: updatedPoll,
+      },
+      {
+        onSuccess: () => {
+          setIsContextMenuOpen(false);
+          toast.success("Голос отменен", {
+            description: "Ваш голос был удален из результатов опроса",
+          });
+        },
+        onError: (error) => {
+          console.error("Ошибка при отмене голоса:", error);
+          toast.error("Ошибка при отмене голоса", {
+            description: "Не удалось отменить ваш голос. Попробуйте снова.",
+          });
+        },
+      },
+    );
   };
 
   const handleSaveEdit = () => {
@@ -123,6 +206,7 @@ export function MessageItem({
         content: editedContent.trim(),
         replyToMessageId: message.replyToMessageId || undefined,
         pinned: message.pinned !== undefined ? message.pinned : false,
+        poll: formatPollForUpdate(message.poll),
       });
       setIsEditDialogOpen(false);
     } else {
@@ -219,6 +303,19 @@ export function MessageItem({
                   {message.content}
                 </p>
               </div>
+              {/* Отображаем опрос под сообщением, если он есть */}
+              {message.poll && (
+                <div className="mt-2 w-full">
+                  <PollDisplay
+                    poll={message.poll}
+                    chatId={chatId}
+                    messageId={message.id}
+                    messageContent={message.content}
+                    replyToMessageId={message.replyToMessageId}
+                    pinned={message.pinned}
+                  />
+                </div>
+              )}
               <div className="mt-1 flex items-center gap-1">
                 <span className="text-muted-foreground text-xs">
                   {format(message.timestamp, "HH:mm")}
@@ -245,6 +342,12 @@ export function MessageItem({
                 <PinIcon className="mr-2 h-4 w-4" />
                 <span>{message.pinned ? "Открепить" : "Закрепить"}</span>
               </ContextMenuItem>
+              {message.poll && hasVotedInPoll && (
+                <ContextMenuItem onClick={handleRemoveVote}>
+                  <XCircleIcon className="mr-2 h-4 w-4" />
+                  <span>Отменить голос</span>
+                </ContextMenuItem>
+              )}
               {isCurrentUser && (
                 <>
                   <ContextMenuItem onClick={handleEditMessage}>
@@ -300,6 +403,15 @@ export function MessageItem({
             <PinIcon className="mr-2 inline-block h-4 w-4" />
             <span>{message.pinned ? "Открепить" : "Закрепить"}</span>
           </div>
+          {message.poll && hasVotedInPoll && (
+            <div
+              className="hover:bg-accent hover:text-accent-foreground cursor-pointer px-2 py-1.5 text-sm"
+              onClick={handleRemoveVote}
+            >
+              <XCircleIcon className="mr-2 inline-block h-4 w-4" />
+              <span>Отменить голос</span>
+            </div>
+          )}
           {isCurrentUser && (
             <>
               <div

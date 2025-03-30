@@ -2,10 +2,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "./api";
 import { Message } from "./get-chat";
 
-interface DeleteMessageParams {
+// Параметры для удаления сообщения
+type DeleteMessageParams = {
   chatId: number;
   messageId: number;
-}
+};
 
 export function useDeleteMessage() {
   const queryClient = useQueryClient();

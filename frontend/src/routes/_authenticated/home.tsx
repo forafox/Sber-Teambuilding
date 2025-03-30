@@ -141,6 +141,9 @@ function RouteComponent() {
               <PlusIcon className="mr-2 h-4 w-4" />
               Создать мероприятие
             </Button>
+            <Button asChild>
+              <Link to="/templates">Шаблоны</Link>
+            </Button>
             <Button
               onClick={() => setCreateOpen(true)}
               className="group relative overflow-hidden border-0 bg-gradient-to-r from-blue-600 to-purple-600 shadow-[0_0_15px_rgba(56,189,248,0.5)] transition-shadow duration-300 hover:from-blue-700 hover:to-purple-700 hover:shadow-[0_0_20px_rgba(168,85,247,0.7)]"

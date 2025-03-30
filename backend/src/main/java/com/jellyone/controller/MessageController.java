@@ -50,7 +50,6 @@ import java.util.List;
 public class MessageController {
 
     private final MessageService messageService;
-    private final MessageReadService messageReadService;
 
     @PostMapping
     @Operation(summary = "Create new message",

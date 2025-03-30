@@ -74,7 +74,6 @@ export function DataTableToolbar({
     includeScore: false,
     threshold: 0.3,
   });
-
   if (table) {
     const isFiltered = table.getState().columnFilters.length > 0;
     return (

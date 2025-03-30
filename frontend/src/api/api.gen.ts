@@ -257,6 +257,7 @@ export interface MessageUpdateRequest {
   pinned: boolean;
   /** Poll update request payload */
   poll?: PollUpdateRequest;
+
 }
 
 /** Poll option update request payload */
@@ -281,6 +282,7 @@ export interface OptionUpdateRequest {
    */
   voters: number[];
 }
+
 
 /** Poll update request payload */
 export type PollUpdateRequest = {
@@ -344,6 +346,8 @@ export interface MessageResponse {
   pinned: boolean;
   /** Poll response with configuration and voting options */
   poll?: PollResponse;
+
+
 }
 
 /** Poll option response with voters information */
@@ -365,6 +369,7 @@ export interface OptionResponse {
   /** List of users who voted for this option */
   voters: UserResponse[];
 }
+
 
 /** Poll response with configuration and voting options */
 export type PollResponse = {
@@ -442,6 +447,7 @@ export interface ChatResponse {
   pinnedMessages: MessageResponse[];
   /** Map of read messages by user ID */
   readMessages: Record<string, MessageResponse>;
+
 }
 
 /** Message content and metadata */
@@ -465,6 +471,7 @@ export interface MessageRequest {
   /** Poll creation request payload */
   poll?: PollRequest;
 }
+
 
 /** Poll option request payload */
 export interface OptionRequest {
@@ -578,11 +585,9 @@ export interface Page {
   /** @format int32 */
   number?: number;
   sort?: SortObject[];
+  pageable?: PageableObject;
   /** @format int32 */
   numberOfElements?: number;
-  last?: boolean;
-  pageable?: PageableObject;
-  first?: boolean;
   empty?: boolean;
 }
 
@@ -591,11 +596,11 @@ export interface PageableObject {
   offset?: number;
   sort?: SortObject[];
   paged?: boolean;
+  unpaged?: boolean;
   /** @format int32 */
   pageNumber?: number;
   /** @format int32 */
   pageSize?: number;
-  unpaged?: boolean;
 }
 
 export interface SortObject {
@@ -910,6 +915,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 
     /**
      * @description Validates an event participation token and adds the current user to the event.
+
      *
      * @tags Token Management
      * @name VerifyEventToken
@@ -923,7 +929,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         method: "POST",
         body: data,
         secure: true,
-        type: ContentType.Json,
+        type: ContentType.Text,
         ...params,
       }),
 
@@ -964,6 +970,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     /**
      * @description Links a Telegram username with the authenticated user account.
      *
+
      * @tags Telegram Management
      * @name CreateTelegramUser
      * @summary Create Telegram user association
