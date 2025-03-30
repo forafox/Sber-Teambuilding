@@ -28,6 +28,7 @@ function RouteComponent() {
   const { data: me } = useSuspenseQuery(getMeQueryOptions());
   const [updateOpen, setUpdateOpen] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
+  console.log();
 
   const handleOpenMap = () => {
     setMapOpen(true);
