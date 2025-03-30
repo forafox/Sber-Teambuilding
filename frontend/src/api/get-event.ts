@@ -17,6 +17,7 @@ export const eventSchema = z.object({
     .string()
     .nullish()
     .transform((it) => it ?? undefined),
+  status: z.enum(["IN_PROGRESS", "DONE", "PLANNED", "COMPLETED", "CANCELLED"]).default("IN_PROGRESS"),
 });
 
 export type Event = z.infer<typeof eventSchema>;
