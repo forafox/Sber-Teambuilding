@@ -302,7 +302,12 @@ export type PollUpdateRequest = {
    * Updated type of the poll
    * @example "MULTIPLE_CHOICE"
    */
-  pollType: "SINGLE" | "MULTIPLE" | "SINGLE_CHOICE" | "MULTIPLE_CHOICE" | "OPEN_ENDED";
+  pollType:
+    | "SINGLE"
+    | "MULTIPLE"
+    | "SINGLE_CHOICE"
+    | "MULTIPLE_CHOICE"
+    | "OPEN_ENDED";
   /** Updated list of poll options */
   options: OptionUpdateRequest[];
 } | null;
@@ -606,12 +611,19 @@ export interface SortObject {
   ignoreCase?: boolean;
 }
 
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
+import type {
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  HeadersDefaults,
+  ResponseType,
+} from "axios";
 import axios from "axios";
 
 export type QueryParamsType = Record<string | number, any>;
 
-export interface FullRequestParams extends Omit<AxiosRequestConfig, "data" | "params" | "url" | "responseType"> {
+export interface FullRequestParams
+  extends Omit<AxiosRequestConfig, "data" | "params" | "url" | "responseType"> {
   /** set parameter to `true` for call `securityWorker` for this request */
   secure?: boolean;
   /** request path */
@@ -626,9 +638,13 @@ export interface FullRequestParams extends Omit<AxiosRequestConfig, "data" | "pa
   body?: unknown;
 }
 
-export type RequestParams = Omit<FullRequestParams, "body" | "method" | "query" | "path">;
+export type RequestParams = Omit<
+  FullRequestParams,
+  "body" | "method" | "query" | "path"
+>;
 
-export interface ApiConfig<SecurityDataType = unknown> extends Omit<AxiosRequestConfig, "data" | "cancelToken"> {
+export interface ApiConfig<SecurityDataType = unknown>
+  extends Omit<AxiosRequestConfig, "data" | "cancelToken"> {
   securityWorker?: (
     securityData: SecurityDataType | null,
   ) => Promise<AxiosRequestConfig | void> | AxiosRequestConfig | void;
@@ -650,8 +666,16 @@ export class HttpClient<SecurityDataType = unknown> {
   private secure?: boolean;
   private format?: ResponseType;
 
-  constructor({ securityWorker, secure, format, ...axiosConfig }: ApiConfig<SecurityDataType> = {}) {
-    this.instance = axios.create({ ...axiosConfig, baseURL: axiosConfig.baseURL || "http://localhost:8080" });
+  constructor({
+    securityWorker,
+    secure,
+    format,
+    ...axiosConfig
+  }: ApiConfig<SecurityDataType> = {}) {
+    this.instance = axios.create({
+      ...axiosConfig,
+      baseURL: axiosConfig.baseURL || "http://localhost:8080",
+    });
     this.secure = secure;
     this.format = format;
     this.securityWorker = securityWorker;
@@ -661,7 +685,10 @@ export class HttpClient<SecurityDataType = unknown> {
     this.securityData = data;
   };
 
-  protected mergeRequestParams(params1: AxiosRequestConfig, params2?: AxiosRequestConfig): AxiosRequestConfig {
+  protected mergeRequestParams(
+    params1: AxiosRequestConfig,
+    params2?: AxiosRequestConfig,
+  ): AxiosRequestConfig {
     const method = params1.method || (params2 && params2.method);
 
     return {
@@ -669,7 +696,11 @@ export class HttpClient<SecurityDataType = unknown> {
       ...params1,
       ...(params2 || {}),
       headers: {
-        ...((method && this.instance.defaults.headers[method.toLowerCase() as keyof HeadersDefaults]) || {}),
+        ...((method &&
+          this.instance.defaults.headers[
+            method.toLowerCase() as keyof HeadersDefaults
+          ]) ||
+          {}),
         ...(params1.headers || {}),
         ...((params2 && params2.headers) || {}),
       },
@@ -690,11 +721,15 @@ export class HttpClient<SecurityDataType = unknown> {
     }
     return Object.keys(input || {}).reduce((formData, key) => {
       const property = input[key];
-      const propertyContent: any[] = property instanceof Array ? property : [property];
+      const propertyContent: any[] =
+        property instanceof Array ? property : [property];
 
       for (const formItem of propertyContent) {
         const isFileType = formItem instanceof Blob || formItem instanceof File;
-        formData.append(key, isFileType ? formItem : this.stringifyFormItem(formItem));
+        formData.append(
+          key,
+          isFileType ? formItem : this.stringifyFormItem(formItem),
+        );
       }
 
       return formData;
@@ -718,11 +753,21 @@ export class HttpClient<SecurityDataType = unknown> {
     const requestParams = this.mergeRequestParams(params, secureParams);
     const responseFormat = format || this.format || undefined;
 
-    if (type === ContentType.FormData && body && body !== null && typeof body === "object") {
+    if (
+      type === ContentType.FormData &&
+      body &&
+      body !== null &&
+      typeof body === "object"
+    ) {
       body = this.createFormData(body as Record<string, unknown>);
     }
 
-    if (type === ContentType.Text && body && body !== null && typeof body !== "string") {
+    if (
+      type === ContentType.Text &&
+      body &&
+      body !== null &&
+      typeof body !== "string"
+    ) {
       body = JSON.stringify(body);
     }
 
@@ -747,7 +792,9 @@ export class HttpClient<SecurityDataType = unknown> {
  *
  * Sample API
  */
-export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+export class Api<
+  SecurityDataType extends unknown,
+> extends HttpClient<SecurityDataType> {
   api = {
     /**
      * @description Retrieves complete details for a specific event
@@ -828,7 +875,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request PUT:/api/events/{eventId}/tasks/{id}
      * @secure
      */
-    updateTask: (id: number, eventId: number, data: TaskRequest, params: RequestParams = {}) =>
+    updateTask: (
+      id: number,
+      eventId: number,
+      data: TaskRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<TaskResponse, ErrorMessage>({
         path: `/api/events/${eventId}/tasks/${id}`,
         method: "PUT",
@@ -881,7 +933,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request PUT:/api/chats/{chatId}/messages/{id}
      * @secure
      */
-    updateMessage: (chatId: number, id: number, data: MessageUpdateRequest, params: RequestParams = {}) =>
+    updateMessage: (
+      chatId: number,
+      id: number,
+      data: MessageUpdateRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<MessageResponse, ErrorMessage>({
         path: `/api/chats/${chatId}/messages/${id}`,
         method: "PUT",
@@ -970,7 +1027,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/api/telegram-users
      * @secure
      */
-    createTelegramUser: (data: TelegramUserRequest, params: RequestParams = {}) =>
+    createTelegramUser: (
+      data: TelegramUserRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<TelegramUserResponse, ErrorMessage>({
         path: `/api/telegram-users`,
         method: "POST",
@@ -1101,7 +1161,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/api/events/{eventId}/tasks
      * @secure
      */
-    createTask: (eventId: number, data: TaskRequest, params: RequestParams = {}) =>
+    createTask: (
+      eventId: number,
+      data: TaskRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<TaskResponse, ErrorMessage>({
         path: `/api/events/${eventId}/tasks`,
         method: "POST",
@@ -1173,7 +1237,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/api/chats/{chatId}/messages
      * @secure
      */
-    createMessage: (chatId: number, data: MessageRequest, params: RequestParams = {}) =>
+    createMessage: (
+      chatId: number,
+      data: MessageRequest,
+      params: RequestParams = {},
+    ) =>
       this.request<MessageResponse, ErrorMessage>({
         path: `/api/chats/${chatId}/messages`,
         method: "POST",
@@ -1260,7 +1328,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request PATCH:/api/events/{id}/participants
      * @secure
      */
-    updateEventParticipants: (id: number, data: number[], params: RequestParams = {}) =>
+    updateEventParticipants: (
+      id: number,
+      data: number[],
+      params: RequestParams = {},
+    ) =>
       this.request<EventResponse, ErrorMessage>({
         path: `/api/events/${id}/participants`,
         method: "PATCH",
@@ -1389,7 +1461,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request GET:/api/templates/events/{eventId}/tasks/{id}
      * @secure
      */
-    getTaskTemplateById: (eventId: number, id: number, params: RequestParams = {}) =>
+    getTaskTemplateById: (
+      eventId: number,
+      id: number,
+      params: RequestParams = {},
+    ) =>
       this.request<TaskResponse, ErrorMessage>({
         path: `/api/templates/events/${eventId}/tasks/${id}`,
         method: "GET",
