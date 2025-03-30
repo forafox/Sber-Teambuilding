@@ -15,6 +15,7 @@ import { useState } from "react";
 import { UpdateEventDialog } from "@/components/events/update-event-dialog";
 import { EventTasks } from "@/components/tasks/event-tasks";
 import { UserHoverCard } from "@/components/user/user-hover-card";
+import { EventLink } from "@/pages/events/event-link";
 
 export const Route = createFileRoute("/_authenticated/events/$eventId/tasks/")({
   component: RouteComponent,
@@ -50,12 +51,15 @@ function RouteComponent() {
                 {formattedDate}
               </CardDescription>
             </div>
-            {isAuthor && (
-              <Button variant="outline" onClick={() => setUpdateOpen(true)}>
-                <Pencil className="mr-2 h-4 w-4" />
-                Изменить
-              </Button>
-            )}
+            <div className="flex items-center gap-2">
+              {isAuthor && (
+                <Button variant="outline" onClick={() => setUpdateOpen(true)}>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Изменить
+                </Button>
+              )}
+              {isAuthor && <EventLink eventId={eventId} />}
+            </div>
           </div>
         </CardHeader>
         <CardContent>
