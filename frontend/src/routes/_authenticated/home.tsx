@@ -18,7 +18,6 @@ import {
   MailIcon,
   PlusIcon,
   UserIcon,
-  SendIcon,
 } from "lucide-react";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
@@ -190,17 +189,8 @@ function RouteComponent() {
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <SendIcon className="text-muted-foreground size-5" />
-                <div>
-                  <p className="text-muted-foreground text-sm">Telegram</p>
-                  <p className="font-medium">
-                    {userInfo?.telegramUsername || "Не подключен"}
-                  </p>
-                </div>
-              </div>
               <Button size="sm" onClick={() => setTelegramDialogOpen(true)}>
-                {userInfo?.telegramUsername ? "Изменить" : "Подключить"}
+                Указать Telegram
               </Button>
             </div>
           </div>
