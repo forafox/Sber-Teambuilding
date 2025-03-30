@@ -5,6 +5,7 @@ BACKEND_IMAGE_NAME ?= sber-backend
 
 
 
+
 FRONTEND_VERSION ?= 0.6.3
 BACKEND_VERSION ?= 0.15.0
 
