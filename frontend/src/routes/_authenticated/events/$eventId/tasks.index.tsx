@@ -30,7 +30,7 @@ function RouteComponent() {
   const [mapOpen, setMapOpen] = useState(false);
 
   const handleOpenMap = () => {
-    setMapOpen(true);
+    // setMapOpen(true);
   };
 
   const isAuthor = me?.id === event.author.id;
