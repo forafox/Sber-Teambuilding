@@ -595,7 +595,6 @@ export interface PageableObject {
   /** @format int64 */
   offset?: number;
   sort?: SortObject[];
-  unpaged?: boolean;
   paged?: boolean;
   unpaged?: boolean;
   /** @format int32 */
