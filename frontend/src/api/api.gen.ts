@@ -577,17 +577,17 @@ export interface Page {
   totalElements?: number;
   /** @format int32 */
   totalPages?: number;
+  first?: boolean;
+  last?: boolean;
   /** @format int32 */
   size?: number;
   content?: object[];
   /** @format int32 */
   number?: number;
   sort?: SortObject[];
+  pageable?: PageableObject;
   /** @format int32 */
   numberOfElements?: number;
-  last?: boolean;
-  pageable?: PageableObject;
-  first?: boolean;
   empty?: boolean;
 }
 
@@ -595,12 +595,12 @@ export interface PageableObject {
   /** @format int64 */
   offset?: number;
   sort?: SortObject[];
+  unpaged?: boolean;
   paged?: boolean;
   /** @format int32 */
   pageNumber?: number;
   /** @format int32 */
   pageSize?: number;
-  unpaged?: boolean;
 }
 
 export interface SortObject {
