@@ -10,6 +10,7 @@ export interface Transaction {
 export function calculateBalances(
   tasks: Task[],
   participants: User[],
+  transactionsHistory: Transaction[] = [],
 ): Transaction[] {
   // Calculate total expenses from all tasks
   const totalExpenses = tasks
@@ -41,6 +42,11 @@ export function calculateBalances(
   participants.forEach((participant) => {
     balances[participant.username] =
       fairShare - (spent[participant.username] || 0);
+  });
+
+  transactionsHistory.forEach((transaction) => {
+    balances[transaction.from] -= transaction.amount;
+    balances[transaction.to] += transaction.amount;
   });
 
   // Calculate transactions directly
