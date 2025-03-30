@@ -15,6 +15,7 @@ import { useState } from "react";
 import { UpdateEventDialog } from "@/components/events/update-event-dialog";
 import { EventTasks } from "@/components/tasks/event-tasks";
 import { UserHoverCard } from "@/components/user/user-hover-card";
+import { MapDialog } from "@/components/map/map-dialog";
 
 export const Route = createFileRoute("/_authenticated/events/$eventId/tasks/")({
   component: RouteComponent,
@@ -26,6 +27,11 @@ function RouteComponent() {
   const { data: event } = useSuspenseQuery(getEventQueryOptions(eventId));
   const { data: me } = useSuspenseQuery(getMeQueryOptions());
   const [updateOpen, setUpdateOpen] = useState(false);
+  const [mapOpen, setMapOpen] = useState(false);
+
+  const handleOpenMap = () => {
+    setMapOpen(true);
+  };
 
   const isAuthor = me?.id === event.author.id;
   const formattedDate = event.date.toLocaleString("ru-RU", {
@@ -83,6 +89,13 @@ function RouteComponent() {
                 </p>
               )}
             </div>
+
+            {event.location && (
+              <p className="text-muted-foreground mb-2 text-sm">
+                Место проведения:{" "}
+                <Button onClick={handleOpenMap}>{event.location}</Button>
+              </p>
+            )}
           </div>
         </CardContent>
         <UpdateEventDialog
@@ -92,6 +105,11 @@ function RouteComponent() {
         />
       </Card>
       <EventTasks eventId={event.id} />
+      <MapDialog
+        open={mapOpen}
+        onOpenChange={setMapOpen}
+        position={[59.965112, 30.28907]}
+      />
     </div>
   );
 }

@@ -190,6 +190,11 @@ function RouteComponent() {
                   <p className="text-muted-foreground text-sm">
                     Участников: {event.participants.length}
                   </p>
+                  {event.location && (
+                    <p className="text-muted-foreground mb-2 text-sm">
+                      Место проведения: {event.location}
+                    </p>
+                  )}
                 </CardContent>
                 <CardFooter>
                   <Button variant="outline" asChild className="w-full">

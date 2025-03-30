@@ -48,6 +48,7 @@ function NewEvent() {
     defaultValues: {
       title: "",
       date: new Date(),
+      location: "",
       participants: [],
     },
   });
@@ -129,6 +130,20 @@ function NewEvent() {
                           onChange={field.onChange}
                         />
                       </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Место проведения</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Введите координаты" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

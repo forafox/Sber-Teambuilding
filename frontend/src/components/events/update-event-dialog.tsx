@@ -114,6 +114,21 @@ export function UpdateEventDialog({ open, onOpenChange, defaultEvent }: Props) {
                 </FormItem>
               )}
             />
+
+            <FormField
+              control={form.control}
+              name="location"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Место проведения</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Введите координаты" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="participants"

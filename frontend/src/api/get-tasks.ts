@@ -29,7 +29,9 @@ export type Task = z.infer<typeof taskSchema>;
 export const getTasksQueryOptions = (eventId: number) => ({
   queryKey: ["tasks", eventId],
   queryFn: async () => {
-    const { data } = await api.api.getTasks(eventId, { pageSize: 10_000 });
+    const { data: data } = await api.api.getTasks(eventId, {
+      pageSize: 10_000,
+    });
     return taskSchema.array().parse(data);
   },
 });
