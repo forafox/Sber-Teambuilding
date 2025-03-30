@@ -33,12 +33,12 @@ export function DataTableRowActions({
           className="data-[state=open]:bg-muted flex h-8 w-8 p-0"
         >
           <MoreHorizontal />
-          <span className="sr-only">Open menu</span>
+          <span className="sr-only">Открыть меню</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
-        <DropdownMenuItem onClick={onEdit}>Edit</DropdownMenuItem>
-        <DropdownMenuItem onClick={onDelete}>Delete</DropdownMenuItem>
+        <DropdownMenuItem onClick={onEdit}>Изменить</DropdownMenuItem>
+        <DropdownMenuItem onClick={onDelete}>Удалить</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -53,7 +53,7 @@ function ChangeTaskShow({
   return (
     <button
       onClick={onClick}
-      className={`${tasksShow == show ? "text-primary bg-transparent" : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs"} focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructiv inline-flex shrink-0 items-center justify-center rounded-md p-2 text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px]`}
+      className={`${tasksShow != show ? "text-primary bg-transparent" : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs"} focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructiv inline-flex shrink-0 items-center justify-center rounded-md p-2 text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px]`}
     >
       {show == "TABLE" ? <ListIcon size={16} /> : <LayoutGridIcon size={16} />}
     </button>
@@ -81,7 +81,7 @@ export function DataTableToolbar({
       <div className="flex items-center justify-between">
         <div className="flex flex-1 items-center space-x-2">
           <Input
-            placeholder="Filter tasks..."
+            placeholder="Фильтр задач..."
             value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
             onChange={(event) => {
               table.getColumn("title")?.setFilterValue(event.target.value);
@@ -111,7 +111,7 @@ export function DataTableToolbar({
               onClick={() => table.resetColumnFilters()}
               className="h-8 px-2 lg:px-3"
             >
-              Reset
+              Удалить
               <X />
             </Button>
           )}
@@ -126,7 +126,7 @@ export function DataTableToolbar({
             show="LIST"
           />
         </div>
-        <DataTableViewOptions table={table} />
+        <DataTableViewOptions table={table} hidden={tasksShow == "LIST"} />
       </div>
     );
   }

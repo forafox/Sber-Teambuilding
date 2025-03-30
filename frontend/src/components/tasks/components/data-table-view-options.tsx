@@ -16,23 +16,27 @@ import { Task } from "@/api/get-tasks";
 
 interface DataTableViewOptionsProps {
   table: Table<Task>;
+  hidden: boolean;
 }
 
-export function DataTableViewOptions({ table }: DataTableViewOptionsProps) {
+export function DataTableViewOptions({
+  table,
+  hidden,
+}: DataTableViewOptionsProps) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger asChild className={`${hidden ? "hidden" : "block"}`}>
         <Button
           variant="outline"
           size="sm"
           className="ml-auto hidden h-8 lg:flex"
         >
           <Settings2 />
-          View
+          Вид
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[150px]">
-        <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
+        <DropdownMenuLabel>Переключить столбцы</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {table
           .getAllColumns()

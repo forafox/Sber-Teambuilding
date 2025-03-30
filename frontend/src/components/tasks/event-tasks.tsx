@@ -15,9 +15,6 @@ import { useState } from "react";
 import { UpdateTaskDialog } from "./update-task-dialog.tsx";
 import { CreateTaskDialog } from "./create-task-dialog";
 import { useUpdateTaskMutation } from "@/api/update-task";
-import { Avatar } from "../ui/avatar";
-import { AvatarFallback } from "../ui/avatar";
-import { getAvatarFallback } from "../user/lib";
 import { TasksTable } from "./components/data-table";
 
 import { DataTableColumnHeader } from "./components/data-table-column-header";
@@ -37,6 +34,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
 } from "@tanstack/react-table";
+import { UserHoverCard } from "../user/user-hover-card.tsx";
 
 type Props = {
   eventId: number;
@@ -325,37 +323,27 @@ function TaskList({
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>{task.title}</CardTitle>
-                  <div className="border-primary/25 rounded-full border-2">
-                    <CardContent>{task.expenses}₽</CardContent>
-                  </div>
+                  {task.expenses && (
+                    <div className="border-primary/25 min-h-6 rounded-full border-2">
+                      <CardContent>
+                        {task.expenses}
+                        {task.expenses && "₽"}
+                      </CardContent>
+                    </div>
+                  )}
                 </div>
               </CardHeader>
               <CardContent>
-                <CardDescription>Автор: {task.author.name}</CardDescription>
+                <CardDescription className="gap-y-4">Автор:</CardDescription>
               </CardContent>
+              <CardContent>
+                <UserHoverCard user={task.author}></UserHoverCard>
+              </CardContent>
+
               <CardContent>{task.description}</CardContent>
-              {task.assignee ? (
+              {task.assignee && (
                 <div className="bg-primary/15 mx-6 flex items-center gap-2 rounded-xl p-4">
-                  <Avatar className="size-10 text-xs">
-                    <AvatarFallback>
-                      {getAvatarFallback(task.assignee.name)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col">
-                    <CardContent>{task.assignee.name}</CardContent>
-                    <CardContent>
-                      <CardDescription>{task.assignee.email}</CardDescription>
-                    </CardContent>
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-primary/15 mx-6 flex flex-col rounded-xl p-4">
-                  <CardContent>Исполнитель не назначен</CardContent>
-                  <CardContent>
-                    <CardDescription>
-                      Вы можете назначить исполнителя
-                    </CardDescription>
-                  </CardContent>
+                  <UserHoverCard user={task.author}></UserHoverCard>
                 </div>
               )}
               <CardFooter className="flex gap-3 max-[447px]:flex-col">
