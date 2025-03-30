@@ -10,15 +10,16 @@ import {
 } from "@/components/ui/card";
 import { useRedeemInviteTokenMutation } from "@/api/invite";
 import { toast } from "sonner";
+import { z } from "zod";
+
+const search = z.object({
+  title: z.string().transform((t) => decodeURIComponent(t)),
+  token: z.string().transform((t) => decodeURIComponent(t)),
+});
 
 export const Route = createFileRoute("/_authenticated/token")({
   component: RouteComponent,
-  validateSearch: (search) => {
-    return {
-      title: search.title as string,
-      token: search.token as string,
-    };
-  },
+  validateSearch: search,
 });
 
 function RouteComponent() {

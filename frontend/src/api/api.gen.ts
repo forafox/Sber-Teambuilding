@@ -980,7 +980,8 @@ export class Api<
         method: "POST",
         body: data,
         secure: true,
-        type: ContentType.Json,
+        // DO NOT CHANGE THAT!!!!!
+        type: ContentType.Text,
         ...params,
       }),
 

@@ -8,14 +8,14 @@ export function useCreateInviteTokenMutation() {
       const { data } = await api.api.createEventToken(eventId);
       return data;
     },
-
   });
 }
 
 export function useRedeemInviteTokenMutation() {
   return useMutation({
     mutationFn: async (token: string) => {
-      const { data } = await api.api.verifyEventToken(token);
+      console.log(token);
+      const { data } = await api.api.verifyEventToken(token.trim());
       return eventSchema.parse(data);
     },
   });
