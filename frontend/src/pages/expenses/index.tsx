@@ -13,6 +13,8 @@ import { User } from "@/api/get-users";
 import { Task } from "@/api/get-tasks";
 import { UserHoverCard } from "@/components/user/user-hover-card";
 import { ExpensesRowActions } from "@/components/expenses/expenses-row-actions";
+import { TransactionsPage } from "./transactions";
+import { BalanceTable } from "@/components/expenses/balance-table";
 
 interface ExpensesPageProps {
   tasks: Task[];
@@ -110,41 +112,11 @@ export function ExpensesPage({
           <CardTitle>Баланс между участниками</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Кто должен</TableHead>
-                  <TableHead>Кому должен</TableHead>
-                  <TableHead className="text-right">Сумма</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {balances.map((balance) => (
-                  <TableRow key={`${balance.from}-${balance.to}`}>
-                    <TableCell>
-                      <UserHoverCard
-                        user={getParticipantByUsername(balance.from)!}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <UserHoverCard
-                        user={getParticipantByUsername(balance.to)!}
-                      />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {balance.amount.toLocaleString("ru-RU", {
-                        style: "currency",
-                        currency: "RUB",
-                      })}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+          <BalanceTable balances={balances} participants={participants} />
         </CardContent>
       </Card>
+
+      <TransactionsPage eventId={eventId} />
     </div>
   );
 }

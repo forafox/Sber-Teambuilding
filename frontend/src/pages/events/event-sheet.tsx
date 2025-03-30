@@ -16,6 +16,7 @@ import {
   MessageCircleIcon,
   LogOut,
   HomeIcon,
+  ArrowLeftRight,
 } from "lucide-react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { getMeQueryOptions } from "@/api/get-me";
@@ -84,6 +85,21 @@ export function EventSheet({ eventId }: EventSheetProps) {
             >
               <DollarSign />
               Смета
+            </Link>
+          </Button>
+          <Button
+            variant="link"
+            className="!px-0 data-[status=active]:underline"
+            asChild
+            onClick={onClick}
+          >
+            <Link
+              from="/events/$eventId"
+              to="/events/$eventId/transactions"
+              params={{ eventId: eventId.toString() }}
+            >
+              <ArrowLeftRight />
+              Транзакции
             </Link>
           </Button>
           <Button
