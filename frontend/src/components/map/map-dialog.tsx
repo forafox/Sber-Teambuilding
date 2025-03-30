@@ -32,7 +32,7 @@ export function MapDialog({ position, open, onOpenChange }: Props) {
             Вы можете изменить название события, дату и участников.
           </DialogDescription>
         </DialogHeader>
-        <DialogContent>
+        <DialogDescription className="h-[200px]">
           <YMaps>
             <Map
               defaultState={{
@@ -51,7 +51,7 @@ export function MapDialog({ position, open, onOpenChange }: Props) {
               />
             </Map>
           </YMaps>
-        </DialogContent>
+        </DialogDescription>
         <DialogFooter>
           <Button onClick={handlePathTo}>Построить маршрут</Button>
         </DialogFooter>
