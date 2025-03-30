@@ -323,9 +323,11 @@ function TaskList({
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>{task.title}</CardTitle>
-                  <div className="border-primary/25 rounded-full border-2">
-                    <CardContent>{task.expenses}₽</CardContent>
-                  </div>
+                  {task.expenses && (
+                    <div className="border-primary/25 rounded-full border-2">
+                      <CardContent>{task.expenses}₽</CardContent>
+                    </div>
+                  )}
                 </div>
               </CardHeader>
               <CardContent>
