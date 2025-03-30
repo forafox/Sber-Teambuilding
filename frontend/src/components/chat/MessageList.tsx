@@ -7,9 +7,14 @@ import { Message } from "@/api/get-chat";
 type MessageListProps = {
   chatId: number;
   onReply: (message: Message) => void;
+  focusInputField?: () => void;
 };
 
-export function MessageList({ chatId, onReply }: MessageListProps) {
+export function MessageList({
+  chatId,
+  onReply,
+  focusInputField,
+}: MessageListProps) {
   const { data: messages, isLoading, error } = useGetMessages(chatId);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
@@ -87,6 +92,7 @@ export function MessageList({ chatId, onReply }: MessageListProps) {
             chatId={chatId}
             onReply={onReply}
             scrollToMessage={scrollToMessage}
+            focusInputField={focusInputField}
           />
         ))}
       </div>

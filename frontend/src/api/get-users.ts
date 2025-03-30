@@ -15,7 +15,7 @@ export type User = z.infer<typeof userSchema>;
 export const getUsersQueryOptions = () => ({
   queryKey: ["users"],
   queryFn: async () => {
-    const { data } = await api.api.getUsers({ size: 10_000 });
+    const { data } = await api.api.searchUsers({ size: 10_000 });
     return userSchema.array().parse(data.content);
   },
 });

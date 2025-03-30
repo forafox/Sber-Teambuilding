@@ -8,7 +8,7 @@ export function useSignInMutation() {
   return useMutation({
     mutationFn: async (data: SignInRequest) => {
       try {
-        const { data: result } = await api.api.login(data);
+        const { data: result } = await api.api.loginUser(data);
         return result;
       } catch (error) {
         if (isAxiosError(error) && error.response?.status === 401) {

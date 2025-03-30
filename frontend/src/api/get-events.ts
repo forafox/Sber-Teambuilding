@@ -7,6 +7,6 @@ export const getEventsQueryOptions = () =>
     queryKey: ["events"],
     queryFn: async () => {
       const { data } = await api.api.getEvents({ size: 10_000 });
-      return eventSchema.array().parse(data.content);
+      return eventSchema.array().parse(data);
     },
   });
