@@ -257,6 +257,7 @@ export interface MessageUpdateRequest {
   pinned: boolean;
   /** Poll update request payload */
   poll?: PollUpdateRequest;
+
 }
 
 /** Poll option update request payload */
@@ -281,6 +282,7 @@ export interface OptionUpdateRequest {
    */
   voters: number[];
 }
+
 
 /** Poll update request payload */
 export type PollUpdateRequest = {
@@ -344,6 +346,8 @@ export interface MessageResponse {
   pinned: boolean;
   /** Poll response with configuration and voting options */
   poll?: PollResponse;
+
+
 }
 
 /** Poll option response with voters information */
@@ -365,6 +369,7 @@ export interface OptionResponse {
   /** List of users who voted for this option */
   voters: UserResponse[];
 }
+
 
 /** Poll response with configuration and voting options */
 export type PollResponse = {
@@ -442,6 +447,7 @@ export interface ChatResponse {
   pinnedMessages: MessageResponse[];
   /** Map of read messages by user ID */
   readMessages: Record<string, MessageResponse>;
+
 }
 
 /** Message content and metadata */
@@ -465,6 +471,7 @@ export interface MessageRequest {
   /** Poll creation request payload */
   poll?: PollRequest;
 }
+
 
 /** Poll option request payload */
 export interface OptionRequest {
@@ -572,8 +579,6 @@ export interface Page {
   totalElements?: number;
   /** @format int32 */
   totalPages?: number;
-  first?: boolean;
-  last?: boolean;
   /** @format int32 */
   size?: number;
   content?: object[];
@@ -605,7 +610,6 @@ export interface SortObject {
   property?: string;
   ignoreCase?: boolean;
 }
-
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
 import axios from "axios";
 
@@ -910,6 +914,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 
     /**
      * @description Validates an event participation token and adds the current user to the event.
+
      *
      * @tags Token Management
      * @name VerifyEventToken
@@ -964,6 +969,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     /**
      * @description Links a Telegram username with the authenticated user account.
      *
+
      * @tags Telegram Management
      * @name CreateTelegramUser
      * @summary Create Telegram user association
