@@ -2,8 +2,8 @@ package com.jellyone.adapters.mail;
 
 import com.jellyone.domain.Event;
 import com.jellyone.domain.enums.EventStatus;
-import com.jellyone.mail.MailSender;
 import com.jellyone.mail.api.MailApi;
+import com.jellyone.mail.api.Sender;
 import com.jellyone.mail.dto.TaskDTO;
 import com.jellyone.service.EventService;
 import com.jellyone.service.TaskService;
@@ -22,12 +22,12 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Profile("mail")
-public class SendMail {
+public class MailSenderService implements SenderService {
     private final TaskService taskService;
     private final EventService eventService;
     private final MailApi mailApi;
     private final MailTaskToTaskDTO taskToTaskDTO;
-    private final MailSender mailSender;
+    private final Sender sender;
     private final UserService userService;
 
 
@@ -37,18 +37,18 @@ public class SendMail {
     public void sendMail(String email, Long userId, Long eventId) {
         Context context = getContext(userId, eventId);
         String eventTitle = eventService.getById(eventId).getTitle();
-        mailSender.sendMailReport(email, eventTitle, context);
+        sender.sendMailReport(email, eventTitle, context);
     }
 
     public void sendMail(Long userId, Long eventId) {
         Context context = getContext(userId, eventId);
         String eventTitle = eventService.getById(eventId).getTitle();
-        mailSender.sendMailReport(userService.getById(userId).getEmail(), eventTitle, context);
+        sender.sendMailReport(userService.getById(userId).getEmail(), eventTitle, context);
     }
 
     private Context getContext(Long userId, Long eventId) {
         Event event = eventService.getById(eventId);
-        double totalAmount = mailApi.getTotalSum(eventId);
+        double totalAmount = mailApi.getTotalSum(eventId); // TODO mailApi поменять на его реализацию
         double amountUserSpent = mailApi.getSumSpentByUser(eventId, userId);
         double amountOwedToUser = mailApi.getSumOwedToUser(eventId, userId);
         boolean isEventClosed = event.getStatus() == EventStatus.DONE;
@@ -56,7 +56,7 @@ public class SendMail {
         List<TaskDTO> tasksDTO = taskService.getAll(0, 50, eventId).get().map(taskToTaskDTO::taskToTaskDTO).toList();
         String eventUrl = host + "/events/" + eventId; // TODO + "/tasks"
 
-        return mailSender.createContext(
+        return sender.createContext(
                 eventUrl,
                 event.getTitle(),
                 LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC),

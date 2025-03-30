@@ -1,14 +1,6 @@
 package com.jellyone.controller;
 
-import com.jellyone.adapters.mail.MailTaskToTaskDTO;
-import com.jellyone.adapters.mail.SendMail;
-import com.jellyone.domain.Event;
-import com.jellyone.domain.enums.EventStatus;
-import com.jellyone.mail.MailSender;
-import com.jellyone.mail.api.MailApi;
-import com.jellyone.service.EventService;
-import com.jellyone.service.TaskService;
-import com.jellyone.service.UserService;
+import com.jellyone.adapters.mail.SenderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,12 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.thymeleaf.context.Context;
-
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.Date;
 
 @Slf4j
 @RestController
@@ -34,7 +20,7 @@ import java.util.Date;
 @RequiredArgsConstructor
 @Profile("mail")
 public class EmailUsageController {
-    private final SendMail sendMail;
+    private final SenderService senderService;
 
     @Operation(summary = "Send simple email")
     @PostMapping("/simple-email")
@@ -44,6 +30,6 @@ public class EmailUsageController {
             @RequestParam(defaultValue = "0") Long eventId
     ) {
         log.info("Send simple email");
-        sendMail.sendMail(email, userId, eventId);
+        senderService.sendMail(email, userId, eventId);
     }
 }

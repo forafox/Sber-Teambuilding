@@ -1,6 +1,6 @@
 package com.jellyone.controller;
 
-import com.jellyone.adapters.mail.SendMail;
+import com.jellyone.adapters.mail.SenderService;
 import com.jellyone.adapters.telegram.TelegramNotificationService;
 import com.jellyone.domain.enums.EventStatus;
 import com.jellyone.service.EventService;
@@ -12,9 +12,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,10 +28,7 @@ public class EventController {
 
     private final EventService eventService;
     private final TelegramNotificationService telegramNotificationService;
-    private final SendMail sendMail;
-
-    @Value("${HOST}")
-    private String host;
+    private final SenderService senderService;
 
     @Operation(summary = "Get all events")
     @GetMapping("/events")
@@ -101,7 +95,7 @@ public class EventController {
     private void handleEventStatusChange(EventStatus status, List<Long> participants, String title, Long id) {
         if (status == EventStatus.DONE) {
             participants.forEach(participantId -> {
-                sendMail.sendMail(participantId, id);
+                senderService.sendMail(participantId, id);
                 telegramNotificationService.sendEventEndNotification(participantId, title);
             });
         }

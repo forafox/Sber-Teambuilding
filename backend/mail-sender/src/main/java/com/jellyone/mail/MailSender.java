@@ -1,5 +1,6 @@
 package com.jellyone.mail;
 
+import com.jellyone.mail.api.Sender;
 import com.jellyone.mail.dto.TaskDTO;
 import com.jellyone.mail.services.ExcelGenerator;
 import com.jellyone.mail.services.MailService;
@@ -17,11 +18,12 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Profile("mail")
-public class MailSender {
+public class MailSender implements Sender {
     private final MailService mailSender;
     private final ExcelGenerator excelGenerator;
     private final String excelFileName = "report.xls";
 
+    @Override
     public Context createContext(
             String eventUrl,
             String eventTitle,
@@ -46,6 +48,7 @@ public class MailSender {
         return context;
     }
 
+    @Override
     public File createExcel(List<TaskDTO> allTasks, List<TaskDTO> myTasks, List<TaskDTO> otherTasks) {
         byte[] excelBytes = excelGenerator.generateExcel(allTasks, myTasks, otherTasks);
         if (excelBytes.length != 0) {
@@ -64,11 +67,13 @@ public class MailSender {
     // Чтобы отправить письмо, нужно создать контекст.
     // Создаем контекст с помощью апишки, метод для создания контекста выше
     // письмо с файлом
+    @Override
     public void sendAttachMailReport(String email, String name, File file, Context context) {
         mailSender.sendAttachMail(email, name, file, context);
     }
 
     // письмо без файла (но у всех один вид)
+    @Override
     public void sendMailReport(String email, String eventTitle, Context context) {
         mailSender.sendMail(email, eventTitle, context);
     }

@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 
 @Service
-@Profile("mail")
 @RequiredArgsConstructor
+@Profile("mail")
 public class MailAdapter implements MailApi {
 
     @Override
