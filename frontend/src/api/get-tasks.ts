@@ -29,11 +29,25 @@ export type Task = z.infer<typeof taskSchema>;
 export const getTasksQueryOptions = (eventId: number) => ({
   queryKey: ["tasks", eventId],
   queryFn: async () => {
-    const { data: data } = await api.api.getTasks(eventId, {
-      pageSize: 10_000,
-    });
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    return taskSchema.array().parse(data.content);
+    const { data } = await api.api.getTasks(eventId, { pageSize: 10_000 });
+    try {
+      // Пробуем парсить как массив (старый формат)
+      return taskSchema.array().parse(data);
+    } catch (error) {
+      // Если ответ пришел в виде объекта со свойством content
+      if (
+        data &&
+        typeof data === "object" &&
+        "content" in data &&
+        Array.isArray(data.content)
+      ) {
+        return taskSchema.array().parse(data.content);
+      }
+      // Если ответ пришел в виде одиночного объекта
+      if (data && typeof data === "object" && !Array.isArray(data)) {
+        return [taskSchema.parse(data)];
+      }
+      throw error;
+    }
   },
 });

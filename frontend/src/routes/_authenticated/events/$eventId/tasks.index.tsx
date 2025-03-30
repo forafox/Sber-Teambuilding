@@ -56,12 +56,15 @@ function RouteComponent() {
                 {formattedDate}
               </CardDescription>
             </div>
-            {isAuthor && (
-              <Button variant="outline" onClick={() => setUpdateOpen(true)}>
-                <Pencil className="mr-2 h-4 w-4" />
-                Изменить
-              </Button>
-            )}
+            <div className="flex items-center gap-2">
+              {isAuthor && (
+                <Button variant="outline" onClick={() => setUpdateOpen(true)}>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Изменить
+                </Button>
+              )}
+              {isAuthor && <EventLink eventId={eventId} title={event.title} />}
+            </div>
           </div>
         </CardHeader>
         <CardContent>

@@ -17,9 +17,9 @@ public interface MailApi {
      * Retrieves the total sum owed to a specific user for a particular event.
      *
      * @param eventId the unique identifier of the event for which to calculate the sum
-     * @param userId the unique identifier of the user for whom to calculate the owed sum
+     * @param userId  the unique identifier of the user for whom to calculate the owed sum
      * @return the total amount owed to the specified user for the specified event,
-     *         can be negative if there is a debt
+     * can be negative if there is a debt
      */
     double getSumOwedToUser(Long eventId, Long userId);
 
@@ -27,17 +27,9 @@ public interface MailApi {
      * Gets total amount spent by user for the event.
      *
      * @param eventId the unique identifier of the event for which to calculate the sum
-     * @param userId the unique identifier of the user for whom to calculate the sum
+     * @param userId  the unique identifier of the user for whom to calculate the sum
      * @return total spent amount (always non-negative)
      */
     double getSumSpentByUser(Long eventId, Long userId);
 
-    /**
-     * Returns debts between the user and others for the event.
-     *
-     * @param eventId the unique identifier of the event for which to calculate the sum
-     * @param userId the unique identifier of the user for whom to calculate the debts
-     * @return Map where: key - other user, value - amount (positive = owes, negative = is owed)
-     */
-    HashMap<UserDTO, Double> getUserDebts(Long eventId, Long userId);
 }

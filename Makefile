@@ -4,8 +4,8 @@ FRONTEND_IMAGE_NAME ?= sber-frontend
 BACKEND_IMAGE_NAME ?= sber-backend
 
 
-FRONTEND_VERSION ?= 0.6.1
-BACKEND_VERSION ?= 0.15.0
+FRONTEND_VERSION ?= 0.11.4
+BACKEND_VERSION ?= 0.18.0
 
 
 FRONTEND_IMAGE = ghcr.io/fegor04/${FRONTEND_IMAGE_NAME}:${FRONTEND_VERSION}
@@ -47,7 +47,4 @@ prod-up:
 
 prod-down:
 	docker compose -f compose.yaml -f compose.prod.yaml down
-
-.env: .env.example
-	cp .env.example .env
 

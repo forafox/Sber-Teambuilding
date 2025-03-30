@@ -31,7 +31,6 @@ type Props = {
   defaultTask: Task;
   eventId: number;
 };
-
 const schema = taskSchema.omit({ status: true, author: true, id: true });
 
 export function UpdateTaskDialog({
@@ -52,6 +51,8 @@ export function UpdateTaskDialog({
       assignee: defaultTask.assignee,
       description: defaultTask.description,
       expenses: defaultTask.expenses,
+      url: defaultTask.url,
+      status: defaultTask.status ?? "IN_PROGRESS",
     },
   });
 
