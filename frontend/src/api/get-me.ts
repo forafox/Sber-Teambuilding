@@ -6,7 +6,7 @@ export const getMeQueryOptions = () =>
   queryOptions({
     queryKey: ["me"],
     queryFn: async () => {
-      const { data } = await api.api.me();
+      const { data } = await api.api.getCurrentUser();
       return userSchema.parse(data);
     },
   });

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, RefObject } from "react";
 import { Button } from "@/components/ui/button";
 import { SendIcon, XIcon } from "lucide-react";
 import { useSendMessage } from "@/api/send-message";
@@ -8,63 +8,69 @@ type MessageInputProps = {
   chatId: number;
   replyToMessage?: Message | null;
   onCancelReply?: () => void;
+  inputRef?: RefObject<HTMLInputElement>;
 };
 
 export function MessageInput({
   chatId,
   replyToMessage,
   onCancelReply,
+  inputRef,
 }: MessageInputProps) {
   const [message, setMessage] = useState("");
   const sendMessage = useSendMessage(chatId);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!message.trim()) return;
-
-    try {
-      await sendMessage.mutateAsync({
+    if (message.trim() && !sendMessage.isPending) {
+      sendMessage.mutate({
         content: message.trim(),
         replyToMessageId: replyToMessage?.id,
+        pinned: false,
       });
       setMessage("");
-      if (onCancelReply) {
+      if (onCancelReply && replyToMessage) {
         onCancelReply();
       }
-    } catch (error) {
-      console.error("Failed to send message:", error);
     }
   };
 
   return (
     <div className="border-t">
       {replyToMessage && (
-        <div className="border-primary bg-muted/10 flex items-center gap-3 border-l-2 p-2 pl-3">
-          <div className="flex-1">
-            <div className="flex items-center">
-              <div className="text-primary mb-0.5 text-sm font-medium">
+        <div className="bg-muted/30 flex items-center gap-2 border-b p-2">
+          <div className="flex flex-1 items-center gap-2">
+            <div className="bg-primary h-4 w-1 rounded-full"></div>
+            <div className="flex-1">
+              <div className="text-sm font-semibold">
                 {replyToMessage.author.name}
               </div>
-            </div>
-            <div className="text-muted-foreground max-w-[calc(100%-40px)] truncate text-xs">
-              {replyToMessage.content}
+              <div className="text-muted-foreground truncate text-xs">
+                {replyToMessage.content.length > 50
+                  ? replyToMessage.content.substring(0, 50) + "..."
+                  : replyToMessage.content}
+              </div>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-6 w-6 rounded-full"
-            onClick={onCancelReply}
-          >
-            <XIcon className="h-4 w-4" />
-          </Button>
+          {onCancelReply && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onCancelReply}
+              className="h-8 w-8 rounded-full"
+            >
+              <XIcon className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       )}
+
       <form
         onSubmit={handleSubmit}
         className="flex w-full items-center gap-2 p-3"
       >
         <input
+          ref={inputRef}
           type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
