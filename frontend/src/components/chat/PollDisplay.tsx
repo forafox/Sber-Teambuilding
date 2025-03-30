@@ -209,7 +209,7 @@ export function PollDisplay({
             // Показываем результаты опроса
             <div className="space-y-4">
               {poll.options?.map((option) => {
-                const userVotedForThisOption = 
+                const userVotedForThisOption =
                   currentUser &&
                   option.voters.some((voter) => voter.id === currentUser.id);
                 return (
@@ -217,7 +217,7 @@ export function PollDisplay({
                     key={option.id}
                     className={`space-y-2 ${
                       userVotedForThisOption
-                        ? "border-primary/20 rounded-md border p-2 bg-primary/5"
+                        ? "border-primary/20 bg-primary/5 rounded-md border p-2"
                         : ""
                     }`}
                   >
@@ -244,7 +244,8 @@ export function PollDisplay({
                         {option.voters.length}{" "}
                         {option.voters.length === 1
                           ? "голос"
-                          : option.voters.length >= 2 && option.voters.length <= 4
+                          : option.voters.length >= 2 &&
+                              option.voters.length <= 4
                             ? "голоса"
                             : "голосов"}
                       </div>
