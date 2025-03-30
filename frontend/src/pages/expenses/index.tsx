@@ -120,7 +120,11 @@ export function ExpensesPage({
           <CardTitle>Баланс между участниками</CardTitle>
         </CardHeader>
         <CardContent>
-          <BalanceTable balances={balances} participants={participants} />
+          <BalanceTable
+            balances={balances}
+            participants={participants}
+            eventId={eventId}
+          />
         </CardContent>
       </Card>
 

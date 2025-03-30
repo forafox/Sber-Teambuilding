@@ -10,14 +10,22 @@ import { UserHoverCard } from "@/components/user/user-hover-card";
 import { Transaction } from "@/pages/expenses/logic";
 import { User } from "@/api/get-users";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, CheckIcon } from "lucide-react";
+import { useCreateEventTransactionMutation } from "@/api/transactions";
+import { Button } from "../ui/button";
 
 interface BalanceTableProps {
   balances: Transaction[];
   participants: User[];
+  eventId: number;
 }
 
-export function BalanceTable({ balances, participants }: BalanceTableProps) {
+export function BalanceTable({
+  balances,
+  participants,
+  eventId,
+}: BalanceTableProps) {
+  const { mutate, isPending } = useCreateEventTransactionMutation();
   function getParticipantByUsername(username: string) {
     return participants.find(
       (participant) => participant.username === username,
@@ -43,6 +51,7 @@ export function BalanceTable({ balances, participants }: BalanceTableProps) {
             <TableHead>Кто должен</TableHead>
             <TableHead>Кому должен</TableHead>
             <TableHead className="text-right">Сумма</TableHead>
+            <TableHead />
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -59,6 +68,23 @@ export function BalanceTable({ balances, participants }: BalanceTableProps) {
                   style: "currency",
                   currency: "RUB",
                 })}
+              </TableCell>
+              <TableCell>
+                <Button
+                  variant="outline"
+                  disabled={isPending}
+                  size="icon"
+                  onClick={() =>
+                    mutate({
+                      fromId: getParticipantByUsername(balance.from)!.id,
+                      toId: getParticipantByUsername(balance.to)!.id,
+                      amount: balance.amount,
+                      eventId: eventId,
+                    })
+                  }
+                >
+                  <CheckIcon />
+                </Button>
               </TableCell>
             </TableRow>
           ))}

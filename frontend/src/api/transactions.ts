@@ -36,3 +36,40 @@ export function useCreateEventTransactionMutation() {
     },
   });
 }
+
+export function useUpdateEventTransactionMutation() {
+  return useMutation({
+    mutationFn: async (transaction: {
+      id: number;
+      amount: number;
+      eventId: number;
+      recipientId: number;
+      senderId: number;
+    }) => {
+      const response = await api.api.updateMoneyTransfer(
+        transaction.eventId,
+        transaction.id,
+        {
+          amount: transaction.amount,
+          senderId: transaction.senderId,
+          recipientId: transaction.recipientId,
+        },
+      );
+      return transactionSchema.parse(response.data);
+    },
+  });
+}
+
+export function useDeleteEventTransactionMutation() {
+  return useMutation({
+    mutationFn: async ({
+      transactionId,
+      eventId,
+    }: {
+      transactionId: number;
+      eventId: number;
+    }) => {
+      await api.api.deleteMoneyTransfer(transactionId, eventId);
+    },
+  });
+}
