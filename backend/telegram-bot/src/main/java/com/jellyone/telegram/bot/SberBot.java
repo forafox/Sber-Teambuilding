@@ -15,10 +15,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
-import java.util.Properties;
 
 @Component
 @RequiredArgsConstructor
@@ -33,13 +30,7 @@ public class SberBot implements SpringLongPollingBot, LongPollingUpdateConsumer 
 
     @Override
     public String getBotToken() {
-        Properties properties = new Properties();
-        try (InputStream inputStream = SberBot.class.getClassLoader().getResourceAsStream("config.properties")) {
-            properties.load(inputStream);
-            return properties.getProperty("BOT_TOKEN");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return "7627331116:AAGPJhtw2RaHN86GL2fbdWTlrS7EEOWu1bA";
     }
 
     @Override
