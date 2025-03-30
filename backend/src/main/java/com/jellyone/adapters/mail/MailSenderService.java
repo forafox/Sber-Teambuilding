@@ -14,10 +14,12 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 
+import java.io.File;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,26 +36,69 @@ public class MailSenderService implements SenderService {
     @Value("${HOST}")
     private String host;
 
+    @Override
     public void sendMail(String email, Long userId, Long eventId) {
+        doSendMail(email, userId, eventId);
+    }
+
+    @Override
+    public void sendMail(Long userId, Long eventId) {
+        String email = userService.getById(userId).getEmail();
+        doSendMail(email, userId, eventId);
+    }
+
+    @Override
+    public void sendAttachedMail(String email, Long userId, Long eventId) {
+        doSendAttachedMail(email, userId, eventId);
+    }
+
+    @Override
+    public void sendAttachedMail(Long userId, Long eventId) {
+        String email = userService.getById(userId).getEmail();
+        doSendAttachedMail(email, userId, eventId);
+    }
+
+    /**
+     * Отправляет письмо с отчетом по мероприятию без вложений
+     * 
+     * @param email адрес электронной почты получателя
+     * @param userId идентификатор пользователя
+     * @param eventId идентификатор мероприятия
+     */
+    private void doSendMail(String email, Long userId, Long eventId) {
         Context context = getContext(userId, eventId);
         String eventTitle = eventService.getById(eventId).getTitle();
         sender.sendMailReport(email, eventTitle, context);
     }
 
-    public void sendMail(Long userId, Long eventId) {
+    /**
+     * Выполняет отправку отчета по мероприятию на указанный email
+     * 
+     * @param email адрес электронной почты получателя
+     * @param userId идентификатор пользователя
+     * @param eventId идентификатор мероприятия
+     */
+    private void doSendAttachedMail(String email, Long userId, Long eventId) {
+        List<TaskDTO> tasks = taskToTaskDTO.taskToTaskDTO(taskService.getAll(0, 50, eventId).toList());
+        List<TaskDTO> myTasks = tasks.stream().filter(task -> task.getUser().getId() == userId).toList();
+        List<TaskDTO> othersTasks = tasks.stream().filter(task -> task.getUser().getId() != userId).toList();
+
+        File excelFile = sender.createExcel(tasks, myTasks, othersTasks);
+
         Context context = getContext(userId, eventId);
         String eventTitle = eventService.getById(eventId).getTitle();
-        sender.sendMailReport(userService.getById(userId).getEmail(), eventTitle, context);
+        sender.sendAttachMailReport(email, eventTitle, excelFile, context);
     }
 
     private Context getContext(Long userId, Long eventId) {
+        
         Event event = eventService.getById(eventId);
         double totalAmount = mailApi.getTotalSum(eventId); // TODO mailApi поменять на его реализацию
         double amountUserSpent = mailApi.getSumSpentByUser(eventId, userId);
         double amountOwedToUser = mailApi.getSumOwedToUser(eventId, userId);
         boolean isEventClosed = event.getStatus() == EventStatus.DONE;
         LocalDateTime eventEndDate = event.getStatus() == EventStatus.DONE ? event.getDate() : null;
-        List<TaskDTO> tasksDTO = taskService.getAll(0, 50, eventId).get().map(taskToTaskDTO::taskToTaskDTO).toList();
+        List<TaskDTO> tasksDTO = taskToTaskDTO.taskToTaskDTO(taskService.getAll(0, 50, eventId).toList());
         String eventUrl = host + "/events/" + eventId; // TODO + "/tasks"
 
         return sender.createContext(
