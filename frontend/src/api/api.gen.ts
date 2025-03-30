@@ -595,8 +595,8 @@ export interface PageableObject {
   /** @format int64 */
   offset?: number;
   sort?: SortObject[];
-  unpaged?: boolean;
   paged?: boolean;
+  unpaged?: boolean;
   /** @format int32 */
   pageNumber?: number;
   /** @format int32 */
@@ -980,7 +980,6 @@ export class Api<
         method: "POST",
         body: data,
         secure: true,
-        // DO NOT CHANGE THAT!!!!!
         type: ContentType.Text,
         ...params,
       }),
