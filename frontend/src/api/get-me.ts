@@ -7,6 +7,15 @@ export const getMeQueryOptions = () =>
     queryKey: ["me"],
     queryFn: async () => {
       const { data } = await api.api.getCurrentUser();
-      return userSchema.parse(data);
+      try {
+        // Пробуем парсить как объект
+        return userSchema.parse(data);
+      } catch (error) {
+        // Если ответ пришел в виде массива, берем первый элемент
+        if (Array.isArray(data)) {
+          return userSchema.parse(data[0]);
+        }
+        throw error;
+      }
     },
   });
