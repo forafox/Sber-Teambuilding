@@ -10,12 +10,14 @@ export const messageSchema = z.object({
   author: userSchema,
   timestamp: z.coerce.date(),
   replyToMessageId: z.number().nullable().optional(),
+  pinned: z.boolean().optional(),
 });
 
 export const chatSchema = z.object({
   id: z.number(),
   event: eventSchema,
   messages: messageSchema.array(),
+  pinnedMessages: messageSchema.array(),
 });
 
 export type Message = z.infer<typeof messageSchema>;

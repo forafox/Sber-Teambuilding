@@ -9,146 +9,38 @@
  * ---------------------------------------------------------------
  */
 
+/** Event creation data */
 export interface EventRequest {
+  /**
+   * Title of the event
+   * @example "Team Building Workshop"
+   */
   title: string;
-  /** @format date-time */
+  /**
+   * Detailed description of the event
+   * @example "Quarterly team building activities and training"
+   */
+  description?: string;
+  /**
+   * Physical or virtual location of the event
+   * @example "Conference Room A or Zoom Meeting"
+   */
+  location?: string;
+  /**
+   * Current status of the event
+   * @example "PLANNED"
+   */
+  status: "IN_PROGRESS" | "DONE" | "PLANNED" | "COMPLETED" | "CANCELLED";
+  /**
+   * Date and time when the event starts
+   * @format date-time
+   */
   date: string;
+  /**
+   * List of participant user IDs
+   * @example [1,2,3]
+   */
   participants?: number[];
-}
-
-export interface EventResponse {
-  /** @format int64 */
-  id: number;
-  title: string;
-  /** User Response */
-  author: UserResponse;
-  /** @format date-time */
-  date: string;
-  participants: UserResponse[];
-  /** @format int64 */
-  chatId: number;
-}
-
-/** User Response */
-export interface UserResponse {
-  /**
-   * The ID of the user
-   * @format int64
-   * @example 1
-   */
-  id: number;
-  /**
-   * The username of the user
-   * @example "j.doe"
-   */
-  username: string;
-  /**
-   * The name of the user
-   * @example "John Doe"
-   */
-  name: string;
-  /**
-   * The email of the user
-   * @example "john.doe@example.com"
-   */
-  email: string;
-  /**
-   * The role of the user
-   * @example "ADMIN"
-   */
-  role: "USER" | "ADMIN" | "GUEST" | "HOUSE_OWNER";
-}
-
-export interface TaskRequest {
-  title: string;
-  assigneeUsername?: string;
-  status: "IN_PROGRESS" | "DONE";
-  description?: string;
-  /** @format double */
-  expenses?: number;
-  url?: string;
-}
-
-/** Task Response */
-export interface TaskResponse {
-  /**
-   * Task ID
-   * @format int64
-   */
-  id: number;
-  /** Task Title */
-  title: string;
-  /** User Response */
-  assignee?: UserResponse;
-  /** User Response */
-  author?: UserResponse;
-  /** Task Status */
-  status: "IN_PROGRESS" | "DONE";
-  /** Task Description */
-  description?: string;
-  /**
-   * Expenses
-   * @format double
-   */
-  expenses?: number;
-  /** Url */
-  url?: string;
-}
-
-export interface MessageRequest {
-  content: string;
-}
-
-export interface MessageResponse {
-  /** @format int64 */
-  id: number;
-  content: string;
-  /** User Response */
-  author: UserResponse;
-  /** @format date-time */
-  timestamp: string;
-}
-
-export interface TelegramUserRequest {
-  telegramUsername: string;
-}
-
-export interface TelegramUserResponse {
-  /** @format int64 */
-  id: number;
-  telegramUsername: string;
-  /** @format int64 */
-  telegramChatId?: number;
-  /** User Response */
-  user: UserResponse;
-}
-
-export interface ChatResponse {
-  /** @format int64 */
-  id: number;
-  messages: MessageResponse[];
-}
-
-export interface SignUpRequest {
-  username: string;
-  password: string;
-  name: string;
-  email: string;
-}
-
-/** JWT Response */
-export interface JwtResponse {
-  /**
-   * User ID
-   * @format int64
-   */
-  id: number;
-  /** Username */
-  username: string;
-  /** Access token */
-  accessToken: string;
-  /** Refresh token */
-  refreshToken: string;
 }
 
 /** Error message model */
@@ -169,8 +61,509 @@ export interface ErrorMessage {
   message: string;
 }
 
-export interface SignInRequest {
+/** Complete event response with details and participants */
+export interface EventResponse {
+  /**
+   * Unique identifier of the event
+   * @format int64
+   * @example 123
+   */
+  id: number;
+  /**
+   * Title of the event
+   * @minLength 3
+   * @maxLength 100
+   * @example "Team Meeting"
+   */
+  title: string;
+  /**
+   * Detailed description of the event
+   * @example "Weekly team sync meeting"
+   */
+  description?: string | null;
+  /**
+   * Location of the event (physical or virtual)
+   * @example "Conference Room A or Zoom"
+   */
+  location?: string | null;
+  /**
+   * Current status of the event
+   * @example "PLANNED"
+   */
+  status: "IN_PROGRESS" | "DONE" | "PLANNED" | "COMPLETED" | "CANCELLED";
+  /** User response with complete user details */
+  author: UserResponse;
+  /**
+   * Date and time when the event starts
+   * @format date-time
+   * @example "2023-12-15T09:00:00Z"
+   */
+  date: string;
+  /** List of participants in the event */
+  participants: UserResponse[];
+  /**
+   * ID of the chat associated with this event
+   * @format int64
+   * @example 456
+   */
+  chatId: number;
+}
+
+/** User response with complete user details */
+export interface UserResponse {
+  /**
+   * Unique identifier of the user
+   * @format int64
+   * @min 1
+   * @example 1
+   */
+  id: number;
+  /**
+   * Unique username for authentication
+   * @minLength 4
+   * @maxLength 32
+   * @example "j.doe"
+   */
   username: string;
+  /**
+   * Full name of the user
+   * @minLength 2
+   * @maxLength 100
+   * @example "John Doe"
+   */
+  name: string;
+  /**
+   * Email address of the user
+   * @example "john.doe@example.com"
+   */
+  email: string;
+  /**
+   * Role defining user permissions
+   * @example "USER"
+   */
+  role: "USER" | "ADMIN" | "GUEST" | "HOUSE_OWNER";
+}
+
+/** Task details */
+export interface TaskRequest {
+  /**
+   * Title of the task
+   * @minLength 3
+   * @maxLength 100
+   * @example "Implement user authentication"
+   */
+  title: string;
+  /**
+   * Username of the assigned user
+   * @example "john_dev"
+   */
+  assigneeUsername?: string | null;
+  /**
+   * Current status of the task
+   * @example "TODO"
+   */
+  status: "IN_PROGRESS" | "DONE";
+  /**
+   * Detailed description of the task
+   * @minLength 0
+   * @maxLength 1000
+   * @example "Implement JWT authentication for the API"
+   */
+  description?: string | null;
+  /**
+   * Expenses associated with the task
+   * @format double
+   * @min 0
+   * @example 150.5
+   */
+  expenses?: number | null;
+  /**
+   * URL related to the task
+   * @example "https://example.com/task-docs"
+   */
+  url?: string | null;
+}
+
+/** Task response with complete task details */
+export interface TaskResponse {
+  /**
+   * Unique identifier of the task
+   * @format int64
+   * @min 1
+   * @example 101
+   */
+  id: number;
+  /**
+   * Title of the task
+   * @minLength 3
+   * @maxLength 100
+   * @example "Implement user authentication"
+   */
+  title: string;
+  /** User response with complete user details */
+  assignee?: UserResponse;
+  /** User response with complete user details */
+  author?: UserResponse;
+  /**
+   * Current status of the task
+   * @example "TODO"
+   */
+  status: "IN_PROGRESS" | "DONE" | "TODO" | "BLOCKED";
+  /**
+   * Detailed description of the task
+   * @minLength 0
+   * @maxLength 1000
+   * @example "Implement JWT authentication for the API"
+   */
+  description?: string | null;
+  /**
+   * Expenses associated with completing this task
+   * @format double
+   * @min 0
+   * @example 150.5
+   */
+  expenses?: number | null;
+  /**
+   * URL related to the task (documentation, reference, etc.)
+   * @example "https://example.com/task-docs"
+   */
+  url?: string | null;
+}
+
+/** Updated message content and metadata */
+export interface MessageUpdateRequest {
+  /**
+   * ID of the message to update
+   * @format int64
+   * @min 1
+   * @example 456
+   */
+  id: number;
+  /**
+   * Updated text content of the message
+   * @example "Updated: Let's meet at 3pm instead!"
+   */
+  content: string;
+  /**
+   * Updated ID of the message being replied to (null to remove reply)
+   * @format int64
+   * @example 123
+   */
+  replyToMessageId?: number | null;
+  /**
+   * Updated pinned status of the message
+   * @example true
+   */
+  pinned: boolean;
+  /** Poll update request payload */
+  poll?: PollUpdateRequest;
+}
+
+/** Poll option update request payload */
+export interface OptionUpdateRequest {
+  /**
+   * ID of the poll option to update
+   * @format int64
+   * @min 1
+   * @example 1
+   */
+  id: number;
+  /**
+   * Updated title/text of the poll option
+   * @minLength 1
+   * @maxLength 100
+   * @example "Strongly Agree"
+   */
+  title: string;
+  /**
+   * List of voter user IDs
+   * @example [1,2,3]
+   */
+  voters: number[];
+}
+
+/** Poll update request payload */
+export type PollUpdateRequest = {
+  /**
+   * ID of the poll to update
+   * @format int64
+   * @min 1
+   * @example 101
+   */
+  id: number;
+  /**
+   * Updated title/question of the poll
+   * @minLength 1
+   * @maxLength 200
+   * @example "Updated: Preferred meeting time options"
+   */
+  title: string;
+  /**
+   * Updated type of the poll
+   * @example "MULTIPLE_CHOICE"
+   */
+  pollType: "SINGLE" | "MULTIPLE" | "SINGLE_CHOICE" | "MULTIPLE_CHOICE" | "OPEN_ENDED";
+  /** Updated list of poll options */
+  options: OptionUpdateRequest[];
+} | null;
+
+/** Message response with content and metadata */
+export interface MessageResponse {
+  /**
+   * Unique identifier of the message
+   * @format int64
+   * @min 1
+   * @example 456
+   */
+  id: number;
+  /**
+   * Text content of the message
+   * @minLength 1
+   * @maxLength 2000
+   * @example "Hello team! Let's discuss the project updates."
+   */
+  content: string;
+  /** User response with complete user details */
+  author: UserResponse;
+  /**
+   * Timestamp when the message was created
+   * @format date-time
+   * @example "2023-12-15T09:00:00Z"
+   */
+  timestamp: string;
+  /**
+   * ID of the message this message replies to (null if not a reply)
+   * @format int64
+   * @example 123
+   */
+  replyToMessageId?: number | null;
+  /**
+   * Whether the message is pinned in the chat
+   * @example false
+   */
+  pinned: boolean;
+  /** Poll response with configuration and voting options */
+  poll?: PollResponse;
+}
+
+/** Poll option response with voters information */
+export interface OptionResponse {
+  /**
+   * Unique identifier of the poll option
+   * @format int64
+   * @min 1
+   * @example 1
+   */
+  id: number;
+  /**
+   * Text content of the poll option
+   * @minLength 1
+   * @maxLength 100
+   * @example "Agree"
+   */
+  title: string;
+  /** List of users who voted for this option */
+  voters: UserResponse[];
+}
+
+/** Poll response with configuration and voting options */
+export type PollResponse = {
+  /**
+   * Unique identifier of the poll
+   * @format int64
+   * @min 1
+   * @example 101
+   */
+  id: number;
+  /**
+   * Title/question of the poll
+   * @minLength 1
+   * @maxLength 200
+   * @example "What's your preferred meeting time?"
+   */
+  title: string;
+  /**
+   * Type of the poll determining voting behavior
+   * @example "SINGLE_CHOICE"
+   */
+  pollType: "SINGLE_CHOICE" | "MULTIPLE_CHOICE" | "OPEN_ENDED";
+  /** Available voting options for this poll */
+  options: OptionResponse[];
+} | null;
+
+/** Telegram user details */
+export interface TelegramUserRequest {
+  /**
+   * Telegram username (without @)
+   * @minLength 1
+   * @maxLength 32
+   * @example "johndoe"
+   */
+  telegramUsername: string;
+}
+
+/** Telegram user association response */
+export interface TelegramUserResponse {
+  /**
+   * Unique identifier of the Telegram user association
+   * @format int64
+   * @min 1
+   * @example 1
+   */
+  id: number;
+  /**
+   * Telegram username (without @)
+   * @minLength 1
+   * @maxLength 32
+   * @example "johndoe"
+   */
+  telegramUsername: string;
+  /**
+   * Telegram chat ID for direct communication
+   * @format int64
+   * @example 123456789
+   */
+  telegramChatId?: number | null;
+  /** User response with complete user details */
+  user: UserResponse;
+}
+
+/** Complete chat response with messages and metadata */
+export interface ChatResponse {
+  /**
+   * Unique identifier of the chat
+   * @format int64
+   * @example 123
+   */
+  id: number;
+  /** List of messages in the chat */
+  messages: MessageResponse[];
+  /** List of pinned messages in the chat */
+  pinnedMessages: MessageResponse[];
+  /** Map of read messages by user ID */
+  readMessages: Record<string, MessageResponse>;
+}
+
+/** Message content and metadata */
+export interface MessageRequest {
+  /**
+   * Text content of the message
+   * @example "Hello team! Let's discuss the project updates."
+   */
+  content: string;
+  /**
+   * ID of the message being replied to (null if not a reply)
+   * @format int64
+   * @example 123
+   */
+  replyToMessageId?: number | null;
+  /**
+   * Whether the message should be pinned in the chat
+   * @example false
+   */
+  pinned: boolean;
+  /** Poll creation request payload */
+  poll?: PollRequest;
+}
+
+/** Poll option request payload */
+export interface OptionRequest {
+  /**
+   * Title/text of the poll option
+   * @example "Agree"
+   */
+  title: string;
+}
+
+/** Poll creation request payload */
+export type PollRequest = {
+  /**
+   * Title/question of the poll
+   * @minLength 1
+   * @maxLength 200
+   * @example "What's your preferred meeting time?"
+   */
+  title: string;
+  /**
+   * Type of the poll
+   * @example "SINGLE"
+   */
+  pollType: "SINGLE" | "MULTIPLE";
+  /** List of poll options */
+  options: OptionRequest[];
+} | null;
+
+/** User registration details */
+export interface SignUpRequest {
+  /**
+   * Unique username for the new account
+   * @minLength 4
+   * @maxLength 32
+   * @example "john_doe"
+   */
+  username: string;
+  /**
+   * Password for the new account
+   * @minLength 5
+   * @maxLength 64
+   * @example "P@ssw0rd123!"
+   */
+  password: string;
+  /**
+   * Full name of the user
+   * @minLength 2
+   * @maxLength 100
+   * @example "John Doe"
+   */
+  name: string;
+  /**
+   * Email address of the user
+   * @example "john.doe@example.com"
+   */
+  email: string;
+}
+
+/** JWT authentication response containing access and refresh tokens */
+export interface JwtResponse {
+  /**
+   * Unique identifier of the authenticated user
+   * @format int64
+   * @min 1
+   * @example 123
+   */
+  id: number;
+  /**
+   * Username of the authenticated user
+   * @example "john_doe"
+   */
+  username: string;
+  /**
+   * JWT access token for API authorization
+   * @example "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+   */
+  accessToken: string;
+  /**
+   * JWT refresh token for obtaining new access tokens
+   * @example "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+   */
+  refreshToken: string;
+}
+
+/** User credentials */
+export interface SignInRequest {
+  /**
+   * Unique username for authentication
+   * @minLength 4
+   * @maxLength 32
+   * @example "john_doe"
+   */
+  username: string;
+  /**
+   * User's password for authentication
+   * @minLength 5
+   * @maxLength 64
+   * @example "P@ssw0rd123!"
+   */
   password: string;
 }
 
@@ -179,8 +572,6 @@ export interface Page {
   totalElements?: number;
   /** @format int32 */
   totalPages?: number;
-  first?: boolean;
-  last?: boolean;
   /** @format int32 */
   size?: number;
   content?: object[];
@@ -189,7 +580,9 @@ export interface Page {
   sort?: SortObject[];
   /** @format int32 */
   numberOfElements?: number;
+  last?: boolean;
   pageable?: PageableObject;
+  first?: boolean;
   empty?: boolean;
 }
 
@@ -197,11 +590,11 @@ export interface PageableObject {
   /** @format int64 */
   offset?: number;
   sort?: SortObject[];
+  paged?: boolean;
   /** @format int32 */
   pageNumber?: number;
   /** @format int32 */
   pageSize?: number;
-  paged?: boolean;
   unpaged?: boolean;
 }
 
@@ -213,76 +606,12 @@ export interface SortObject {
   ignoreCase?: boolean;
 }
 
-export interface PageUserResponse {
-  /** @format int64 */
-  totalElements?: number;
-  /** @format int32 */
-  totalPages?: number;
-  first?: boolean;
-  last?: boolean;
-  /** @format int32 */
-  size?: number;
-  content?: UserResponse[];
-  /** @format int32 */
-  number?: number;
-  sort?: SortObject[];
-  /** @format int32 */
-  numberOfElements?: number;
-  pageable?: PageableObject;
-  empty?: boolean;
-}
-
-export interface PageEventResponse {
-  /** @format int64 */
-  totalElements?: number;
-  /** @format int32 */
-  totalPages?: number;
-  first?: boolean;
-  last?: boolean;
-  /** @format int32 */
-  size?: number;
-  content?: EventResponse[];
-  /** @format int32 */
-  number?: number;
-  sort?: SortObject[];
-  /** @format int32 */
-  numberOfElements?: number;
-  pageable?: PageableObject;
-  empty?: boolean;
-}
-
-export interface PageTaskResponse {
-  /** @format int64 */
-  totalElements?: number;
-  /** @format int32 */
-  totalPages?: number;
-  first?: boolean;
-  last?: boolean;
-  /** @format int32 */
-  size?: number;
-  content?: TaskResponse[];
-  /** @format int32 */
-  number?: number;
-  sort?: SortObject[];
-  /** @format int32 */
-  numberOfElements?: number;
-  pageable?: PageableObject;
-  empty?: boolean;
-}
-
-import type {
-  AxiosInstance,
-  AxiosRequestConfig,
-  AxiosResponse,
-  HeadersDefaults,
-  ResponseType,
-} from "axios";
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
 import axios from "axios";
 
 export type QueryParamsType = Record<string | number, any>;
 
-export interface FullRequestParams
-  extends Omit<AxiosRequestConfig, "data" | "params" | "url" | "responseType"> {
+export interface FullRequestParams extends Omit<AxiosRequestConfig, "data" | "params" | "url" | "responseType"> {
   /** set parameter to `true` for call `securityWorker` for this request */
   secure?: boolean;
   /** request path */
@@ -297,13 +626,9 @@ export interface FullRequestParams
   body?: unknown;
 }
 
-export type RequestParams = Omit<
-  FullRequestParams,
-  "body" | "method" | "query" | "path"
->;
+export type RequestParams = Omit<FullRequestParams, "body" | "method" | "query" | "path">;
 
-export interface ApiConfig<SecurityDataType = unknown>
-  extends Omit<AxiosRequestConfig, "data" | "cancelToken"> {
+export interface ApiConfig<SecurityDataType = unknown> extends Omit<AxiosRequestConfig, "data" | "cancelToken"> {
   securityWorker?: (
     securityData: SecurityDataType | null,
   ) => Promise<AxiosRequestConfig | void> | AxiosRequestConfig | void;
@@ -325,16 +650,8 @@ export class HttpClient<SecurityDataType = unknown> {
   private secure?: boolean;
   private format?: ResponseType;
 
-  constructor({
-    securityWorker,
-    secure,
-    format,
-    ...axiosConfig
-  }: ApiConfig<SecurityDataType> = {}) {
-    this.instance = axios.create({
-      ...axiosConfig,
-      baseURL: axiosConfig.baseURL || "http://localhost:8080",
-    });
+  constructor({ securityWorker, secure, format, ...axiosConfig }: ApiConfig<SecurityDataType> = {}) {
+    this.instance = axios.create({ ...axiosConfig, baseURL: axiosConfig.baseURL || "http://localhost:8080" });
     this.secure = secure;
     this.format = format;
     this.securityWorker = securityWorker;
@@ -344,10 +661,7 @@ export class HttpClient<SecurityDataType = unknown> {
     this.securityData = data;
   };
 
-  protected mergeRequestParams(
-    params1: AxiosRequestConfig,
-    params2?: AxiosRequestConfig,
-  ): AxiosRequestConfig {
+  protected mergeRequestParams(params1: AxiosRequestConfig, params2?: AxiosRequestConfig): AxiosRequestConfig {
     const method = params1.method || (params2 && params2.method);
 
     return {
@@ -355,11 +669,7 @@ export class HttpClient<SecurityDataType = unknown> {
       ...params1,
       ...(params2 || {}),
       headers: {
-        ...((method &&
-          this.instance.defaults.headers[
-            method.toLowerCase() as keyof HeadersDefaults
-          ]) ||
-          {}),
+        ...((method && this.instance.defaults.headers[method.toLowerCase() as keyof HeadersDefaults]) || {}),
         ...(params1.headers || {}),
         ...((params2 && params2.headers) || {}),
       },
@@ -380,15 +690,11 @@ export class HttpClient<SecurityDataType = unknown> {
     }
     return Object.keys(input || {}).reduce((formData, key) => {
       const property = input[key];
-      const propertyContent: any[] =
-        property instanceof Array ? property : [property];
+      const propertyContent: any[] = property instanceof Array ? property : [property];
 
       for (const formItem of propertyContent) {
         const isFileType = formItem instanceof Blob || formItem instanceof File;
-        formData.append(
-          key,
-          isFileType ? formItem : this.stringifyFormItem(formItem),
-        );
+        formData.append(key, isFileType ? formItem : this.stringifyFormItem(formItem));
       }
 
       return formData;
@@ -412,21 +718,11 @@ export class HttpClient<SecurityDataType = unknown> {
     const requestParams = this.mergeRequestParams(params, secureParams);
     const responseFormat = format || this.format || undefined;
 
-    if (
-      type === ContentType.FormData &&
-      body &&
-      body !== null &&
-      typeof body === "object"
-    ) {
+    if (type === ContentType.FormData && body && body !== null && typeof body === "object") {
       body = this.createFormData(body as Record<string, unknown>);
     }
 
-    if (
-      type === ContentType.Text &&
-      body &&
-      body !== null &&
-      typeof body !== "string"
-    ) {
+    if (type === ContentType.Text && body && body !== null && typeof body !== "string") {
       body = JSON.stringify(body);
     }
 
@@ -451,20 +747,19 @@ export class HttpClient<SecurityDataType = unknown> {
  *
  * Sample API
  */
-export class Api<
-  SecurityDataType extends unknown,
-> extends HttpClient<SecurityDataType> {
+export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
   api = {
     /**
-     * No description
+     * @description Retrieves complete details for a specific event
      *
      * @tags Event Management
      * @name GetEventById
+     * @summary Get event by ID
      * @request GET:/api/events/{id}
      * @secure
      */
     getEventById: (id: number, params: RequestParams = {}) =>
-      this.request<EventResponse, any>({
+      this.request<EventResponse, ErrorMessage>({
         path: `/api/events/${id}`,
         method: "GET",
         secure: true,
@@ -472,15 +767,16 @@ export class Api<
       }),
 
     /**
-     * No description
+     * @description Updates all fields of an existing event
      *
      * @tags Event Management
      * @name UpdateEvent
+     * @summary Update event
      * @request PUT:/api/events/{id}
      * @secure
      */
     updateEvent: (id: number, data: EventRequest, params: RequestParams = {}) =>
-      this.request<EventResponse, any>({
+      this.request<EventResponse, ErrorMessage>({
         path: `/api/events/${id}`,
         method: "PUT",
         body: data,
@@ -490,15 +786,16 @@ export class Api<
       }),
 
     /**
-     * No description
+     * @description Permanently removes an event
      *
      * @tags Event Management
      * @name DeleteEvent
+     * @summary Delete event
      * @request DELETE:/api/events/{id}
      * @secure
      */
     deleteEvent: (id: number, params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<void, ErrorMessage>({
         path: `/api/events/${id}`,
         method: "DELETE",
         secure: true,
@@ -506,15 +803,16 @@ export class Api<
       }),
 
     /**
-     * No description
+     * @description Retrieves details of a specific task
      *
      * @tags Task Management
      * @name GetTaskById
+     * @summary Get task by ID
      * @request GET:/api/events/{eventId}/tasks/{id}
      * @secure
      */
     getTaskById: (eventId: number, id: number, params: RequestParams = {}) =>
-      this.request<TaskResponse, any>({
+      this.request<TaskResponse, ErrorMessage>({
         path: `/api/events/${eventId}/tasks/${id}`,
         method: "GET",
         secure: true,
@@ -522,20 +820,16 @@ export class Api<
       }),
 
     /**
-     * No description
+     * @description Modifies all fields of an existing task
      *
      * @tags Task Management
      * @name UpdateTask
+     * @summary Update task
      * @request PUT:/api/events/{eventId}/tasks/{id}
      * @secure
      */
-    updateTask: (
-      id: number,
-      eventId: number,
-      data: TaskRequest,
-      params: RequestParams = {},
-    ) =>
-      this.request<TaskResponse, any>({
+    updateTask: (id: number, eventId: number, data: TaskRequest, params: RequestParams = {}) =>
+      this.request<TaskResponse, ErrorMessage>({
         path: `/api/events/${eventId}/tasks/${id}`,
         method: "PUT",
         body: data,
@@ -545,15 +839,16 @@ export class Api<
       }),
 
     /**
-     * No description
+     * @description Permanently removes a task
      *
      * @tags Task Management
      * @name DeleteTask
+     * @summary Delete task
      * @request DELETE:/api/events/{eventId}/tasks/{id}
      * @secure
      */
     deleteTask: (eventId: number, id: number, params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<void, ErrorMessage>({
         path: `/api/events/${eventId}/tasks/${id}`,
         method: "DELETE",
         secure: true,
@@ -561,16 +856,16 @@ export class Api<
       }),
 
     /**
-     * No description
+     * @description Retrieves a specific message from a chat
      *
      * @tags Message Management
      * @name GetMessageById
-     * @summary Get message by id
+     * @summary Get message by ID
      * @request GET:/api/chats/{chatId}/messages/{id}
      * @secure
      */
     getMessageById: (chatId: number, id: number, params: RequestParams = {}) =>
-      this.request<MessageResponse, any>({
+      this.request<MessageResponse, ErrorMessage>({
         path: `/api/chats/${chatId}/messages/${id}`,
         method: "GET",
         secure: true,
@@ -578,21 +873,16 @@ export class Api<
       }),
 
     /**
-     * No description
+     * @description Modifies the content or properties of an existing message
      *
      * @tags Message Management
      * @name UpdateMessage
-     * @summary Update message by id
+     * @summary Update message
      * @request PUT:/api/chats/{chatId}/messages/{id}
      * @secure
      */
-    updateMessage: (
-      chatId: number,
-      id: number,
-      data: MessageRequest,
-      params: RequestParams = {},
-    ) =>
-      this.request<MessageResponse, any>({
+    updateMessage: (chatId: number, id: number, data: MessageUpdateRequest, params: RequestParams = {}) =>
+      this.request<MessageResponse, ErrorMessage>({
         path: `/api/chats/${chatId}/messages/${id}`,
         method: "PUT",
         body: data,
@@ -602,16 +892,16 @@ export class Api<
       }),
 
     /**
-     * No description
+     * @description Permanently removes a message from a chat
      *
      * @tags Message Management
      * @name DeleteMessage
-     * @summary Delete message by id
+     * @summary Delete message
      * @request DELETE:/api/chats/{chatId}/messages/{id}
      * @secure
      */
     deleteMessage: (chatId: number, id: number, params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<void, ErrorMessage>({
         path: `/api/chats/${chatId}/messages/${id}`,
         method: "DELETE",
         secure: true,
@@ -619,19 +909,69 @@ export class Api<
       }),
 
     /**
-     * No description
+     * @description Validates an event participation token and adds the current user to the event.
      *
-     * @tags Telegram User Management
+     * @tags Token Management
+     * @name VerifyEventToken
+     * @summary Verify and use participation token
+     * @request POST:/api/tokens/verify
+     * @secure
+     */
+    verifyEventToken: (data: string, params: RequestParams = {}) =>
+      this.request<EventResponse, ErrorMessage>({
+        path: `/api/tokens/verify`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Creates a secure token that can be used to join a specific event.
+     *
+     * @tags Token Management
+     * @name CreateEventToken
+     * @summary Generate event participation token
+     * @request POST:/api/tokens/events/{eventId}
+     * @secure
+     */
+    createEventToken: (eventId: number, params: RequestParams = {}) =>
+      this.request<string, ErrorMessage>({
+        path: `/api/tokens/events/${eventId}`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Applies an event template to create a new event with all associated tasks.
+     *
+     * @tags Template Management
+     * @name ApplyTemplate
+     * @summary Apply template
+     * @request POST:/api/templates/events/{eventId}
+     * @secure
+     */
+    applyTemplate: (eventId: number, params: RequestParams = {}) =>
+      this.request<EventResponse, ErrorMessage>({
+        path: `/api/templates/events/${eventId}`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Links a Telegram username with the authenticated user account.
+     *
+     * @tags Telegram Management
      * @name CreateTelegramUser
-     * @summary Create telegram user
+     * @summary Create Telegram user association
      * @request POST:/api/telegram-users
      * @secure
      */
-    createTelegramUser: (
-      data: TelegramUserRequest,
-      params: RequestParams = {},
-    ) =>
-      this.request<TelegramUserResponse, any>({
+    createTelegramUser: (data: TelegramUserRequest, params: RequestParams = {}) =>
+      this.request<TelegramUserResponse, ErrorMessage>({
         path: `/api/telegram-users`,
         method: "POST",
         body: data,
@@ -641,15 +981,16 @@ export class Api<
       }),
 
     /**
-     * No description
+     * @description Sends a real-time notification to all connected WebSocket clients. Requires valid JWT authentication.
      *
-     * @tags Task Management
-     * @name NotifyAllClients
+     * @tags Notification Management
+     * @name BroadcastNotification
+     * @summary Broadcast notification
      * @request POST:/api/notify
      * @secure
      */
-    notifyAllClients: (data: string, params: RequestParams = {}) =>
-      this.request<string, any>({
+    broadcastNotification: (data: string, params: RequestParams = {}) =>
+      this.request<string, ErrorMessage>({
         path: `/api/notify`,
         method: "POST",
         body: data,
@@ -659,11 +1000,11 @@ export class Api<
       }),
 
     /**
-     * No description
+     * @description Retrieves events with optional status filtering
      *
      * @tags Event Management
      * @name GetEvents
-     * @summary Get all events
+     * @summary Get paginated list of events
      * @request GET:/api/events
      * @secure
      */
@@ -679,10 +1020,15 @@ export class Api<
          * @default 10
          */
         size?: number;
+        /**
+         * Status filter for events
+         * @example "ACTIVE"
+         */
+        status?: "IN_PROGRESS" | "DONE";
       },
       params: RequestParams = {},
     ) =>
-      this.request<PageEventResponse, any>({
+      this.request<EventResponse, ErrorMessage>({
         path: `/api/events`,
         method: "GET",
         query: query,
@@ -691,16 +1037,16 @@ export class Api<
       }),
 
     /**
-     * No description
+     * @description Creates an event and notifies participants via Telegram
      *
      * @tags Event Management
      * @name CreateEvent
-     * @summary Create event
+     * @summary Create new event
      * @request POST:/api/events
      * @secure
      */
     createEvent: (data: EventRequest, params: RequestParams = {}) =>
-      this.request<EventResponse, any>({
+      this.request<EventResponse, ErrorMessage>({
         path: `/api/events`,
         method: "POST",
         body: data,
@@ -710,11 +1056,11 @@ export class Api<
       }),
 
     /**
-     * No description
+     * @description Retrieves a paginated list of tasks for a specific event
      *
      * @tags Task Management
      * @name GetTasks
-     * @summary Get all tasks
+     * @summary Get paginated tasks
      * @request GET:/api/events/{eventId}/tasks
      * @secure
      */
@@ -722,19 +1068,23 @@ export class Api<
       eventId: number,
       query?: {
         /**
+         * Page number (zero-based)
          * @format int32
          * @default 0
+         * @example 0
          */
         page?: number;
         /**
+         * Number of items per page
          * @format int32
          * @default 10
+         * @example 10
          */
         pageSize?: number;
       },
       params: RequestParams = {},
     ) =>
-      this.request<PageTaskResponse, any>({
+      this.request<TaskResponse, ErrorMessage>({
         path: `/api/events/${eventId}/tasks`,
         method: "GET",
         query: query,
@@ -743,20 +1093,16 @@ export class Api<
       }),
 
     /**
-     * No description
+     * @description Creates a new task and notifies assignee via Telegram
      *
      * @tags Task Management
      * @name CreateTask
-     * @summary Create task
+     * @summary Create new task
      * @request POST:/api/events/{eventId}/tasks
      * @secure
      */
-    createTask: (
-      eventId: number,
-      data: TaskRequest,
-      params: RequestParams = {},
-    ) =>
-      this.request<TaskResponse, any>({
+    createTask: (eventId: number, data: TaskRequest, params: RequestParams = {}) =>
+      this.request<TaskResponse, ErrorMessage>({
         path: `/api/events/${eventId}/tasks`,
         method: "POST",
         body: data,
@@ -766,16 +1112,35 @@ export class Api<
       }),
 
     /**
-     * No description
+     * @description Generates an event based on natural language description
+     *
+     * @tags Event Management
+     * @name CreateEventFromPrompt
+     * @summary Create event from prompt
+     * @request POST:/api/events/prompt
+     * @secure
+     */
+    createEventFromPrompt: (data: string, params: RequestParams = {}) =>
+      this.request<EventResponse, ErrorMessage>({
+        path: `/api/events/prompt`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Creates a new chat session and returns chat details
      *
      * @tags Chat Management
      * @name CreateChat
-     * @summary Create chat
+     * @summary Create new chat
      * @request POST:/api/chats
      * @secure
      */
     createChat: (params: RequestParams = {}) =>
-      this.request<ChatResponse, any>({
+      this.request<ChatResponse, ErrorMessage>({
         path: `/api/chats`,
         method: "POST",
         secure: true,
@@ -783,16 +1148,16 @@ export class Api<
       }),
 
     /**
-     * No description
+     * @description Retrieves all messages for a specific chat
      *
      * @tags Message Management
      * @name GetAllMessagesByChatId
-     * @summary Get all messages by chat id
+     * @summary Get all chat messages
      * @request GET:/api/chats/{chatId}/messages
      * @secure
      */
     getAllMessagesByChatId: (chatId: number, params: RequestParams = {}) =>
-      this.request<MessageResponse[], any>({
+      this.request<MessageResponse, ErrorMessage>({
         path: `/api/chats/${chatId}/messages`,
         method: "GET",
         secure: true,
@@ -800,20 +1165,16 @@ export class Api<
       }),
 
     /**
-     * No description
+     * @description Creates a new message in the specified chat
      *
      * @tags Message Management
      * @name CreateMessage
-     * @summary Create message
+     * @summary Create new message
      * @request POST:/api/chats/{chatId}/messages
      * @secure
      */
-    createMessage: (
-      chatId: number,
-      data: MessageRequest,
-      params: RequestParams = {},
-    ) =>
-      this.request<MessageResponse, any>({
+    createMessage: (chatId: number, data: MessageRequest, params: RequestParams = {}) =>
+      this.request<MessageResponse, ErrorMessage>({
         path: `/api/chats/${chatId}/messages`,
         method: "POST",
         body: data,
@@ -823,73 +1184,84 @@ export class Api<
       }),
 
     /**
-     * @description Registers a new user with provided details and generates JWT token
+     * @description Records that a user has read a specific message
+     *
+     * @tags Message Management
+     * @name SetMessageRead
+     * @summary Mark message as read
+     * @request POST:/api/chats/{chatId}/messages/{id}/read
+     * @secure
+     */
+    setMessageRead: (chatId: number, id: number, params: RequestParams = {}) =>
+      this.request<void, ErrorMessage>({
+        path: `/api/chats/${chatId}/messages/${id}/read`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Creates new user account and returns authentication tokens
      *
      * @tags Authorization and Registration
-     * @name Register
-     * @summary User registration
+     * @name RegisterUser
+     * @summary Register new user
      * @request POST:/api/auth/register
      */
-    register: (data: SignUpRequest, params: RequestParams = {}) =>
+    registerUser: (data: SignUpRequest, params: RequestParams = {}) =>
       this.request<JwtResponse, ErrorMessage>({
         path: `/api/auth/register`,
         method: "POST",
         body: data,
         type: ContentType.Json,
-        format: "json",
         ...params,
       }),
 
     /**
-     * @description Refreshes JWT token based on provided refresh token
+     * @description Generates new access/refresh token pair using valid refresh token
      *
      * @tags Authorization and Registration
-     * @name Refresh
-     * @summary Refresh token
+     * @name RefreshTokens
+     * @summary Refresh authentication tokens
      * @request POST:/api/auth/refresh
      */
-    refresh: (data: string, params: RequestParams = {}) =>
+    refreshTokens: (data: string, params: RequestParams = {}) =>
       this.request<JwtResponse, ErrorMessage>({
         path: `/api/auth/refresh`,
         method: "POST",
         body: data,
         type: ContentType.Json,
-        format: "json",
         ...params,
       }),
 
     /**
-     * @description Authenticates user based on provided credentials and generates JWT token
+     * @description Validates user credentials and returns JWT tokens for authorization
      *
      * @tags Authorization and Registration
-     * @name Login
-     * @summary User login
+     * @name LoginUser
+     * @summary Authenticate user
      * @request POST:/api/auth/login
      */
-    login: (data: SignInRequest, params: RequestParams = {}) =>
+    loginUser: (data: SignInRequest, params: RequestParams = {}) =>
       this.request<JwtResponse, ErrorMessage>({
         path: `/api/auth/login`,
         method: "POST",
         body: data,
         type: ContentType.Json,
-        format: "json",
         ...params,
       }),
 
     /**
-     * No description
+     * @description Modifies the participant list for an event
      *
      * @tags Event Management
      * @name UpdateEventParticipants
+     * @summary Update event participants
      * @request PATCH:/api/events/{id}/participants
      * @secure
      */
-    updateEventParticipants: (
-      id: number,
-      data: number[],
-      params: RequestParams = {},
-    ) =>
-      this.request<EventResponse, any>({
+    updateEventParticipants: (id: number, data: number[], params: RequestParams = {}) =>
+      this.request<EventResponse, ErrorMessage>({
         path: `/api/events/${id}/participants`,
         method: "PATCH",
         body: data,
@@ -899,69 +1271,143 @@ export class Api<
       }),
 
     /**
-     * @description Get paginated users with optional fuzzy search by fullName or username
+     * @description Retrieves paginated list of users with optional fuzzy search.
      *
      * @tags User Management
-     * @name GetUsers
-     * @summary Get users with pagination and search
+     * @name SearchUsers
+     * @summary Search and paginate users
      * @request GET:/api/users
      * @secure
      */
-    getUsers: (
+    searchUsers: (
       query?: {
-        /** @default "" */
+        /**
+         * Search term (username or fullName)
+         * @default ""
+         * @example "john"
+         */
         search?: string;
         /**
+         * Page number (zero-based)
          * @format int32
          * @default 0
+         * @example 0
          */
         page?: number;
         /**
+         * Number of items per page
          * @format int32
          * @default 10
+         * @example 10
          */
         size?: number;
       },
       params: RequestParams = {},
     ) =>
-      this.request<Page, PageUserResponse>({
+      this.request<Page, ErrorMessage>({
         path: `/api/users`,
         method: "GET",
         query: query,
         secure: true,
-        format: "json",
         ...params,
       }),
 
     /**
-     * @description Get user by id
+     * @description Retrieves user details by their unique identifier
      *
      * @tags User Management
      * @name GetUserById
-     * @summary Get user by id
+     * @summary Get user by ID
      * @request GET:/api/users/{id}
      * @secure
      */
     getUserById: (id: number, params: RequestParams = {}) =>
-      this.request<UserResponse, UserResponse>({
+      this.request<UserResponse, ErrorMessage>({
         path: `/api/users/${id}`,
         method: "GET",
         secure: true,
-        format: "json",
         ...params,
       }),
 
     /**
-     * @description Get current user
+     * @description Retrieves a list of all available event templates
+     *
+     * @tags Template Management
+     * @name GetAllEventTemplates
+     * @summary Get all event templates
+     * @request GET:/api/templates/events
+     * @secure
+     */
+    getAllEventTemplates: (params: RequestParams = {}) =>
+      this.request<EventResponse, ErrorMessage>({
+        path: `/api/templates/events`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Retrieves details of a specific event template
+     *
+     * @tags Template Management
+     * @name GetEventTemplateById
+     * @summary Get event template by ID
+     * @request GET:/api/templates/events/{id}
+     * @secure
+     */
+    getEventTemplateById: (id: number, params: RequestParams = {}) =>
+      this.request<EventResponse, ErrorMessage>({
+        path: `/api/templates/events/${id}`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Retrieves all task templates associated with an event template
+     *
+     * @tags Template Management
+     * @name GetTaskTemplatesByEvent
+     * @summary Get all task templates for event
+     * @request GET:/api/templates/events/{eventId}/tasks
+     * @secure
+     */
+    getTaskTemplatesByEvent: (eventId: number, params: RequestParams = {}) =>
+      this.request<TaskResponse, ErrorMessage>({
+        path: `/api/templates/events/${eventId}/tasks`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Retrieves details of a specific task template within an event template
+     *
+     * @tags Template Management
+     * @name GetTaskTemplateById
+     * @summary Get task template by ID
+     * @request GET:/api/templates/events/{eventId}/tasks/{id}
+     * @secure
+     */
+    getTaskTemplateById: (eventId: number, id: number, params: RequestParams = {}) =>
+      this.request<TaskResponse, ErrorMessage>({
+        path: `/api/templates/events/${eventId}/tasks/${id}`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Retrieves detailed information about the currently authenticated user
      *
      * @tags User Management
-     * @name Me
-     * @summary Get current user
+     * @name GetCurrentUser
+     * @summary Get current authenticated user
      * @request GET:/api/me
      * @secure
      */
-    me: (params: RequestParams = {}) =>
-      this.request<UserResponse, UserResponse>({
+    getCurrentUser: (params: RequestParams = {}) =>
+      this.request<UserResponse, ErrorMessage>({
         path: `/api/me`,
         method: "GET",
         secure: true,
@@ -969,16 +1415,16 @@ export class Api<
       }),
 
     /**
-     * No description
+     * @description Retrieves chat details including pinned and read messages
      *
      * @tags Chat Management
      * @name GetChatById
-     * @summary Get chat by id
+     * @summary Get chat by ID
      * @request GET:/api/chats/{id}
      * @secure
      */
     getChatById: (id: number, params: RequestParams = {}) =>
-      this.request<ChatResponse, any>({
+      this.request<ChatResponse, ErrorMessage>({
         path: `/api/chats/${id}`,
         method: "GET",
         secure: true,
@@ -986,16 +1432,16 @@ export class Api<
       }),
 
     /**
-     * No description
+     * @description Permanently deletes a chat session
      *
      * @tags Chat Management
      * @name DeleteChat
-     * @summary Delete chat by id
+     * @summary Delete chat by ID
      * @request DELETE:/api/chats/{id}
      * @secure
      */
     deleteChat: (id: number, params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<void, ErrorMessage>({
         path: `/api/chats/${id}`,
         method: "DELETE",
         secure: true,

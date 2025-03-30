@@ -1,24 +1,39 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "./api";
-import { MessageRequest } from "./api.gen";
 import { Message, messageSchema } from "./get-chat";
 
-// Расширяем тип MessageRequest для поддержки replyToMessageId
-type ExtendedMessageRequest = MessageRequest & {
+// Параметры для обновления сообщения
+type UpdateMessageParams = {
+  chatId: number;
+  messageId: number;
+  content: string;
   replyToMessageId?: number;
+  pinned?: boolean;
 };
 
-export function useUpdateMessage(chatId: number, messageId: number) {
+export function useUpdateMessage() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (message: ExtendedMessageRequest) => {
-      const response = await api.api.updateMessage(chatId, messageId, message);
+    mutationFn: async ({
+      chatId,
+      messageId,
+      ...message
+    }: UpdateMessageParams) => {
+      const response = await api.api.updateMessage(chatId, messageId, {
+        id: messageId,
+        content: message.content,
+        replyToMessageId: message.replyToMessageId,
+        pinned: message.pinned !== undefined ? message.pinned : false,
+      });
       return messageSchema.parse(response.data);
     },
-    onSuccess: (data) => {
+    onSuccess: (data, { chatId, messageId }) => {
       queryClient.invalidateQueries({
         queryKey: ["chats", chatId, "messages"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["chats", chatId],
       });
       queryClient.setQueryData<Message[]>(
         ["chats", chatId, "messages"],

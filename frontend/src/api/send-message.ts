@@ -13,12 +13,19 @@ export function useSendMessage(chatId: number) {
 
   return useMutation({
     mutationFn: async (message: ExtendedMessageRequest) => {
-      const response = await api.api.createMessage(chatId, message);
+      const response = await api.api.createMessage(chatId, {
+        content: message.content,
+        replyToMessageId: message.replyToMessageId,
+        pinned: message.pinned || false,
+      });
       return messageSchema.parse(response.data);
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({
         queryKey: ["chats", chatId, "messages"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["chats", chatId],
       });
       queryClient.setQueryData<Message[]>(
         ["chats", chatId, "messages"],
