@@ -5,10 +5,15 @@ import { RouterProvider, createRouter } from "@tanstack/react-router";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  focusManager,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
 
 import "@tanstack/react-query";
 import { AxiosError } from "axios";
+import { ZodError } from "zod";
 
 declare module "@tanstack/react-query" {
   interface Register {
@@ -20,6 +25,9 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry(failureCount, error) {
+        if (error instanceof ZodError) {
+          return false;
+        }
         if (error.response?.status) {
           const status = error.response.status;
           if (400 <= status && status < 500) {
@@ -38,6 +46,20 @@ const queryClient = new QueryClient({
       },
     },
   },
+});
+
+focusManager.setEventListener((handleFocus) => {
+  // Listen to visibilitychange
+  if (typeof window !== "undefined" && window.addEventListener) {
+    const visibilitychangeHandler = () => {
+      handleFocus();
+    };
+    window.addEventListener("focus", visibilitychangeHandler, false);
+    return () => {
+      // Be sure to unsubscribe if a new handler is set
+      window.removeEventListener("focus", visibilitychangeHandler);
+    };
+  }
 });
 
 // Create a new router instance
