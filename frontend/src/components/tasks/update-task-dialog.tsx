@@ -34,7 +34,7 @@ type Props = {
   eventId: number;
 };
 
-const schema = taskSchema.omit({ status: true, id: true, author: true });
+const schema = taskSchema.omit({ id: true, author: true });
 
 export function UpdateTaskDialog({
   open,
@@ -65,7 +65,7 @@ export function UpdateTaskDialog({
         description: data.description ?? "",
         expenses: data?.expenses ?? undefined,
         url: data?.url ?? undefined,
-        status: "IN_PROGRESS",
+        status: data.status,
       },
       {
         onSuccess: () => {
