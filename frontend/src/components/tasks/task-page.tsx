@@ -13,6 +13,7 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink, Pencil } from "lucide-react";
 import { UserHoverCard } from "../user/user-hover-card";
+import { Task } from "@/api/get-tasks";
 
 export function TaskPage({
   taskId,
@@ -24,7 +25,9 @@ export function TaskPage({
   const { data: task } = useSuspenseQuery(
     getTaskByIdQueryOptions(eventId, taskId),
   );
-  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState<Task | null>(
+    null,
+  );
 
   function formatCurrency(expenses: number): string {
     return expenses.toLocaleString("ru-RU", {
@@ -101,7 +104,7 @@ export function TaskPage({
             <ExternalLink className="mr-2" />
             Найти на Купер
           </Button>
-          <Button onClick={() => setIsUpdateDialogOpen(true)}>
+          <Button onClick={() => setIsUpdateDialogOpen(task)}>
             <Pencil className="mr-2" />
             Редактировать
           </Button>
@@ -109,7 +112,7 @@ export function TaskPage({
       </Card>
 
       <UpdateTaskDialog
-        open={isUpdateDialogOpen}
+        open={Boolean(isUpdateDialogOpen)}
         onOpenChange={setIsUpdateDialogOpen}
         defaultTask={task}
         eventId={eventId}

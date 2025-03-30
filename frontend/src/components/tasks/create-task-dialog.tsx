@@ -23,8 +23,6 @@ import { SelectUser } from "../user/select-user";
 import { Button } from "../ui/button";
 import { Suspense } from "react";
 import { taskSchema } from "@/api/get-tasks";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { getEventQueryOptions } from "@/api/get-event";
 
 type Props = {
   open: boolean;
@@ -32,10 +30,9 @@ type Props = {
   eventId: number;
 };
 
-const schema = taskSchema.omit({ status: true, id: true, author: true });
+const schema = taskSchema.omit({ status: true, author: true, id: true });
 
 export function CreateTaskDialog({ open, onOpenChange, eventId }: Props) {
-  const { data: event } = useSuspenseQuery(getEventQueryOptions(eventId));
   const { mutate, error, isPending } = useCreateTaskMutation();
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
@@ -137,11 +134,7 @@ export function CreateTaskDialog({ open, onOpenChange, eventId }: Props) {
                   <FormLabel>Участники</FormLabel>
                   <FormControl>
                     <Suspense fallback={<></>}>
-                      <SelectUser
-                        value={value}
-                        onChange={onChange}
-                        participants={event.participants}
-                      />
+                      <SelectUser value={value} onChange={onChange} />
                     </Suspense>
                   </FormControl>
                 </FormItem>
