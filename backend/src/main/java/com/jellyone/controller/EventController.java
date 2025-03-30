@@ -1,5 +1,6 @@
 package com.jellyone.controller;
 
+import com.jellyone.adapters.mail.SenderService;
 import com.jellyone.adapters.telegram.TelegramNotificationService;
 import com.jellyone.domain.enums.EventStatus;
 import com.jellyone.service.EventService;
@@ -27,6 +28,7 @@ public class EventController {
 
     private final EventService eventService;
     private final TelegramNotificationService telegramNotificationService;
+    private final SenderService senderService;
 
     @Operation(summary = "Get all events")
     @GetMapping("/events")
@@ -78,7 +80,7 @@ public class EventController {
             @Valid @RequestBody EventRequest event
     ) {
         log.info("Received request to update an event with id: {}", id);
-        handleEventStatusChange(event.status(), event.participants(), event.title());
+        handleEventStatusChange(event.status(), event.participants(), event.title(), id);
         return EventResponse.toResponse(eventService.update(
                 id,
                 event.title(),
@@ -90,10 +92,12 @@ public class EventController {
         ));
     }
 
-    private void handleEventStatusChange(EventStatus status, List<Long> participants, String title) {
+    private void handleEventStatusChange(EventStatus status, List<Long> participants, String title, Long id) {
         if (status == EventStatus.DONE) {
-            participants.forEach(participantId ->
-                    telegramNotificationService.sendEventEndNotification(participantId, title));
+            participants.forEach(participantId -> {
+                senderService.sendMail(participantId, id);
+                telegramNotificationService.sendEventEndNotification(participantId, title);
+            });
         }
     }
 
