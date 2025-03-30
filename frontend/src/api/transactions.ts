@@ -69,7 +69,7 @@ export function useDeleteEventTransactionMutation() {
       transactionId: number;
       eventId: number;
     }) => {
-      await api.api.deleteMoneyTransfer(transactionId, eventId);
+      await api.api.deleteMoneyTransfer(eventId, transactionId);
     },
   });
 }
