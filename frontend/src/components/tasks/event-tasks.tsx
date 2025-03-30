@@ -97,7 +97,7 @@ export function EventTasks({ eventId }: Props) {
   );
   console.log(tasksStatus);
   const [isOpenCreateDialog, setIsOpenCreateDialog] = useState(false);
-  const activeTasks = tasksData || [];
+  const [activeTasks, setActiveTasks] = useState(tasksData || []);
   const columns: ColumnDef<Task>[] = [
     {
       accessorKey: "title",
@@ -272,6 +272,8 @@ export function EventTasks({ eventId }: Props) {
           setTasksStatus={setTasksStatus}
           tasksShow={tasksShow}
           setTasksShow={setTasksShow}
+          tasksData={tasksData}
+          setActiveTasks={setActiveTasks}
         />
         {tasksShow == "LIST" ? (
           <TaskList

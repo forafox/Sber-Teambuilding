@@ -11,6 +11,25 @@ import { statuses } from "../data/data";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 import { Task } from "@/api/get-tasks";
 import { ListIcon, LayoutGridIcon } from "lucide-react";
+import Fuse from "fuse.js";
+import { User } from "@/api/get-users";
+
+type fuseResult = {
+  id: number;
+  status: "IN_PROGRESS" | "DONE";
+  title: string;
+  author: {
+    id: number;
+    name: string;
+    username: string;
+    email: string;
+    role: "USER" | "ADMIN" | "GUEST" | "HOUSE_OWNER";
+  };
+  assignee?: User | undefined | null;
+  description?: string | undefined;
+  expenses?: number | undefined;
+  url?: string | undefined;
+}[];
 
 interface DataTableToolbarProps {
   table: Table<Task> | undefined;
@@ -18,6 +37,8 @@ interface DataTableToolbarProps {
   setTasksStatus: React.Dispatch<React.SetStateAction<string[]>>;
   tasksShow: "TABLE" | "LIST";
   setTasksShow: React.Dispatch<React.SetStateAction<"TABLE" | "LIST">>;
+  setActiveTasks: React.Dispatch<React.SetStateAction<Task[] | []>>;
+  tasksData: Task[];
 }
 
 function ChangeTaskShow({
@@ -45,7 +66,15 @@ export function DataTableToolbar({
   setTasksStatus,
   tasksShow,
   setTasksShow,
+  setActiveTasks,
+  tasksData,
 }: DataTableToolbarProps) {
+  const fuse = new Fuse(tasksData, {
+    keys: ["title"],
+    includeScore: false,
+    threshold: 0.3,
+  });
+
   if (table) {
     const isFiltered = table.getState().columnFilters.length > 0;
     return (
@@ -54,9 +83,17 @@ export function DataTableToolbar({
           <Input
             placeholder="Filter tasks..."
             value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-            onChange={(event) =>
-              table.getColumn("title")?.setFilterValue(event.target.value)
-            }
+            onChange={(event) => {
+              table.getColumn("title")?.setFilterValue(event.target.value);
+              if (event.target.value == "") {
+                setActiveTasks(tasksData);
+              } else {
+                const newArray = fuse.search(event.target.value);
+                const items: fuseResult = [];
+                newArray.forEach((elem) => items.push(elem.item));
+                setActiveTasks(items);
+              }
+            }}
             className="h-8 w-[150px] lg:w-[250px]"
           />
           {table.getColumn("status") && (
