@@ -4,6 +4,7 @@ FRONTEND_IMAGE_NAME ?= sber-frontend
 BACKEND_IMAGE_NAME ?= sber-backend
 
 
+
 FRONTEND_VERSION ?= 0.12.1s
 BACKEND_VERSION ?= 0.18.0
 

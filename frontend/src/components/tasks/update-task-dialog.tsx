@@ -24,6 +24,8 @@ import { Button } from "../ui/button";
 import { Suspense } from "react";
 import { Task } from "@/api/get-tasks";
 import { taskSchema } from "@/api/get-tasks";
+import { getEventQueryOptions } from "@/api/get-event";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 type Props = {
   open: boolean;
@@ -40,6 +42,7 @@ export function UpdateTaskDialog({
   defaultTask,
   eventId,
 }: Props) {
+  const { data: event } = useSuspenseQuery(getEventQueryOptions(eventId));
   const { mutate, error, isPending } = useUpdateTaskMutation();
   function expenses(exp: number | undefined | string | null) {
     if (exp) return Number(exp);
@@ -144,7 +147,11 @@ export function UpdateTaskDialog({
                   <FormLabel>Исполнитель</FormLabel>
                   <FormControl>
                     <Suspense fallback={<></>}>
-                      <SelectUser value={value} onChange={onChange} />
+                      <SelectUser
+                        value={value}
+                        onChange={onChange}
+                        participants={event.participants}
+                      />
                     </Suspense>
                   </FormControl>
                 </FormItem>
