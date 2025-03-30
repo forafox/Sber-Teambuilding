@@ -99,8 +99,7 @@ function RouteComponent() {
 
             {event.description && (
               <p className="text-muted-foreground mb-2 text-sm">
-                Цель мероприятия:{" "}
-                <Button onClick={handleOpenMap}>{event.description}</Button>
+                Цель мероприятия: {event.description}
               </p>
             )}
           </div>
