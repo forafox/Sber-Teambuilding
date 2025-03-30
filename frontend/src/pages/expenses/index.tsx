@@ -13,6 +13,10 @@ import { User } from "@/api/get-users";
 import { Task } from "@/api/get-tasks";
 import { UserHoverCard } from "@/components/user/user-hover-card";
 import { ExpensesRowActions } from "@/components/expenses/expenses-row-actions";
+import { TransactionsPage } from "./transactions";
+import { BalanceTable } from "@/components/expenses/balance-table";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { getEventTransactionsQueryOptions } from "@/api/transactions";
 
 interface ExpensesPageProps {
   tasks: Task[];
@@ -25,10 +29,22 @@ export function ExpensesPage({
   participants,
   eventId,
 }: ExpensesPageProps) {
+  const { data: transactions } = useSuspenseQuery(
+    getEventTransactionsQueryOptions(eventId),
+  );
+
   const tasksWithExpenses = tasks.filter((task) => task.expenses !== undefined);
 
   // Calculate balances between participants
-  const balances = calculateBalances(tasksWithExpenses, participants);
+  const balances = calculateBalances(
+    tasksWithExpenses,
+    participants,
+    transactions.map((transaction) => ({
+      from: transaction.sender.username,
+      to: transaction.recipient.username,
+      amount: transaction.amount,
+    })),
+  );
   const filteredTasks = tasksWithExpenses.sort((a, b) => {
     if (a.expenses === undefined) return 1;
     if (b.expenses === undefined) return -1;
@@ -39,12 +55,6 @@ export function ExpensesPage({
     (acc, task) => acc + (task.expenses || 0),
     0,
   );
-
-  function getParticipantByUsername(username: string) {
-    return participants.find(
-      (participant) => participant.username === username,
-    );
-  }
 
   return (
     <div className="space-y-8">
@@ -110,41 +120,15 @@ export function ExpensesPage({
           <CardTitle>Баланс между участниками</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Кто должен</TableHead>
-                  <TableHead>Кому должен</TableHead>
-                  <TableHead className="text-right">Сумма</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {balances.map((balance) => (
-                  <TableRow key={`${balance.from}-${balance.to}`}>
-                    <TableCell>
-                      <UserHoverCard
-                        user={getParticipantByUsername(balance.from)!}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <UserHoverCard
-                        user={getParticipantByUsername(balance.to)!}
-                      />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {balance.amount.toLocaleString("ru-RU", {
-                        style: "currency",
-                        currency: "RUB",
-                      })}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+          <BalanceTable
+            balances={balances}
+            participants={participants}
+            eventId={eventId}
+          />
         </CardContent>
       </Card>
+
+      <TransactionsPage eventId={eventId} />
     </div>
   );
 }

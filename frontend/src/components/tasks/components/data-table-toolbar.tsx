@@ -39,7 +39,6 @@ interface DataTableToolbarProps {
   setTasksShow: React.Dispatch<React.SetStateAction<"TABLE" | "LIST">>;
   setActiveTasks: React.Dispatch<React.SetStateAction<Task[] | []>>;
   tasksData: Task[];
-}
 
 function ChangeTaskShow({
   tasksShow,

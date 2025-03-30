@@ -230,6 +230,50 @@ export interface TaskResponse {
   url?: string | null;
 }
 
+/** Money transfer details */
+export interface MoneyTransferRequest {
+  /**
+   * Amount of money to transfer
+   * @format double
+   * @example 100.5
+   */
+  amount: number;
+  /**
+   * ID of the user sending money
+   * @format int64
+   * @example 123
+   */
+  senderId: number;
+  /**
+   * ID of the user receiving money
+   * @format int64
+   * @example 456
+   */
+  recipientId: number;
+}
+
+/** Response object representing a money transfer between users */
+export interface MoneyTransferResponse {
+  /**
+   * Unique identifier of the money transfer
+   * @format int64
+   * @example 789
+   */
+  id: number;
+  /**
+   * Amount of money transferred
+   * @format double
+   * @example 150.75
+   */
+  amount: number;
+  /** User response with complete user details */
+  sender: UserResponse;
+  /** User response with complete user details */
+  recipient: UserResponse;
+  /** Complete event response with details and participants */
+  eventResponse: EventResponse;
+}
+
 /** Updated message content and metadata */
 export interface MessageUpdateRequest {
   /**
@@ -572,17 +616,17 @@ export interface Page {
   totalElements?: number;
   /** @format int32 */
   totalPages?: number;
+  first?: boolean;
+  last?: boolean;
   /** @format int32 */
   size?: number;
   content?: object[];
   /** @format int32 */
   number?: number;
   sort?: SortObject[];
+  pageable?: PageableObject;
   /** @format int32 */
   numberOfElements?: number;
-  last?: boolean;
-  pageable?: PageableObject;
-  first?: boolean;
   empty?: boolean;
 }
 
@@ -590,12 +634,12 @@ export interface PageableObject {
   /** @format int64 */
   offset?: number;
   sort?: SortObject[];
+  unpaged?: boolean;
   paged?: boolean;
   /** @format int32 */
   pageNumber?: number;
   /** @format int32 */
   pageSize?: number;
-  unpaged?: boolean;
 }
 
 export interface SortObject {
@@ -856,6 +900,72 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
+     * @description Retrieves a specific money transfer by its ID
+     *
+     * @tags Money Transfer
+     * @name GetMoneyTransferById
+     * @summary Get money transfer by ID
+     * @request GET:/api/events/{eventId}/money-transfers/{id}
+     * @secure
+     */
+    getMoneyTransferById: (
+      eventId: number,
+      id: number,
+      params: RequestParams = {},
+    ) =>
+      this.request<MoneyTransferResponse, ErrorMessage>({
+        path: `/api/events/${eventId}/money-transfers/${id}`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Modifies an existing money transfer
+     *
+     * @tags Money Transfer
+     * @name UpdateMoneyTransfer
+     * @summary Update money transfer
+     * @request PUT:/api/events/{eventId}/money-transfers/{id}
+     * @secure
+     */
+    updateMoneyTransfer: (
+      eventId: number,
+      id: number,
+      data: MoneyTransferRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<MoneyTransferResponse, ErrorMessage>({
+        path: `/api/events/${eventId}/money-transfers/${id}`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Permanently removes a money transfer
+     *
+     * @tags Money Transfer
+     * @name DeleteMoneyTransfer
+     * @summary Delete money transfer
+     * @request DELETE:/api/events/{eventId}/money-transfers/{id}
+     * @secure
+     */
+    deleteMoneyTransfer: (
+      eventId: number,
+      id: number,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, ErrorMessage>({
+        path: `/api/events/${eventId}/money-transfers/${id}`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
      * @description Retrieves a specific message from a chat
      *
      * @tags Message Management
@@ -923,7 +1033,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         method: "POST",
         body: data,
         secure: true,
-        type: ContentType.Json,
+        type: ContentType.Text,
         ...params,
       }),
 
@@ -1104,6 +1214,66 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     createTask: (eventId: number, data: TaskRequest, params: RequestParams = {}) =>
       this.request<TaskResponse, ErrorMessage>({
         path: `/api/events/${eventId}/tasks`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description Retrieves all money transfers for a specific event with pagination
+     *
+     * @tags Money Transfer
+     * @name GetAllMoneyTransfersByEventId
+     * @summary Get all money transfers for event
+     * @request GET:/api/events/{eventId}/money-transfers
+     * @secure
+     */
+    getAllMoneyTransfersByEventId: (
+      eventId: number,
+      query?: {
+        /**
+         * Page number (0-based)
+         * @format int32
+         * @default 0
+         * @example 0
+         */
+        page?: number;
+        /**
+         * Number of items per page
+         * @format int32
+         * @default 20
+         * @example 20
+         */
+        size?: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<Page, ErrorMessage>({
+        path: `/api/events/${eventId}/money-transfers`,
+        method: "GET",
+        query: query,
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * @description Creates a new money transfer between users for a specific event
+     *
+     * @tags Money Transfer
+     * @name CreateMoneyTransfer
+     * @summary Create money transfer
+     * @request POST:/api/events/{eventId}/money-transfers
+     * @secure
+     */
+    createMoneyTransfer: (
+      eventId: number,
+      data: MoneyTransferRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<MoneyTransferResponse, ErrorMessage>({
+        path: `/api/events/${eventId}/money-transfers`,
         method: "POST",
         body: data,
         secure: true,
