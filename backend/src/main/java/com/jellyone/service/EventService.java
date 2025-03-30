@@ -96,9 +96,9 @@ public class EventService {
         webSocketSessionService.sendMessageToAll(ServerChange.EVENTS_UPDATED.name());
     }
 
-    public Event updateParticipants(Long id, List<Long> participants) {
-        log.info("Try to update event with id: {}", id);
-        Event event = getById(id);
+    public Event updateParticipants(Long eventId, List<Long> participants) {
+        log.info("Try to update event with id: {}", eventId);
+        Event event = getById(eventId);
         List<User> participantsFromEvent = event.getParticipants();
         for (Long userId : participants) {
             if (checkIfUserAlreadyParticipant(userId, participantsFromEvent)) {

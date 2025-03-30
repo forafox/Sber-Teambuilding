@@ -30,6 +30,6 @@ export const getTasksQueryOptions = (eventId: number) => ({
   queryKey: ["tasks", eventId],
   queryFn: async () => {
     const { data } = await api.api.getTasks(eventId, { pageSize: 10_000 });
-    return taskSchema.array().parse(data.content);
+    return taskSchema.array().parse(data);
   },
 });
