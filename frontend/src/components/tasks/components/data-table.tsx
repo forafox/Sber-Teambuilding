@@ -26,7 +26,7 @@ export function TasksTable<TValue>({
 }: TasksTableProps<TValue>) {
   return (
     <>
-      <div className="rounded-md border">
+      <div className="max-w-[calc(100vw-81.6px)] overflow-scroll rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
