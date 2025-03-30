@@ -26,7 +26,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/templates")
 @RequiredArgsConstructor
-@Tag(name = "Template Management API",
+@Tag(name = "Template Management",
         description = "Endpoints for managing and applying event and task templates")
 @SecurityRequirement(name = "JWT")
 @ApiResponses({

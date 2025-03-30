@@ -23,7 +23,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/chats")
 @RequiredArgsConstructor
-@Tag(name = "Chat Management API",
+@Tag(name = "Chat Management",
         description = "Endpoints for chat creation, retrieval and deletion")
 @SecurityRequirement(name = "JWT")
 @ApiResponses({

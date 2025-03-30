@@ -28,7 +28,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-@Tag(name = "Event Management API",
+@Tag(name = "Event Management",
         description = "Endpoints for creating, managing and querying events")
 @SecurityRequirement(name = "JWT")
 @ApiResponses({

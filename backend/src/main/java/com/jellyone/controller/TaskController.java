@@ -25,7 +25,7 @@ import java.security.Principal;
 @RestController
 @RequestMapping("/api/events/{eventId}")
 @RequiredArgsConstructor
-@Tag(name = "Task Management API",
+@Tag(name = "Task Management",
         description = "Endpoints for creating, managing and tracking tasks within events")
 @SecurityRequirement(name = "JWT")
 @ApiResponses({

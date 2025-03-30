@@ -26,7 +26,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/chats/{chatId}/messages")
 @RequiredArgsConstructor
-@Tag(name = "Message Management API",
+@Tag(name = "Message Management",
         description = "Endpoints for creating, reading, updating and deleting chat messages")
 @SecurityRequirement(name = "JWT")
 @ApiResponses({

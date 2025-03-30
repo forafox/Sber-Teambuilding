@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-@Tag(name = "Notification API",
+@Tag(name = "Notification Management",
         description = "Endpoints for managing real-time notifications via WebSocket")
 @SecurityRequirement(name = "JWT")
 @ApiResponses({

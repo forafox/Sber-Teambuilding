@@ -22,7 +22,7 @@ import java.security.Principal;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-@Tag(name = "User Management API",
+@Tag(name = "User Management",
         description = "Endpoints for retrieving and managing user information")
 @SecurityRequirement(name = "JWT")
 @ApiResponses({

@@ -26,7 +26,7 @@ import java.security.Principal;
 @RestController
 @RequestMapping("/api/telegram-users")
 @RequiredArgsConstructor
-@Tag(name = "Telegram User API",
+@Tag(name = "Telegram Management",
         description = "Endpoints for managing Telegram user associations")
 @SecurityRequirement(name = "JWT")
 @ApiResponses({

@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @Validated
-@Tag(name = "Authentication API",
+@Tag(name = "Authorization and Registration",
         description = "Endpoints for user authentication, registration and token management")
 @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Successful operation"),

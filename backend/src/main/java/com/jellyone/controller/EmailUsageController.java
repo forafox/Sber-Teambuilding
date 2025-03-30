@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityRequirement(name = "JWT")
 @RequiredArgsConstructor
 @Profile("mail")
-@Tag(name = "Email API",
+@Tag(name = "Email Management",
         description = "Endpoints for sending email notifications and reports")
 @SecurityRequirement(name = "JWT")
 @ApiResponses({
