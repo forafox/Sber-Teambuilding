@@ -14,6 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -78,6 +80,11 @@ public class TaskService {
         log.info("Try to get all tasks");
         Pageable pageable = PageRequest.of(page, size);
         return taskRepository.findAllByEventId(eventId, pageable);
+    }
+
+    public List<Task> getAllByEventID(Long eventId) {
+        log.info("Try to get all tasks");
+        return taskRepository.findAllByEventId(eventId);
     }
 
     public void delete(Long id) {
