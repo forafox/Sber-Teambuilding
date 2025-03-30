@@ -51,6 +51,7 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { UserHoverCard } from "@/components/user/user-hover-card";
 
 // Schema for edit form validation
 const editTransactionSchema = z.object({
@@ -178,9 +179,11 @@ export function TransactionsPage({ eventId }: TransactionsPageProps) {
                 {transactions.map((transaction) => (
                   <TableRow key={transaction.id}>
                     <TableCell className="font-medium">
-                      {transaction.sender.name}
+                      <UserHoverCard user={transaction.sender} />
                     </TableCell>
-                    <TableCell>{transaction.recipient.name}</TableCell>
+                    <TableCell>
+                      <UserHoverCard user={transaction.recipient} />
+                    </TableCell>
                     <TableCell className="text-right">
                       {formatCurrency(transaction.amount)}
                     </TableCell>
