@@ -37,6 +37,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
 } from "@tanstack/react-table";
+import { Link } from "@tanstack/react-router";
 
 type Props = {
   eventId: number;
@@ -322,10 +323,20 @@ function TaskList({
             <Card key={task.id}>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>{task.title}</CardTitle>
-                  <div className="border-primary/25 rounded-full border-2">
-                    <CardContent>{task.expenses}₽</CardContent>
-                  </div>
+                  <CardTitle>
+                    <Link
+                      to="/events/$eventId/tasks/$taskId"
+                      from="/events/$eventId/tasks"
+                      params={(prev) => ({ ...prev, taskId: String(task.id) })}
+                    >
+                      {task.title}
+                    </Link>
+                  </CardTitle>
+                  {task.expenses && (
+                    <div className="border-primary/25 rounded-full border-2">
+                      <CardContent>{task.expenses}₽</CardContent>
+                    </div>
+                  )}
                 </div>
               </CardHeader>
               <CardContent>

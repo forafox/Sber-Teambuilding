@@ -6,7 +6,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { createFileRoute } from "@tanstack/react-router";
-import { Calendar, Pencil } from "lucide-react";
+import { Calendar, Pencil, CheckSquare, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getMeQueryOptions } from "@/api/get-me";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -17,6 +17,8 @@ import { EventTasks } from "@/components/tasks/event-tasks";
 import { UserHoverCard } from "@/components/user/user-hover-card";
 import { MapDialog } from "@/components/map/map-dialog";
 import { EventLink } from "@/pages/events/event-link";
+import { useUpdateEventMutation } from "@/api/update-event";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/events/$eventId/tasks/")({
   component: RouteComponent,
@@ -29,9 +31,29 @@ function RouteComponent() {
   const { data: me } = useSuspenseQuery(getMeQueryOptions());
   const [updateOpen, setUpdateOpen] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
+  const updateEventMutation = useUpdateEventMutation();
 
   const handleOpenMap = () => {
     // setMapOpen(true);
+  };
+
+  const finishEvent = () => {
+    updateEventMutation.mutate(
+      {
+        eventId,
+        status: "DONE",
+        title: event.title,
+        description: event.description,
+        location: event.location,
+        date: event.date.toISOString(),
+        participants: event.participants.map((participant) => participant.id),
+      },
+      {
+        onSuccess: () => {
+          toast.success("Мероприятие завершено");
+        },
+      },
+    );
   };
 
   const isAuthor = me?.id === event.author.id;
@@ -58,13 +80,33 @@ function RouteComponent() {
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
-              {isAuthor && (
-                <Button variant="outline" onClick={() => setUpdateOpen(true)}>
-                  <Pencil className="mr-2 h-4 w-4" />
-                  Изменить
-                </Button>
-              )}
               {isAuthor && <EventLink eventId={eventId} title={event.title} />}
+              {isAuthor && (
+                <>
+                  <Button variant="outline" onClick={() => setUpdateOpen(true)}>
+                    <Pencil className="mr-2 h-4 w-4" />
+                    Изменить
+                  </Button>
+                  {event.status !== "DONE" ? (
+                    <Button
+                      variant="outline"
+                      onClick={finishEvent}
+                      disabled={updateEventMutation.isPending}
+                    >
+                      <CheckSquare className="mr-2 h-4 w-4" />
+                      Завершить
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      className="cursor-default bg-green-200 text-green-800 hover:bg-green-300"
+                    >
+                      <CheckCircle className="mr-2 h-4 w-4" />
+                      Завершено
+                    </Button>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </CardHeader>

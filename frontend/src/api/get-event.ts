@@ -9,6 +9,7 @@ export const eventSchema = z.object({
   participants: userSchema.array(),
   author: userSchema,
   chatId: z.number(),
+  status: z.enum(["IN_PROGRESS", "DONE"]).catch("IN_PROGRESS"),
   description: z
     .string()
     .nullish()
