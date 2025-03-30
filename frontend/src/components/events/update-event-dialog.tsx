@@ -24,6 +24,14 @@ import { Button } from "../ui/button";
 import { Suspense } from "react";
 import { DateTimePicker } from "../ui/date-time-picker";
 import { Event, eventSchema } from "@/api/get-event";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { CheckCircle2, Clock } from "lucide-react";
 
 type Props = {
   open: boolean;
@@ -32,6 +40,20 @@ type Props = {
 };
 
 const schema = eventSchema.omit({ author: true, chatId: true });
+
+// Определяем статусы мероприятий с иконками и переводами
+const eventStatuses = [
+  {
+    value: "IN_PROGRESS",
+    label: "В процессе",
+    icon: Clock,
+  },
+  {
+    value: "DONE",
+    label: "Завершено",
+    icon: CheckCircle2,
+  },
+];
 
 export function UpdateEventDialog({ open, onOpenChange, defaultEvent }: Props) {
   const { mutate, error, isPending } = useUpdateEventMutation();
@@ -42,6 +64,9 @@ export function UpdateEventDialog({ open, onOpenChange, defaultEvent }: Props) {
       title: defaultEvent.title,
       date: defaultEvent.date,
       participants: defaultEvent.participants,
+      status: defaultEvent.status || "IN_PROGRESS",
+      description: defaultEvent.description,
+      location: defaultEvent.location,
     },
   });
 
@@ -52,7 +77,7 @@ export function UpdateEventDialog({ open, onOpenChange, defaultEvent }: Props) {
         date: data.date.toISOString(),
         title: data.title,
         participants: data.participants.map((it) => it.id),
-        status: "IN_PROGRESS",
+        status: data.status,
         description: data.description,
         location: data.location,
       },
@@ -78,8 +103,8 @@ export function UpdateEventDialog({ open, onOpenChange, defaultEvent }: Props) {
         <DialogHeader>
           <DialogTitle>Редактирование события</DialogTitle>
           <DialogDescription>
-            Вы можете изменить название события, дату, участников, цель и место
-            проведения.
+            Вы можете изменить название события, дату, статус, участников, цель
+            и место проведения.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -112,6 +137,36 @@ export function UpdateEventDialog({ open, onOpenChange, defaultEvent }: Props) {
                       onChange={field.onChange}
                     />
                   </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Статус мероприятия</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Выберите статус" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {eventStatuses.map((status) => (
+                        <SelectItem key={status.value} value={status.value}>
+                          <div className="flex items-center gap-2">
+                            <status.icon className="h-4 w-4" />
+                            <span>{status.label}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </FormItem>
               )}
             />
