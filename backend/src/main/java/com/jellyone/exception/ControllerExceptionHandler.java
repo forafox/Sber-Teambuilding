@@ -1,6 +1,5 @@
 package com.jellyone.exception;
 
-import com.jellyone.exception.ResourceNotFoundException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import jakarta.validation.ConstraintViolationException;

@@ -46,7 +46,7 @@ export function CreateEventPromptDialog({ open, onOpenChange }: Props) {
     mutate(values.prompt, {
       onSuccess: (data) => {
         navigate({
-          to: "/events/$eventId",
+          to: "/events/$eventId/tasks",
           params: { eventId: String(data.id) },
         });
         onOpenChange(false);

@@ -5,17 +5,17 @@
     <title>Смета мероприятия</title>
 
 <!--    что нужно положить в контекст-->
-<!--        eventNumber - номер мероп-->
+<!--        eventTitle - название мероприятия-->
 <!--        curDate - дата заказа отчета-->
 <!--        totalAmount - общ сумма-->
 <!--        amountSpent - юзер потратил-->
-<!--        amountOwedToYou - скоко должны юзеру-->
-<!--        amountYouOwe - скоко должен юзер-->
+<!--        amountOwedToUser - скоко должны юзеру-->
 <!--        isEventClosed - закрыт ли ивент (булиан)-->
 <!--        eventEndDate - дата закрытия ивента-->
+<!--        eventUrl - url мероприятия-->
 
 </head>
-<body style="font-family: Tahoma, sans-serif; margin: 0; padding: 0;">
+<body style="font-family: Tahoma, sans-serif; margin: 0; padding: 0; color: #333;">
 <center>
     <table width="600" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto; background-color: #ffffff;">
         <tr>
@@ -29,11 +29,13 @@
                 <h2 style="font-size: 32px; color: #333; margin: 20px 0;">Смета мероприятия</h2>
 
                 <div style="font-size: 18px; margin-bottom: 5px;">
-                    Номер мероприятия <span style="color: #5555ff; font-weight: bold;" th:text="${eventNumber}">#65000500</span>
+                    <span style="color: #333;">Название мероприятия</span> 
+                    <!-- Название мероприятия  -->
+                    <a th:href="${eventUrl}" style="color: #4b4bf8; font-weight: bold; text-decoration: none;" th:text="${eventTitle}">Название события</a>
                 </div>
 
-                <div style="color: #555; margin-bottom: 30px;" th:text="${#dates.format(curDate, 'MMMM d, yyyy')}">
-                    Апрель 17, 2021
+                <div style="color: #555; margin-bottom: 30px;" th:text="${#temporals.format(curDate, 'HH:mm dd MMMM, yyyy', new java.util.Locale('ru'))}">
+                    17 апреля 2021
                 </div>
 
                 <hr style="border: 0; border-top: 1px solid #ddd; width: 100%;">
@@ -57,7 +59,7 @@
                                     </td>
                                     <td align="right" valign="middle" width="100"
                                         style="padding: 15px 0; font-weight: bold;"
-                                        th:text="${'$' + #numbers.formatDecimal(item.price, 0, 2)}">$20.00
+                                        th:text="${item.price == 0 ? '₽0.00' : '₽' + #numbers.formatDecimal(item.price, 0, 2)}">$20.00
                                     </td>
                                 </tr>
                             </table>
@@ -83,25 +85,25 @@
                     <tr>
                         <td align="right" style="padding: 8px 0;">Сумма:</td>
                         <td align="right" width="100" style="padding: 8px 0; font-weight: bold;"
-                            th:text="${'$' + #numbers.formatDecimal(totalAmount, 0, 2)}">$40.00
+                            th:text="${(totalAmount < 1 ? '₽0' : '₽') + #numbers.formatDecimal(totalAmount, 0, 2)}">$40.00
                         </td>
                     </tr>
                     <tr>
                         <td align="right" style="padding: 8px 0;">Вы потратили:</td>
                         <td align="right" width="100" style="padding: 8px 0; font-weight: bold;"
-                            th:text="${'$' + #numbers.formatDecimal(amountSpent, 0, 2)}">$0.00
+                            th:text="${(amountSpent < 1 ? '₽0' : '₽') + #numbers.formatDecimal(amountSpent, 0, 2)}">$0.00
                         </td>
                     </tr>
-                    <tr>
+                    <tr th:if="${amountOwedToUser >= 0}">
                         <td align="right" style="padding: 8px 0;">Вам должны:</td>
                         <td align="right" width="100" style="padding: 8px 0; font-weight: bold;"
-                            th:text="${'$' + #numbers.formatDecimal(amountOwedToYou, 0, 2)}">$10.00
+                            th:text="${(amountOwedToUser < 1 ? '₽0' : '₽') + #numbers.formatDecimal(amountOwedToUser, 0, 2)}">₽10.00
                         </td>
                     </tr>
-                    <tr>
+                    <tr th:if="${amountOwedToUser < 0}">
                         <td align="right" style="padding: 8px 0;">Вы должны:</td>
                         <td align="right" width="100" style="padding: 8px 0; font-weight: bold;"
-                            th:text="${'$' + #numbers.formatDecimal(amountYouOwe, 0, 2)}">$50.00
+                            th:text="${(amountOwedToUser > -1 ? '-₽0' : '-₽') + #numbers.formatDecimal(T(java.lang.Math).abs(amountOwedToUser), 0, 2)}">₽50.00
                         </td>
                     </tr>
                 </table>
@@ -124,10 +126,10 @@
                     </tr>
                     <tr>
                         <td align="left" width="100" style="padding: 8px 0; font-weight: bold;">
-                            Дата окончания
-                            <div style="color: #555; margin-bottom: 30px;" th:text="${#dates.format(eventEndDate, 'MMMM d, yyyy')}">
-                                Февраль 17, 1970
-                            </div>
+                            Дата окончания  
+                            <span style="color: #555; margin-bottom: 30px;" th:text="${#temporals.format(eventEndDate, 'HH:mm dd MMMM, yyyy', new java.util.Locale('ru'))}">
+                                2024 Февраль 17 15:30
+                            </span>
                         </td>
                     </tr>
                 </table>

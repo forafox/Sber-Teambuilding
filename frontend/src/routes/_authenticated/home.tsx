@@ -11,7 +11,13 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, MailIcon, PlusIcon, UserIcon } from "lucide-react";
+import {
+  BotIcon,
+  CalendarIcon,
+  MailIcon,
+  PlusIcon,
+  UserIcon,
+} from "lucide-react";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 import { CreateEventPromptDialog } from "@/components/events/create-event-prompt-dialog";
@@ -82,12 +88,24 @@ function RouteComponent() {
       <div className="mb-8">
         <div className="mb-4 flex flex-col items-start gap-2 md:flex-row md:items-center md:justify-between">
           <h2 className="text-2xl font-bold">Активные мероприятия</h2>
-          <div className="flex flex-row-reverse items-center gap-2 md:flex-row">
+          <div className="flex flex-row-reverse items-center gap-4 md:flex-row">
             <Button variant="outline" onClick={handleCreateEvent}>
               <PlusIcon className="mr-2 h-4 w-4" />
               Создать мероприятие
             </Button>
-            <Button onClick={() => setCreateOpen(true)}>GigaChat</Button>
+            <Button
+              onClick={() => setCreateOpen(true)}
+              className="group relative overflow-hidden border-0 bg-gradient-to-r from-blue-600 to-purple-600 shadow-[0_0_15px_rgba(56,189,248,0.5)] transition-shadow duration-300 hover:from-blue-700 hover:to-purple-700 hover:shadow-[0_0_20px_rgba(168,85,247,0.7)]"
+            >
+              <span className="absolute inset-0 bg-[rgba(255,255,255,0.2)] opacity-0 blur-md transition-opacity duration-300 group-hover:opacity-70"></span>
+              <span className="relative z-10 flex items-center justify-center">
+                <BotIcon className="mr-2 size-5" />
+                <span className="bg-gradient-to-r from-white to-blue-100 bg-clip-text font-medium text-transparent">
+                  Giga
+                </span>
+                <span className="font-bold text-white">Chat</span>
+              </span>
+            </Button>
           </div>
         </div>
 

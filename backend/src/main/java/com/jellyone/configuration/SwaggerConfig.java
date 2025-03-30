@@ -20,9 +20,14 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
                 @Tag(name = "Authorization and Registration", description = "API for users"),
                 @Tag(name = "User Management", description = "API for users"),
                 @Tag(name = "Event Management", description = "API for events"),
-                @Tag(name = "WebSocket", description = "API for WebSocket"),
+                @Tag(name = "Notification Management", description = "API for notifications"),
                 @Tag(name = "Task Management", description = "API for tasks"),
                 @Tag(name = "Message Management", description = "API for messages"),
+                @Tag(name = "Chat Management", description = "API for chats"),
+                @Tag(name = "Token Management", description = "API for event tokens"),
+                @Tag(name = "Template Management", description = "API for templates"),
+                @Tag(name = "Email Management", description = "API for sending email reports"),
+                @Tag(name = "Telegram Management", description = "API for managing Telegram users"),
         }
 )
 @SecurityScheme(
