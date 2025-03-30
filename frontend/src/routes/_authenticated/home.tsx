@@ -18,6 +18,7 @@ import {
   MailIcon,
   PlusIcon,
   UserIcon,
+  SendIcon,
 } from "lucide-react";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
@@ -34,6 +35,19 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { useSelectTelegramUsername } from "@/api/telegram-username";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { toast } from "sonner";
 
 type fuseResult = {
   title: string;
@@ -74,9 +88,35 @@ function RouteComponent() {
   const navigate = useNavigate();
   const [createOpen, setCreateOpen] = useState(false);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+  const [telegramDialogOpen, setTelegramDialogOpen] = useState(false);
+  const telegramMutation = useSelectTelegramUsername();
 
   const [activeEvents, setActiveEvents] = useState(eventsData || []);
   const userInfo = userData;
+
+  const telegramSchema = z.object({
+    username: z.string().min(5, "Минимум 5 символов"),
+  });
+
+  const telegramForm = useForm<z.infer<typeof telegramSchema>>({
+    resolver: zodResolver(telegramSchema),
+    defaultValues: {
+      username: "",
+    },
+  });
+
+  const onSubmitTelegram = (values: z.infer<typeof telegramSchema>) => {
+    telegramMutation.mutate(values.username, {
+      onSuccess: () => {
+        toast.success("Telegram подключен");
+        setTelegramDialogOpen(false);
+        telegramForm.reset();
+      },
+      onError: () => {
+        toast.error("Не удалось подключить Telegram. Попробуйте еще раз.");
+      },
+    });
+  };
 
   const fuse = new Fuse(eventsData, {
     keys: ["title"],
@@ -148,6 +188,20 @@ function RouteComponent() {
                 <p className="text-muted-foreground text-sm">Email</p>
                 <p className="font-medium">{userInfo?.email}</p>
               </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <SendIcon className="text-muted-foreground size-5" />
+                <div>
+                  <p className="text-muted-foreground text-sm">Telegram</p>
+                  <p className="font-medium">
+                    {userInfo?.telegramUsername || "Не подключен"}
+                  </p>
+                </div>
+              </div>
+              <Button size="sm" onClick={() => setTelegramDialogOpen(true)}>
+                {userInfo?.telegramUsername ? "Изменить" : "Подключить"}
+              </Button>
             </div>
           </div>
         </CardContent>
@@ -266,6 +320,50 @@ function RouteComponent() {
 
       {/* Create Event Dialog */}
       <CreateEventPromptDialog open={createOpen} onOpenChange={setCreateOpen} />
+
+      {/* Telegram Username Dialog */}
+      <Dialog open={telegramDialogOpen} onOpenChange={setTelegramDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Подключение Telegram</DialogTitle>
+            <DialogDescription>
+              Введите ваше имя пользователя в Telegram без символа @
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...telegramForm}>
+            <form
+              onSubmit={telegramForm.handleSubmit(onSubmitTelegram)}
+              className="space-y-4"
+            >
+              <FormField
+                control={telegramForm.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Имя пользователя Telegram</FormLabel>
+                    <FormControl>
+                      <Input placeholder="username" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <DialogFooter className="flex justify-end gap-2 sm:justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setTelegramDialogOpen(false)}
+                >
+                  Отмена
+                </Button>
+                <Button type="submit" disabled={telegramMutation.isPending}>
+                  {telegramMutation.isPending ? "Подключение..." : "Подключить"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
