@@ -1,22 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "./api";
-
 import { Message, messageSchema } from "./get-chat";
 
-interface UpdateMessageParams {
+// Параметры для обновления сообщения
+type UpdateMessageParams = {
   chatId: number;
   messageId: number;
   content: string;
   replyToMessageId?: number;
   pinned?: boolean;
-}
-
-interface MessageUpdateRequest {
-  content: string;
-  replyToMessageId?: number;
-  pinned: boolean;
-  id: number;
-}
+};
 
 export function useUpdateMessage() {
   const queryClient = useQueryClient();
@@ -27,18 +20,12 @@ export function useUpdateMessage() {
       messageId,
       ...message
     }: UpdateMessageParams) => {
-      const updateRequest: MessageUpdateRequest = {
+      const response = await api.api.updateMessage(chatId, messageId, {
+        id: messageId,
         content: message.content,
         replyToMessageId: message.replyToMessageId,
         pinned: message.pinned !== undefined ? message.pinned : false,
-        id: messageId,
-      };
-
-      const response = await api.api.updateMessage(
-        chatId,
-        messageId,
-        updateRequest,
-      );
+      });
       return messageSchema.parse(response.data);
     },
     onSuccess: (data, { chatId, messageId }) => {
