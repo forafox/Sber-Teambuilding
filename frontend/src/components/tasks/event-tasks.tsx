@@ -12,33 +12,35 @@ import { Button } from "../ui/button";
 import { PlusIcon, CheckIcon, PencilIcon, Trash2Icon } from "lucide-react";
 import { useDeleteTaskMutation } from "@/api/delete-task";
 import { useState } from "react";
-import { UpdateTaskDialog } from "./update-task-dialog";
+import { UpdateTaskDialog } from "./update-task-dialog.tsx";
 import { CreateTaskDialog } from "./create-task-dialog";
 import { useUpdateTaskMutation } from "@/api/update-task";
-import { Link } from "@tanstack/react-router";
+import { Avatar } from "../ui/avatar";
+import { AvatarFallback } from "../ui/avatar";
+import { getAvatarFallback } from "../user/lib";
+import { TasksTable } from "./components/data-table";
+
+import { DataTableColumnHeader } from "./components/data-table-column-header";
+import { DataTableRowActions } from "./components/data-table-row-actions";
+import * as React from "react";
+import { ColumnDef } from "@tanstack/react-table";
+import { DataTableToolbar } from "./components/data-table-toolbar";
+import { useReactTable } from "@tanstack/react-table";
+import {
+  ColumnFiltersState,
+  SortingState,
+  VisibilityState,
+  getCoreRowModel,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+} from "@tanstack/react-table";
 
 type Props = {
   eventId: number;
 };
-
-function ChangeStatusButton({
-  tasksStatus,
-  onClick,
-  status,
-}: {
-  tasksStatus: "IN_PROGRESS" | "DONE";
-  onClick: () => void;
-  status: "IN_PROGRESS" | "DONE";
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`${tasksStatus == status ? "text-primary bg-transparent" : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs"} focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructiv inline-flex shrink-0 items-center justify-center rounded-md px-4 py-2 text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px]`}
-    >
-      {status == "IN_PROGRESS" ? "Активные задачи" : "Выполненные задачи"}
-    </button>
-  );
-}
 
 function DeleteTaskButton({
   taskId,
@@ -56,7 +58,11 @@ function DeleteTaskButton({
   };
 
   return (
-    <Button onClick={() => handleDeleteTask(taskId)} disabled={isPending}>
+    <Button
+      id={`deletetask${taskId}`}
+      onClick={() => handleDeleteTask(taskId)}
+      disabled={isPending}
+    >
       <Trash2Icon className="h-4 w-4" />
     </Button>
   );
@@ -79,73 +85,172 @@ function MakeDoneTask({ task, eventId }: { task: Task; eventId: number }) {
   );
 }
 
-function TaskCard({ task, eventId }: { task: Task; eventId: number }) {
-  const [isOpenUpdateDialog, setIsOpenUpdateDialog] = useState(false);
-
-  const handleEditTask = () => {
-    setIsOpenUpdateDialog(true);
-  };
-
-  return (
-    <Card key={task.id}>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle>
-            <Link
-              to="/events/$eventId/tasks/$taskId"
-              params={{
-                eventId: String(eventId),
-                taskId: String(task.id),
-              }}
-            >
-              {task.title}
-            </Link>
-          </CardTitle>
-        </div>
-        {task.expenses && <CardDescription>{task.expenses}₽</CardDescription>}
-      </CardHeader>
-      <CardContent>
-        <CardDescription>Автор: {task.author.name}</CardDescription>
-      </CardContent>
-      <CardContent>{task.description}</CardContent>
-      {task.assignee && (
-        <div className="bg-primary/15 mx-6 flex flex-col rounded-xl p-4">
-          <CardContent>{task.assignee?.name}</CardContent>
-          <CardContent>
-            <CardDescription>{task.assignee?.email}</CardDescription>
-          </CardContent>
-        </div>
-      )}
-      <CardFooter className="flex gap-3">
-        <Button
-          onClick={handleEditTask}
-          className="hover:bg-primary/10 border-inherit bg-transparent text-inherit"
-        >
-          <PencilIcon className="mr-2 h-4 w-4" />
-          Изменить
-        </Button>
-        <DeleteTaskButton taskId={task.id} eventId={eventId}></DeleteTaskButton>
-        {task.status == "IN_PROGRESS" && (
-          <MakeDoneTask task={task} eventId={eventId} />
-        )}
-      </CardFooter>
-      <UpdateTaskDialog
-        open={isOpenUpdateDialog}
-        onOpenChange={setIsOpenUpdateDialog}
-        defaultTask={task}
-        eventId={eventId}
-      />
-    </Card>
-  );
-}
-
 export function EventTasks({ eventId }: Props) {
   const { data: tasksData } = useSuspenseQuery(getTasksQueryOptions(eventId));
-  const [tasksStatus, setTasksStatus] = useState<"IN_PROGRESS" | "DONE">(
+  const [tasksShow, setTasksShow] = useState<"TABLE" | "LIST">("LIST");
+  const [tasksStatus, setTasksStatus] = useState<string[]>([
     "IN_PROGRESS",
+    "DONE",
+  ]);
+  const [isOpenUpdateDialog, setIsOpenUpdateDialog] = useState<null | Task>(
+    null,
   );
+  console.log(tasksStatus);
   const [isOpenCreateDialog, setIsOpenCreateDialog] = useState(false);
-  const activeEvents = tasksData || [];
+  const activeTasks = tasksData || [];
+  const columns: ColumnDef<Task>[] = [
+    {
+      accessorKey: "title",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Название" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="ml-4 flex space-x-2">
+            <span className="max-w-[500px] truncate font-medium">
+              {row.getValue("title")}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "description",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Описание" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            <span className="max-w-[500px] truncate font-medium">
+              {row.getValue("description")}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "author",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Автор" />
+      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            <span className="max-w-[500px] truncate font-medium">
+              {row.original.author.name}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "assignee",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Исполнитель" />
+      ),
+      cell: ({ row }) => {
+        if (row.original.assignee) {
+          return (
+            <div className="flex space-x-2">
+              <span className="max-w-[500px] truncate font-medium">
+                {row.original.assignee.name}
+              </span>
+            </div>
+          );
+        }
+        return null;
+      },
+    },
+    {
+      accessorKey: "status",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Статус" />
+      ),
+      cell: ({ row }) => {
+        const status = row.original.status;
+        if (status == "IN_PROGRESS") {
+          return (
+            <div className="flex w-[100px] items-center">
+              <span>Активна</span>
+            </div>
+          );
+        }
+        return (
+          <div className="flex w-[100px] items-center">
+            <span>Выполнена</span>
+          </div>
+        );
+      },
+      filterFn: (row, _, value) => {
+        return value.includes(row.original.status);
+      },
+    },
+    {
+      accessorKey: "price",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Стоимость" />
+      ),
+      cell: ({ row }) => {
+        const expenses = row.original.expenses;
+
+        if (!expenses) {
+          return null;
+        }
+
+        return (
+          <div className="flex items-center">
+            <span className="min-h-4 max-w-[100px] text-clip">{expenses}</span>
+          </div>
+        );
+      },
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => (
+        <DataTableRowActions
+          row={row}
+          onEdit={() => setIsOpenUpdateDialog(row.original)}
+          onDelete={() => {
+            document.getElementById(`deletetask${row.original.id}`)?.click();
+          }}
+        />
+      ),
+    },
+  ];
+
+  const [rowSelection, setRowSelection] = React.useState({});
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    [],
+  );
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const table = useReactTable<Task>({
+    data: activeTasks,
+    columns,
+    state: {
+      sorting,
+      columnVisibility,
+      rowSelection,
+      columnFilters,
+    },
+    enableRowSelection: true,
+    onRowSelectionChange: setRowSelection,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onColumnVisibilityChange: setColumnVisibility,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFacetedRowModel: getFacetedRowModel(),
+    getFacetedUniqueValues: getFacetedUniqueValues(),
+  });
+
+  const handleEditTask = (task: Task) => {
+    setIsOpenUpdateDialog(task);
+  };
 
   const handleCreateTask = () => {
     setIsOpenCreateDialog(true);
@@ -160,32 +265,117 @@ export function EventTasks({ eventId }: Props) {
           Создать задачу
         </Button>
       </div>
-      <div className="flex flex-wrap items-center justify-center gap-4">
-        <ChangeStatusButton
+      <div className="space-y-4">
+        <DataTableToolbar
+          table={table}
           tasksStatus={tasksStatus}
-          onClick={() => setTasksStatus("IN_PROGRESS")}
-          status={"IN_PROGRESS"}
+          setTasksStatus={setTasksStatus}
+          tasksShow={tasksShow}
+          setTasksShow={setTasksShow}
         />
-        <ChangeStatusButton
-          tasksStatus={tasksStatus}
-          onClick={() => setTasksStatus("DONE")}
-          status={"DONE"}
+        {tasksShow == "LIST" ? (
+          <TaskList
+            activeTasks={activeTasks}
+            tasksStatus={tasksStatus}
+            eventId={eventId}
+            handleEditTask={handleEditTask}
+          />
+        ) : (
+          <TasksTable table={table} columns={columns} />
+        )}
+      </div>
+      {isOpenUpdateDialog && (
+        <UpdateTaskDialog
+          open={Boolean(isOpenUpdateDialog)}
+          onOpenChange={setIsOpenUpdateDialog}
+          defaultTask={isOpenUpdateDialog}
+          eventId={eventId}
         />
-      </div>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {activeEvents.map((task) => (
-          <>
-            {task.status == tasksStatus && (
-              <TaskCard key={task.id} task={task} eventId={eventId} />
-            )}
-          </>
-        ))}
-      </div>
+      )}
       <CreateTaskDialog
         open={isOpenCreateDialog}
         onOpenChange={setIsOpenCreateDialog}
         eventId={eventId}
       />
     </Card>
+  );
+}
+
+type TaskListProps = {
+  activeTasks: Task[];
+  tasksStatus: string[];
+  eventId: number;
+  handleEditTask: (task: Task) => void;
+};
+
+function TaskList({
+  activeTasks,
+  tasksStatus,
+  eventId,
+  handleEditTask,
+}: TaskListProps) {
+  return (
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {activeTasks.map((task) => (
+        <>
+          {tasksStatus.includes(task.status) && (
+            <Card key={task.id}>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle>{task.title}</CardTitle>
+                  <div className="border-primary/25 rounded-full border-2">
+                    <CardContent>{task.expenses}₽</CardContent>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <CardDescription>Автор: {task.author.name}</CardDescription>
+              </CardContent>
+              <CardContent>{task.description}</CardContent>
+              {task.assignee ? (
+                <div className="bg-primary/15 mx-6 flex items-center gap-2 rounded-xl p-4">
+                  <Avatar className="size-10 text-xs">
+                    <AvatarFallback>
+                      {getAvatarFallback(task.assignee.name)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col">
+                    <CardContent>{task.assignee.name}</CardContent>
+                    <CardContent>
+                      <CardDescription>{task.assignee.email}</CardDescription>
+                    </CardContent>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-primary/15 mx-6 flex flex-col rounded-xl p-4">
+                  <CardContent>Исполнитель не назначен</CardContent>
+                  <CardContent>
+                    <CardDescription>
+                      Вы можете назначить исполнителя
+                    </CardDescription>
+                  </CardContent>
+                </div>
+              )}
+              <CardFooter className="flex gap-3">
+                <Button
+                  onClick={() => handleEditTask(task)}
+                  className="hover:bg-primary/10 border-inherit bg-transparent text-inherit"
+                >
+                  <PencilIcon className="mr-2 h-4 w-4" />
+                  Изменить
+                </Button>
+                <DeleteTaskButton
+                  taskId={task.id}
+                  eventId={eventId}
+                ></DeleteTaskButton>
+                {task.status == "IN_PROGRESS" && (
+                  <MakeDoneTask task={task} eventId={eventId} />
+                )}
+              </CardFooter>
+            </Card>
+          )}
+        </>
+      ))}
+    </div>
   );
 }

@@ -24,17 +24,15 @@ import { Button } from "../ui/button";
 import { Suspense } from "react";
 import { Task } from "@/api/get-tasks";
 import { taskSchema } from "@/api/get-tasks";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { getEventQueryOptions } from "@/api/get-event";
 
 type Props = {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onOpenChange: (open: null | Task) => void;
   defaultTask: Task;
   eventId: number;
 };
 
-const schema = taskSchema.omit({ status: true, id: true, author: true });
+const schema = taskSchema.omit({ status: true, author: true, id: true });
 
 export function UpdateTaskDialog({
   open,
@@ -42,8 +40,11 @@ export function UpdateTaskDialog({
   defaultTask,
   eventId,
 }: Props) {
-  const { data: event } = useSuspenseQuery(getEventQueryOptions(eventId));
   const { mutate, error, isPending } = useUpdateTaskMutation();
+  function expenses(exp: number | undefined | string | null) {
+    if (exp) return Number(exp);
+    else return undefined;
+  }
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -51,7 +52,6 @@ export function UpdateTaskDialog({
       assignee: defaultTask.assignee,
       description: defaultTask.description,
       expenses: defaultTask.expenses,
-      url: defaultTask.url,
     },
   });
 
@@ -62,14 +62,13 @@ export function UpdateTaskDialog({
         taskId: defaultTask.id,
         assigneeUsername: data.assignee?.username,
         title: data.title,
-        description: data.description ?? "",
-        expenses: data?.expenses ?? undefined,
-        url: data?.url ?? undefined,
+        description: data.description,
+        expenses: expenses(data.expenses),
         status: "IN_PROGRESS",
       },
       {
         onSuccess: () => {
-          onOpenChange(false);
+          onOpenChange(null);
         },
       },
     );
@@ -81,8 +80,8 @@ export function UpdateTaskDialog({
       onOpenChange={(open) => {
         if (!open) {
           form.reset();
-        }
-        onOpenChange(open);
+          onOpenChange(null);
+        } else onOpenChange(defaultTask);
       }}
     >
       <DialogContent>
@@ -143,24 +142,8 @@ export function UpdateTaskDialog({
                   <FormLabel>Исполнитель</FormLabel>
                   <FormControl>
                     <Suspense fallback={<></>}>
-                      <SelectUser
-                        value={value}
-                        onChange={onChange}
-                        participants={event.participants}
-                      />
+                      <SelectUser value={value} onChange={onChange} />
                     </Suspense>
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="url"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Ссылка</FormLabel>
-                  <FormControl>
-                    <Input type="url" {...field} />
                   </FormControl>
                 </FormItem>
               )}

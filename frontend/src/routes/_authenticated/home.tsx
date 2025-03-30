@@ -22,6 +22,31 @@ import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 import { CreateEventPromptDialog } from "@/components/events/create-event-prompt-dialog";
 import { useState } from "react";
+import Fuse from "fuse.js";
+import { Input } from "@/components/ui/input";
+
+type fuseResult = {
+  title: string;
+  id: number;
+  author: {
+    name: string;
+    id: number;
+    role: "USER" | "ADMIN" | "GUEST" | "HOUSE_OWNER";
+    email: string;
+    username: string;
+  };
+  date: Date;
+  participants: {
+    name: string;
+    id: number;
+    role: "USER" | "ADMIN" | "GUEST" | "HOUSE_OWNER";
+    email: string;
+    username: string;
+  }[];
+  chatId: number;
+  description?: string | undefined;
+  location?: string | undefined;
+}[];
 
 export const Route = createFileRoute("/_authenticated/home")({
   component: RouteComponent,
@@ -39,8 +64,26 @@ function RouteComponent() {
   const navigate = useNavigate();
   const [createOpen, setCreateOpen] = useState(false);
 
-  const activeEvents = eventsData || [];
+  const [activeEvents, setActiveEvents] = useState(eventsData || []);
   const userInfo = userData;
+
+  const fuse = new Fuse(eventsData, {
+    keys: ["title"],
+    includeScore: false,
+    threshold: 0.3,
+  });
+
+  const handleSearchEvent = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    if (e.target.value == "") {
+      setActiveEvents(eventsData);
+    } else {
+      const newArray = fuse.search(e.target.value);
+      const items: fuseResult = [];
+      newArray.forEach((elem) => items.push(elem.item));
+      setActiveEvents(items);
+    }
+  };
 
   const handleCreateEvent = () => {
     navigate({ to: "/events/new" });
@@ -88,6 +131,11 @@ function RouteComponent() {
       <div className="mb-8">
         <div className="mb-4 flex flex-col items-start gap-2 md:flex-row md:items-center md:justify-between">
           <h2 className="text-2xl font-bold">Активные мероприятия</h2>
+          <Input
+            onChange={handleSearchEvent}
+            placeholder="Найти мероприятие"
+            className="max-w-[300px] min-w-36"
+          />
           <div className="flex flex-row-reverse items-center gap-4 md:flex-row">
             <Button variant="outline" onClick={handleCreateEvent}>
               <PlusIcon className="mr-2 h-4 w-4" />
