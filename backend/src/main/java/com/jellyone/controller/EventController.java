@@ -219,7 +219,7 @@ public class EventController {
     private void handleEventStatusChange(EventStatus status, List<Long> participants, String title, Long id) {
         if (status == EventStatus.DONE) {
             participants.forEach(participantId -> {
-                senderService.sendMail(participantId, id);
+                senderService.sendAttachedMail(participantId, id);
                 telegramNotificationService.sendEventEndNotification(participantId, title);
             });
         }
