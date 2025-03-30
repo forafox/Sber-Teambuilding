@@ -577,17 +577,17 @@ export interface Page {
   totalElements?: number;
   /** @format int32 */
   totalPages?: number;
+  first?: boolean;
+  last?: boolean;
   /** @format int32 */
   size?: number;
   content?: object[];
   /** @format int32 */
   number?: number;
   sort?: SortObject[];
+  pageable?: PageableObject;
   /** @format int32 */
   numberOfElements?: number;
-  last?: boolean;
-  pageable?: PageableObject;
-  first?: boolean;
   empty?: boolean;
 }
 
@@ -596,11 +596,11 @@ export interface PageableObject {
   offset?: number;
   sort?: SortObject[];
   paged?: boolean;
+  unpaged?: boolean;
   /** @format int32 */
   pageNumber?: number;
   /** @format int32 */
   pageSize?: number;
-  unpaged?: boolean;
 }
 
 export interface SortObject {
@@ -980,7 +980,7 @@ export class Api<
         method: "POST",
         body: data,
         secure: true,
-        type: ContentType.Json,
+        type: ContentType.Text,
         ...params,
       }),
 

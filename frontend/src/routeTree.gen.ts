@@ -15,6 +15,7 @@ import { Route as SignUpImport } from "./routes/sign-up";
 import { Route as SignInImport } from "./routes/sign-in";
 import { Route as AuthenticatedRouteImport } from "./routes/_authenticated/route";
 import { Route as IndexImport } from "./routes/index";
+import { Route as AuthenticatedTokenImport } from "./routes/_authenticated/token";
 import { Route as AuthenticatedHomeImport } from "./routes/_authenticated/home";
 import { Route as AuthenticatedEventsNewImport } from "./routes/_authenticated/events/new";
 import { Route as AuthenticatedEventsEventIdRouteImport } from "./routes/_authenticated/events/$eventId/route";
@@ -46,6 +47,12 @@ const IndexRoute = IndexImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => rootRoute,
+} as any);
+
+const AuthenticatedTokenRoute = AuthenticatedTokenImport.update({
+  id: "/token",
+  path: "/token",
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any);
 
 const AuthenticatedHomeRoute = AuthenticatedHomeImport.update({
@@ -134,6 +141,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthenticatedHomeImport;
       parentRoute: typeof AuthenticatedRouteImport;
     };
+    "/_authenticated/token": {
+      id: "/_authenticated/token";
+      path: "/token";
+      fullPath: "/token";
+      preLoaderRoute: typeof AuthenticatedTokenImport;
+      parentRoute: typeof AuthenticatedRouteImport;
+    };
     "/_authenticated/events/$eventId": {
       id: "/_authenticated/events/$eventId";
       path: "/events/$eventId";
@@ -206,12 +220,14 @@ const AuthenticatedEventsEventIdRouteRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute;
+  AuthenticatedTokenRoute: typeof AuthenticatedTokenRoute;
   AuthenticatedEventsEventIdRouteRoute: typeof AuthenticatedEventsEventIdRouteRouteWithChildren;
   AuthenticatedEventsNewRoute: typeof AuthenticatedEventsNewRoute;
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
+  AuthenticatedTokenRoute: AuthenticatedTokenRoute,
   AuthenticatedEventsEventIdRouteRoute:
     AuthenticatedEventsEventIdRouteRouteWithChildren,
   AuthenticatedEventsNewRoute: AuthenticatedEventsNewRoute,
@@ -226,6 +242,7 @@ export interface FileRoutesByFullPath {
   "/sign-in": typeof SignInRoute;
   "/sign-up": typeof SignUpRoute;
   "/home": typeof AuthenticatedHomeRoute;
+  "/token": typeof AuthenticatedTokenRoute;
   "/events/$eventId": typeof AuthenticatedEventsEventIdRouteRouteWithChildren;
   "/events/new": typeof AuthenticatedEventsNewRoute;
   "/events/$eventId/chat": typeof AuthenticatedEventsEventIdChatRoute;
@@ -240,6 +257,7 @@ export interface FileRoutesByTo {
   "/sign-in": typeof SignInRoute;
   "/sign-up": typeof SignUpRoute;
   "/home": typeof AuthenticatedHomeRoute;
+  "/token": typeof AuthenticatedTokenRoute;
   "/events/$eventId": typeof AuthenticatedEventsEventIdRouteRouteWithChildren;
   "/events/new": typeof AuthenticatedEventsNewRoute;
   "/events/$eventId/chat": typeof AuthenticatedEventsEventIdChatRoute;
@@ -255,6 +273,7 @@ export interface FileRoutesById {
   "/sign-in": typeof SignInRoute;
   "/sign-up": typeof SignUpRoute;
   "/_authenticated/home": typeof AuthenticatedHomeRoute;
+  "/_authenticated/token": typeof AuthenticatedTokenRoute;
   "/_authenticated/events/$eventId": typeof AuthenticatedEventsEventIdRouteRouteWithChildren;
   "/_authenticated/events/new": typeof AuthenticatedEventsNewRoute;
   "/_authenticated/events/$eventId/chat": typeof AuthenticatedEventsEventIdChatRoute;
@@ -271,6 +290,7 @@ export interface FileRouteTypes {
     | "/sign-in"
     | "/sign-up"
     | "/home"
+    | "/token"
     | "/events/$eventId"
     | "/events/new"
     | "/events/$eventId/chat"
@@ -284,6 +304,7 @@ export interface FileRouteTypes {
     | "/sign-in"
     | "/sign-up"
     | "/home"
+    | "/token"
     | "/events/$eventId"
     | "/events/new"
     | "/events/$eventId/chat"
@@ -297,6 +318,7 @@ export interface FileRouteTypes {
     | "/sign-in"
     | "/sign-up"
     | "/_authenticated/home"
+    | "/_authenticated/token"
     | "/_authenticated/events/$eventId"
     | "/_authenticated/events/new"
     | "/_authenticated/events/$eventId/chat"
@@ -343,6 +365,7 @@ export const routeTree = rootRoute
       "filePath": "_authenticated/route.tsx",
       "children": [
         "/_authenticated/home",
+        "/_authenticated/token",
         "/_authenticated/events/$eventId",
         "/_authenticated/events/new"
       ]
@@ -355,6 +378,10 @@ export const routeTree = rootRoute
     },
     "/_authenticated/home": {
       "filePath": "_authenticated/home.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/token": {
+      "filePath": "_authenticated/token.tsx",
       "parent": "/_authenticated"
     },
     "/_authenticated/events/$eventId": {
