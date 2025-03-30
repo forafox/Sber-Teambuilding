@@ -32,6 +32,6 @@ export const getTasksQueryOptions = (eventId: number) => ({
     const { data: data } = await api.api.getTasks(eventId, {
       pageSize: 10_000,
     });
-    return taskSchema.array().parse(data);
+    return taskSchema.array().parse(data.content);
   },
 });
