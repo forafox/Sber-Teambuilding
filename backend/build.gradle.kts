@@ -76,7 +76,7 @@ tasks.withType<Test> {
 
 checkstyle {
     toolVersion = "10.20.2"
-    configFile = rootProject.file("config/checkstyle/checkstyle.xml")
+    configFile = file("config/checkstyle/checkstyle.xml")
     configDirectory.set(configFile.parentFile)
 }
 
