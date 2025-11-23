@@ -12,8 +12,7 @@ scrape_configs:
   - job_name: 'backend'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['sber__backend:8080']
+      - targets: ['sber-backend:8080']
         labels:
           application: 'sber-teambuilding-backend'
           service: 'backend'
-
