@@ -42,7 +42,7 @@ jobs:
         uses: dorny/test-reporter@v1
         with:
           name: frontend-vitest
-          path: test-results/vitest-junit.xml
+          path: frontend/test-results/vitest-junit.xml
           reporter: java-junit
           fail-on-error: false
       - name: Upload frontend coverage
@@ -50,14 +50,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: frontend-coverage
-          path: coverage
+          path: frontend/coverage
           if-no-files-found: ignore
       - name: Upload frontend dist
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: frontend-dist
-          path: dist
+          path: frontend/dist
           if-no-files-found: error
 
   build-backend:
@@ -86,7 +86,7 @@ jobs:
         uses: dorny/test-reporter@v1
         with:
           name: backend-junit
-          path: build/test-results/test/*.xml
+          path: backend/build/test-results/test/*.xml
           reporter: java-junit
           fail-on-error: false
       - name: Upload backend coverage (JaCoCo HTML)
@@ -94,19 +94,19 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: backend-coverage
-          path: build/reports/jacoco/test/html
+          path: backend/build/reports/jacoco/test/html
           if-no-files-found: ignore
       - name: Upload backend test report (HTML)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: backend-tests
-          path: build/reports/tests/test
+          path: backend/build/reports/tests/test
           if-no-files-found: ignore
       - name: Upload backend boot jar
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: backend-boot-jar
-          path: build/libs/*.jar
+          path: backend/build/libs/*.jar
 
