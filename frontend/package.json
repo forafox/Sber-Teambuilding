@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "pretest:ci": "mkdir -p test-results",
+    "test:ci": "vitest run --coverage --reporter=default --reporter=junit --outputFile ./test-results/vitest-junit.xml",
     "preview": "vite preview",
     "prettier": "prettier . --write",
     "generate-api": "npx swagger-typescript-api -p http://localhost:8080/v3/api-docs -o src/api -n api.gen.ts --axios",

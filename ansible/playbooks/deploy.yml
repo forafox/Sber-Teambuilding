@@ -1,0 +1,7 @@
+---
+- name: Deploy Sber TeamBuilding stack
+  hosts: prod
+  become: false
+  roles:
+    - role: deploy
+

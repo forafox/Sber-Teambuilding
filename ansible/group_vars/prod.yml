@@ -1,0 +1,17 @@
+deploy_dir: /home/efedorov/Projects/sber-teambuilding
+compose_files:
+  - compose.yaml
+  - compose.prod.yaml
+monitoring_dir: monitoring
+frontend_image_name: sber-frontend
+backend_image_name: sber-backend
+frontend_version: latest
+backend_version: latest
+frontend_image: "ghcr.io/fegor04/{{ frontend_image_name }}:{{ frontend_version }}"
+backend_image: "ghcr.io/fegor04/{{ backend_image_name }}:{{ backend_version }}"
+postgres_image: postgres:17.2
+traefik_image: traefik:3.2
+app_env: {}
+ghcr_username: null
+ghcr_token: null
+
