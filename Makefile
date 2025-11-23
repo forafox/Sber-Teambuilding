@@ -5,7 +5,7 @@ BACKEND_IMAGE_NAME ?= sber-backend
 
 
 FRONTEND_VERSION ?= 0.11.3
-BACKEND_VERSION ?= 0.18.0
+BACKEND_VERSION ?= 0.18.1
 
 
 FRONTEND_IMAGE = ghcr.io/fegor04/${FRONTEND_IMAGE_NAME}:${FRONTEND_VERSION}
@@ -19,7 +19,7 @@ export
 all: build-backend build-frontend
 
 build-backend: backend
-	cd backend && ./gradlew bootBuildImage --imageName=${BACKEND_IMAGE}
+	cd backend && ./gradlew bootJar && docker build . -t ${BACKEND_IMAGE}
 
 build-frontend: frontend
 	cd frontend && docker build . -t ${FRONTEND_IMAGE}

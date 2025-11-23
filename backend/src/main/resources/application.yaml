@@ -36,3 +36,14 @@ gigachat:
   api:
     clientId: ${GIGACHAT_CLIENT_ID:client-id}
     authorizationKey: ${GIGACHAT_AUTHORIZATION_KEY:key}
+server:
+  allowed-hosts: '*'
+  forward-headers-strategy: native
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    prometheus:
+      enabled: true
