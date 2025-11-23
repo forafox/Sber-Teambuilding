@@ -8,7 +8,7 @@
         <module name="ImportOrder">
             <property name="option" value="top"/>
             <property name="sortStaticImportsAlphabetically" value="true"/>
-            <property name="separateLineBetweenGroups" value="true"/>
+            <property name="separatedStaticGroups" value="true"/>
         </module>
         <module name="UnusedImports"/>
         <module name="NeedBraces"/>
