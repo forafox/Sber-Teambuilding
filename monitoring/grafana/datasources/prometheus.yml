@@ -1,10 +1,10 @@
 apiVersion: 1
 
 datasources:
-  - name: Prometheus
+  - name: prometheus
     type: prometheus
     access: proxy
-    url: http://prometheus:9090
+    url: http://sber-prometheus:9090
     isDefault: true
     editable: true
 
