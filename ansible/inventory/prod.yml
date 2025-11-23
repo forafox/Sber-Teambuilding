@@ -1,0 +1,8 @@
+all:
+  children:
+    prod:
+      hosts:
+        sber-prod:
+          ansible_host: 85.208.86.167
+          ansible_user: efedorov
+

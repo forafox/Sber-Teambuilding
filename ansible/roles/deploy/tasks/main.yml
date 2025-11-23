@@ -1,0 +1,77 @@
+---
+- name: Ensure Docker engine is installed
+  become: true
+  ansible.builtin.apt:
+    name:
+      - docker.io
+      - docker-compose-plugin
+    state: present
+    update_cache: true
+
+- name: Ensure deploy directory exists
+  ansible.builtin.file:
+    path: "{{ deploy_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Copy compose files
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../../{{ item }}"
+    dest: "{{ deploy_dir }}/{{ item }}"
+    mode: "0644"
+  loop: "{{ compose_files }}"
+
+- name: Sync monitoring configuration
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../../{{ monitoring_dir }}/"
+    dest: "{{ deploy_dir }}/{{ monitoring_dir }}/"
+    mode: preserve
+
+- name: Render .env file
+  ansible.builtin.template:
+    src: "env.j2"
+    dest: "{{ deploy_dir }}/.env"
+    mode: "0600"
+  when: (app_env | default({})) | length > 0
+
+- name: Log in to GHCR
+  become: true
+  ansible.builtin.command: >
+    docker login ghcr.io -u {{ ghcr_username }} --password-stdin
+  args:
+    stdin: "{{ ghcr_token }}"
+  no_log: true
+  when:
+    - (ghcr_username | default("")) | length > 0
+    - (ghcr_token | default("")) | length > 0
+
+- name: Pull latest images
+  become: true
+  ansible.builtin.command: >
+    docker compose -f compose.yaml -f compose.prod.yaml pull
+  args:
+    chdir: "{{ deploy_dir }}"
+  environment: "{{ {
+      'FRONTEND_IMAGE': frontend_image,
+      'BACKEND_IMAGE': backend_image,
+      'FRONTEND_VERSION': frontend_version,
+      'BACKEND_VERSION': backend_version,
+      'POSTGRES_IMAGE': postgres_image,
+      'TRAEFIK_IMAGE': traefik_image
+    } | combine(app_env | default({})) }}"
+
+- name: Apply docker compose stack
+  become: true
+  ansible.builtin.command: >
+    docker compose -f compose.yaml -f compose.prod.yaml up -d --remove-orphans
+  args:
+    chdir: "{{ deploy_dir }}"
+  environment: "{{ {
+      'FRONTEND_IMAGE': frontend_image,
+      'BACKEND_IMAGE': backend_image,
+      'FRONTEND_VERSION': frontend_version,
+      'BACKEND_VERSION': backend_version,
+      'POSTGRES_IMAGE': postgres_image,
+      'TRAEFIK_IMAGE': traefik_image
+    } | combine(app_env | default({})) }}"
+

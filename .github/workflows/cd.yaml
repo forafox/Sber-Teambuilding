@@ -4,55 +4,110 @@ on:
   push:
     branches: ["main"]
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAMESPACE: ghcr.io/fegor04
+  FRONTEND_IMAGE_NAME: sber-frontend
+  BACKEND_IMAGE_NAME: sber-backend
+  IMAGE_TAG: ${{ github.sha }}
+  FRONTEND_VERSION: ${{ github.sha }}
+  BACKEND_VERSION: ${{ github.sha }}
+
 jobs:
-  build-backend:
+  build-and-push:
     runs-on: ubuntu-latest
-
     permissions:
       packages: write
       contents: read
-
+    env:
+      FRONTEND_VERSION: ${{ env.FRONTEND_VERSION }}
+      BACKEND_VERSION: ${{ env.BACKEND_VERSION }}
     steps:
       - uses: actions/checkout@v4
       - name: Log in to registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
       - name: Copy .env
         run: cp .env.example .env
-      - name: Build docker image
+      - name: Build backend image
         run: make build-backend
-      - name: Push docker image
-        run: make push-backend
-
-  build-frontend:
-    runs-on: ubuntu-latest
-
-    permissions:
-      packages: write
-      contents: read
-
-    steps:
-      - uses: actions/checkout@v4
-      - name: Log in to registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-      - name: Copy .env
-        run: cp .env.example .env
-      - name: Build docker image
+      - name: Build frontend image
         run: make build-frontend
-      - name: Push docker image
+      - name: Push backend image
+        run: make push-backend
+      - name: Push frontend image
         run: make push-frontend
-        
+
   deploy:
     runs-on: ubuntu-latest
-    needs: [build-backend, build-frontend]
+    needs: build-and-push
     concurrency: sber.efedorov.spb.su
+    permissions:
+      contents: read
+    env:
+      FRONTEND_VERSION: ${{ env.FRONTEND_VERSION }}
+      BACKEND_VERSION: ${{ env.BACKEND_VERSION }}
     steps:
-      - name: Pull & re-deploy
-        uses: appleboy/ssh-action@v1
-        with:
-          host: 85.208.86.167
-          username: efedorov
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            cd Projects/sber-teambuilding
-            git pull
-            make prod-up
+      - uses: actions/checkout@v4
+      - name: Configure SSH key
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/id_ansible
+          chmod 600 ~/.ssh/id_ansible
+          cat >> ~/.ssh/config <<'EOF'
+Host sber-prod
+  HostName 85.208.86.167
+  User efedorov
+  IdentityFile ~/.ssh/id_ansible
+  StrictHostKeyChecking no
+EOF
+      - name: Install Ansible
+        run: sudo apt-get update && sudo apt-get install -y ansible
+      - name: Generate Ansible variable file
+        env:
+          FRONTEND_VERSION: ${{ env.FRONTEND_VERSION }}
+          BACKEND_VERSION: ${{ env.BACKEND_VERSION }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APP_ENV_JSON: ${{ secrets.PROD_APP_ENV_JSON }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          data = {
+              "frontend_version": os.environ["FRONTEND_VERSION"],
+              "backend_version": os.environ["BACKEND_VERSION"],
+              "ghcr_username": os.environ["GITHUB_ACTOR"],
+              "ghcr_token": os.environ["GHCR_TOKEN"],
+              "app_env": {}
+          }
+
+          env_json = os.environ.get("APP_ENV_JSON")
+          if env_json:
+              data["app_env"] = json.loads(env_json)
+
+          def escape(value: str) -> str:
+              return value.replace("\\", "\\\\").replace('"', '\\"')
+
+          path = Path("ansible/vars.auto.yml")
+          path.parent.mkdir(parents=True, exist_ok=True)
+          with path.open("w", encoding="utf-8") as handle:
+              handle.write(f'frontend_version: "{escape(data["frontend_version"])}"\\n')
+              handle.write(f'backend_version: "{escape(data["backend_version"])}"\\n')
+              handle.write(f'ghcr_username: "{escape(data["ghcr_username"])}"\\n')
+              handle.write(f'ghcr_token: "{escape(data["ghcr_token"])}"\\n')
+              handle.write("app_env:\\n")
+              for key, value in data["app_env"].items():
+                  handle.write(f'  {key}: "{escape(str(value))}"\\n')
+          PY
+      - name: Deploy via Ansible
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: "False"
+          ANSIBLE_PRIVATE_KEY_FILE: ~/.ssh/id_ansible
+        run: |
+          ansible-playbook \
+            -i ansible/inventory/prod.yml \
+            ansible/playbooks/deploy.yml \
+            --extra-vars "@ansible/vars.auto.yml"

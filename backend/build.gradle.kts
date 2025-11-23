@@ -1,3 +1,4 @@
+import org.gradle.api.plugins.quality.Checkstyle
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 fun removeVIfFirst(s: String) = if (s.startsWith("v")) s.removePrefix("v") else s
@@ -8,6 +9,7 @@ plugins {
     id("org.springframework.boot") version "3.3.4"
     id("io.spring.dependency-management") version "1.1.6"
     jacoco
+    checkstyle
 }
 
 group = "com.jellyone"
@@ -70,6 +72,19 @@ java {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+checkstyle {
+    toolVersion = "10.20.2"
+    configFile = file("config/checkstyle/checkstyle.xml")
+    configDirectory.set(configFile.parentFile)
+}
+
+tasks.withType<Checkstyle>().configureEach {
+    reports {
+        xml.required.set(false)
+        html.required.set(true)
+    }
 }
 
 tasks.withType<BootJar> {

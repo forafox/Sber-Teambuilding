@@ -1,10 +1,15 @@
 name: ci
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
+  workflow_dispatch:
+  
+permissions:
+  contents: read
+  pull-requests: write
+  actions: read
+  checks: write
 
 jobs:
   build-frontend:
@@ -12,45 +17,112 @@ jobs:
       run:
         working-directory: ./frontend
     runs-on: ubuntu-latest
-    
+
     permissions:
       contents: read
       pull-requests: write
+      actions: read
+      checks: write
 
     steps:
-    - uses: actions/checkout@v4
-    - name: 'Install Node'
-      uses: actions/setup-node@v4
-      with:
-        node-version: '22.5.x'
-    - name: Install dependencies
-      run: npm install -g pnpm && pnpm install
-    - name: Build
-      run: pnpm run build
-    - name: Test
-      run: pnpm run test
+      - uses: actions/checkout@v4
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.5.x"
+      - name: Enable Corepack
+        run: corepack enable pnpm
+      - name: Enable pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Lint
+        run: pnpm run lint
+      - name: Test
+        run: pnpm run test:ci
+      - name: Build
+        run: pnpm run build
+      - name: Publish Vitest report to PR
+        if: |
+          always() && (
+            github.event_name != 'pull_request' ||
+            github.event.pull_request.head.repo.fork == false
+          )
+        uses: dorny/test-reporter@v1
+        with:
+          name: frontend-vitest
+          path: frontend/test-results/vitest-junit.xml
+          reporter: java-junit
+          fail-on-error: false
+      - name: Upload frontend coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: frontend/coverage
+          if-no-files-found: ignore
+      - name: Upload frontend dist
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
+          if-no-files-found: error
 
   build-backend:
     permissions:
       contents: read
-      issues: write
       pull-requests: write
+      actions: read
+      checks: write
     defaults:
       run:
         working-directory: ./backend
     runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
 
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v4
-     
-    - name: Build
-      run: ./gradlew build
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Run tests and quality gates
+        run: ./gradlew clean test jacocoTestReport checkstyleMain checkstyleTest
+      - name: Publish backend test report
+        if: |
+          always() && (
+            github.event_name != 'pull_request' ||
+            github.event.pull_request.head.repo.fork == false
+          )
+        uses: dorny/test-reporter@v1
+        with:
+          name: backend-junit
+          path: backend/build/test-results/test/*.xml
+          reporter: java-junit
+          fail-on-error: false
+      - name: Upload backend coverage (JaCoCo HTML)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/build/reports/jacoco/test/html
+          if-no-files-found: ignore
+      - name: Upload backend test report (HTML)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-tests
+          path: backend/build/reports/tests/test
+          if-no-files-found: ignore
+      - name: Upload backend boot jar
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-boot-jar
+          path: backend/build/libs/*.jar
 
