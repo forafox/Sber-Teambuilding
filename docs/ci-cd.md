@@ -18,7 +18,7 @@
   - Frontend job now runs lint + `pnpm test:ci` (Vitest w/coverage + JUnit) + build, uploads coverage/dist artifacts, and posts test results via `dorny/test-reporter`.
   - Backend job runs `./gradlew clean test jacocoTestReport checkstyleMain checkstyleTest`, publishes JUnit + HTML reports + JaCoCo artifacts, and ships bootable JARs.
   - `frontend/vite.config.ts` enables `json/html/lcov` coverage reporters; `frontend/package.json` exposes a CI-friendly test command.
-  - Checkstyle is configured via `config/checkstyle/checkstyle.xml` and wired into `backend/build.gradle.kts`.
+  - Checkstyle is configured via `backend/config/checkstyle/checkstyle.xml` and wired into `backend/build.gradle.kts`.
 - **Deployment automation** (`ansible/`)
   - Inventory (`inventory/prod.yml`), group vars, and a reusable `deploy` role install Docker, sync compose/manifests, authenticate to GHCR, pull tagged images, and run `docker compose up -d`.
   - Optional `.env` templating is available when `app_env` is provided (e.g., via secret JSON). Otherwise existing secrets remain untouched while Compose picks up new image tags via injected env vars.
