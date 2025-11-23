@@ -41,6 +41,47 @@ services:
         condition: "service_healthy"
     networks:
       - internal
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: sber__prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - internal
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+  grafana:
+    image: grafana/grafana:latest
+    container_name: sber__grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    ports:
+      - "3000:3000"
+    networks:
+      - internal
+    depends_on:
+      prometheus:
+        condition: "service_healthy"
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health"]
   postgres:
     image: ${POSTGRES_IMAGE}
     container_name: sber__postgres
@@ -59,4 +100,8 @@ services:
       - internal
 volumes:
   pgdata:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
     driver: local

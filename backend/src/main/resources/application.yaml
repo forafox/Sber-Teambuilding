@@ -36,3 +36,14 @@ gigachat:
   api:
     clientId: ${GIGACHAT_CLIENT_ID:client-id}
     authorizationKey: ${GIGACHAT_AUTHORIZATION_KEY:key}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name:sber-teambuilding-backend}
