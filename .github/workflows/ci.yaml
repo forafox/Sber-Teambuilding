@@ -38,7 +38,11 @@ jobs:
       - name: Build
         run: pnpm run build
       - name: Publish Vitest report to PR
-        if: always()
+        if: |
+          always() && (
+            github.event_name != 'pull_request' ||
+            github.event.pull_request.head.repo.fork == false
+          )
         uses: dorny/test-reporter@v1
         with:
           name: frontend-vitest
@@ -82,7 +86,11 @@ jobs:
       - name: Run tests and quality gates
         run: ./gradlew clean test jacocoTestReport checkstyleMain checkstyleTest
       - name: Publish backend test report
-        if: always()
+        if: |
+          always() && (
+            github.event_name != 'pull_request' ||
+            github.event.pull_request.head.repo.fork == false
+          )
         uses: dorny/test-reporter@v1
         with:
           name: backend-junit
