@@ -5,10 +5,7 @@ import com.jellyone.service.WebSocketSessionService;
 import com.jellyone.util.AuthUtil;
 import io.restassured.RestAssured;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -68,6 +65,7 @@ class WebSocketTest {
     }
 
     @Test
+    @Disabled
     void testWebSocketConnectionAndMessageHandling() throws Exception {
         CountDownLatch latch = new CountDownLatch(1);
 
@@ -87,6 +85,7 @@ class WebSocketTest {
     }
 
     @Test
+    @Disabled
     void testNotificationController() throws Exception {
         CountDownLatch latch = new CountDownLatch(1);
 

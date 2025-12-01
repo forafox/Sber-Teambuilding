@@ -17,6 +17,9 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
 @AutoConfigureMockMvc
@@ -189,5 +192,81 @@ class AuthControllerTest {
                 .post("/api/auth/register")
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value());
+    }
+
+    @Test
+    void registerNewUserShouldReturnOk() {
+        // Проверяем, что можно зарегистрировать нового уникального пользователя
+        SignUpRequest signUpRequest = new SignUpRequest("testuser5", "password", "Test User 5", "test5@test.com");
+
+        RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(signUpRequest)
+                .accept(ContentType.JSON)
+                .when()
+                .post("/api/auth/register")
+                .then()
+                .statusCode(HttpStatus.OK.value());
+    }
+
+    @Test
+    void loginNewlyRegisteredUserShouldReturnOk() {
+        // Сначала регистрируем нового пользователя
+        SignUpRequest signUpRequest = new SignUpRequest("testuser6", "password", "Test User 6", "test6@test.com");
+
+        RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(signUpRequest)
+                .accept(ContentType.JSON)
+                .when()
+                .post("/api/auth/register")
+                .then()
+                .statusCode(HttpStatus.OK.value());
+
+        // Логинимся новым пользователем
+        JwtRequest loginRequest = new JwtRequest("testuser6", "password");
+
+        RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(loginRequest)
+                .accept(ContentType.JSON)
+                .when()
+                .post("/api/auth/login")
+                .then()
+                .statusCode(HttpStatus.OK.value());
+    }
+
+    @Test
+    void refreshWithValidRefreshTokenShouldReturnNewTokens() {
+        // Используем уже существующий refreshToken из setup
+        JwtResponse response = RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(refreshToken)
+                .when()
+                .post("/api/auth/refresh")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .as(JwtResponse.class);
+
+        // Проверяем, что новые токены не пустые
+        assertNotNull(response.accessToken());
+        assertNotNull(response.refreshToken());
+    }
+
+    @Test
+    void registerDifferentUsernamesShouldAllSucceed() {
+        // Регистрируем сразу несколько разных пользователей
+        for (int i = 7; i <= 9; i++) {
+            SignUpRequest signUpRequest = new SignUpRequest("testuser" + i, "password", "Test User " + i, "test" + i + "@test.com");
+            RestAssured.given()
+                    .contentType(ContentType.JSON)
+                    .body(signUpRequest)
+                    .accept(ContentType.JSON)
+                    .when()
+                    .post("/api/auth/register")
+                    .then()
+                    .statusCode(HttpStatus.OK.value());
+        }
     }
 }
